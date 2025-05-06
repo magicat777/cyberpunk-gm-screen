@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk RED GM Screen - Simple Desktop</title>
+    
+    <!-- Use minimal CSS as base, then try to load the other CSS files -->
+    <link rel="stylesheet" href="css/minimal.css">
+    <link rel="stylesheet" href="css/desktop-layout.css">
+    <link rel="stylesheet" href="css/gm-tools.css">
+    <link rel="stylesheet" href="css/initiative-tracker.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Inline styles for critical elements */
+        .main-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #1a1a1a;
+            border-right: 1px solid #39ff14;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .content-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background-color: #121212;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+        }
+        
+        .sidebar-title {
+            color: #39ff14;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-item {
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 4px;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #222;
+            color: #39ff14;
+        }
+        
+        .panel {
+            position: absolute;
+            background-color: #1a1a1a;
+            border: 1px solid #39ff14;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+            min-width: 300px;
+            min-height: 200px;
+            overflow: auto;
+        }
+        
+        .panel-header {
+            background-color: #0a0e11;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            cursor: move;
+            border-bottom: 1px solid #39ff14;
+        }
+        
+        .panel-title {
+            color: #39ff14;
+            font-weight: bold;
+        }
+        
+        .panel-close {
+            color: #ff3a47;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 16px;
+        }
+        
+        .panel-content {
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Version indicator -->
+    <div class="version-indicator">v2.0.77 Simplified</div>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h1>CP RED GM</h1>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Characters</div>
+                <div class="sidebar-item" onclick="addPanel('Character Manager', characterManagerContent)">Character Manager</div>
+                <div class="sidebar-item" onclick="addPanel('NPC Generator', npcGeneratorContent)">NPC Generator</div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Tools</div>
+                <div class="sidebar-item" onclick="addPanel('Dice Roller', diceRollerContent)">Dice Roller</div>
+                <div class="sidebar-item" onclick="addPanel('Initiative Tracker', initiativeTrackerContent)">Initiative Tracker</div>
+                <div class="sidebar-item" onclick="addPanel('Notes', notesContent)">Notes</div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Rules</div>
+                <div class="sidebar-item" onclick="addPanel('Combat Reference', combatReferenceContent)">Combat Reference</div>
+                <div class="sidebar-item" onclick="addPanel('Skill Reference', skillReferenceContent)">Skill Reference</div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Settings</div>
+                <div class="sidebar-item" onclick="logout()">Logout</div>
+            </div>
+        </div>
+        
+        <!-- Content Area (Panels will be added here) -->
+        <div class="content-area" id="content-area">
+            <!-- Panels will be dynamically added here -->
+        </div>
+    </div>
+    
+    <script>
+        // Simple panel management system
+        let panelIdCounter = 1;
+        let panels = [];
+        
+        // Add a new panel to the content area
+        function addPanel(title, contentGenerator) {
+            try {
+                const contentArea = document.getElementById('content-area');
+                if (!contentArea) {
+                    console.error('Content area not found');
+                    alert('Error: Content area not found. Page structure may be corrupted.');
+                    return null;
+                }
+                
+                if (!contentGenerator) {
+                    console.error('Content generator not provided for:', title);
+                    alert(`Error: Content generator not found for panel "${title}"`);
+                    return null;
+                }
+                
+                const panelId = `panel-${panelIdCounter++}`;
+                
+                // Create panel element
+                const panel = document.createElement('div');
+                panel.id = panelId;
+                panel.className = 'panel';
+                panel.style.left = `${Math.random() * 400}px`;
+                panel.style.top = `${Math.random() * 200}px`;
+                
+                // Create panel header
+                const header = document.createElement('div');
+                header.className = 'panel-header';
+                
+                const titleEl = document.createElement('div');
+                titleEl.className = 'panel-title';
+                titleEl.textContent = title;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'panel-close';
+                closeBtn.textContent = '×';
+                closeBtn.onclick = () => removePanel(panelId);
+                
+                header.appendChild(titleEl);
+                header.appendChild(closeBtn);
+                
+                // Create panel content
+                const content = document.createElement('div');
+                content.className = 'panel-content';
+                
+                try {
+                    content.innerHTML = contentGenerator();
+                } catch (error) {
+                    console.error('Error generating content for panel:', title, error);
+                    content.innerHTML = `<p>Error loading panel content: ${error.message}</p>`;
+                }
+                
+                // Assemble panel
+                panel.appendChild(header);
+                panel.appendChild(content);
+                
+                // Add to content area
+                contentArea.appendChild(panel);
+                
+                // Make draggable
+                makeDraggable(panel);
+                
+                // Add to panels array
+                panels.push({
+                    id: panelId,
+                    title: title,
+                    left: panel.style.left,
+                    top: panel.style.top
+                });
+                
+                // Save panel state
+                savePanelState();
+                
+                return panel;
+            } catch (error) {
+                console.error('Error creating panel:', error);
+                alert(`Error creating panel: ${error.message}`);
+                return null;
+            }
+        }
+        
+        // Remove a panel by id
+        function removePanel(panelId) {
+            const panel = document.getElementById(panelId);
+            if (panel) {
+                panel.remove();
+                panels = panels.filter(p => p.id !== panelId);
+                savePanelState();
+            }
+        }
+        
+        // Make an element draggable
+        function makeDraggable(element) {
+            const header = element.querySelector('.panel-header');
+            let isDragging = false;
+            let offsetX = 0;
+            let offsetY = 0;
+            
+            header.addEventListener('mousedown', startDrag);
+            
+            function startDrag(e) {
+                isDragging = true;
+                offsetX = e.clientX - element.getBoundingClientRect().left;
+                offsetY = e.clientY - element.getBoundingClientRect().top;
+                
+                // Add event listeners
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', stopDrag);
+                
+                // Bring to front
+                bringToFront(element);
+                
+                e.preventDefault();
+            }
+            
+            function drag(e) {
+                if (!isDragging) return;
+                
+                const x = e.clientX - offsetX;
+                const y = e.clientY - offsetY;
+                
+                element.style.left = `${x}px`;
+                element.style.top = `${y}px`;
+            }
+            
+            function stopDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('mouseup', stopDrag);
+                
+                // Save state after drag
+                savePanelState();
+            }
+        }
+        
+        // Bring a panel to the front
+        function bringToFront(panel) {
+            // Set all panels to z-index 1
+            document.querySelectorAll('.panel').forEach(p => {
+                p.style.zIndex = 1;
+            });
+            
+            // Set this panel to z-index 10
+            panel.style.zIndex = 10;
+        }
+        
+        // Save panel state to localStorage
+        function savePanelState() {
+            try {
+                localStorage.setItem('cyberpunk-gm-panels', JSON.stringify(panels));
+                console.log('Panel state saved');
+            } catch (error) {
+                console.error('Failed to save panel state:', error);
+            }
+        }
+        
+        // Load panel state from localStorage
+        function loadPanelState() {
+            try {
+                const savedPanels = localStorage.getItem('cyberpunk-gm-panels');
+                if (savedPanels) {
+                    try {
+                        const parsedPanels = JSON.parse(savedPanels);
+                        if (Array.isArray(parsedPanels)) {
+                            parsedPanels.forEach(panel => {
+                                if (!panel || !panel.title) {
+                                    console.error('Invalid panel data:', panel);
+                                    return;
+                                }
+                                
+                                const contentFunction = getContentFunction(panel.title);
+                                if (contentFunction) {
+                                    const newPanel = addPanel(panel.title, contentFunction);
+                                    if (newPanel) {
+                                        if (panel.left) newPanel.style.left = panel.left;
+                                        if (panel.top) newPanel.style.top = panel.top;
+                                    }
+                                } else {
+                                    console.error('Content function not found for panel title:', panel.title);
+                                }
+                            });
+                            console.log('Panel state loaded successfully');
+                        } else {
+                            console.error('Saved panels is not an array:', parsedPanels);
+                            // Clear invalid data
+                            localStorage.removeItem('cyberpunk-gm-panels');
+                        }
+                    } catch (parseError) {
+                        console.error('Error parsing saved panels:', parseError);
+                        // Clear corrupted data
+                        localStorage.removeItem('cyberpunk-gm-panels');
+                    }
+                } else {
+                    console.log('No saved panels found');
+                }
+            } catch (error) {
+                console.error('Failed to load panel state:', error);
+                // Add a recovery option
+                const recover = confirm('Error loading saved layout. Would you like to reset the saved layout?');
+                if (recover) {
+                    localStorage.removeItem('cyberpunk-gm-panels');
+                    // Reload page
+                    window.location.reload();
+                }
+            }
+        }
+        
+        // Get content generator function by panel title
+        function getContentFunction(title) {
+            const contentMap = {
+                'Character Manager': characterManagerContent,
+                'NPC Generator': npcGeneratorContent,
+                'Dice Roller': diceRollerContent,
+                'Initiative Tracker': initiativeTrackerContent,
+                'Notes': notesContent,
+                'Combat Reference': combatReferenceContent,
+                'Skill Reference': skillReferenceContent
+            };
+            
+            return contentMap[title];
+        }
+        
+        // Content generators for each panel type
+        function characterManagerContent() {
+            return `
+                <h3>Character Manager</h3>
+                <div>
+                    <button onclick="alert('Add character functionality would go here')">Add Character</button>
+                    <button onclick="alert('Edit character functionality would go here')">Edit Character</button>
+                </div>
+                <div style="margin-top: 15px;">
+                    <div style="border: 1px solid #333; padding: 10px; margin-bottom: 10px;">
+                        <strong>Johnny Silverhand</strong><br>
+                        Role: Rockerboy<br>
+                        HP: 40/45
+                    </div>
+                    <div style="border: 1px solid #333; padding: 10px; margin-bottom: 10px;">
+                        <strong>Alt Cunningham</strong><br>
+                        Role: Netrunner<br>
+                        HP: 32/35
+                    </div>
+                </div>
+            `;
+        }
+        
+        function npcGeneratorContent() {
+            return `
+                <h3>NPC Generator</h3>
+                <div>
+                    <label>NPC Type:
+                        <select>
+                            <option>Corporate</option>
+                            <option>Fixer</option>
+                            <option>Nomad</option>
+                            <option>Street Punk</option>
+                        </select>
+                    </label>
+                </div>
+                <div>
+                    <button onclick="alert('Generate NPC functionality would go here')">Generate</button>
+                </div>
+            `;
+        }
+        
+        function diceRollerContent() {
+            return `
+                <h3>Dice Roller</h3>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="number" min="1" max="10" value="1" id="dice-count" style="width: 60px;">
+                    <span>d</span>
+                    <select id="dice-type" style="width: 80px;">
+                        <option value="4">4</option>
+                        <option value="6">6</option>
+                        <option value="8">8</option>
+                        <option value="10" selected>10</option>
+                        <option value="12">12</option>
+                        <option value="20">20</option>
+                        <option value="100">100</option>
+                    </select>
+                    <button onclick="rollDice()">Roll</button>
+                </div>
+                <div id="dice-results" style="border: 1px solid #333; padding: 10px; min-height: 100px;">
+                    Roll results will appear here...
+                </div>
+            `;
+        }
+        
+        function initiativeTrackerContent() {
+            return `
+                <h3>Initiative Tracker</h3>
+                <button onclick="alert('Add combatant functionality would go here')">Add Combatant</button>
+                <div style="margin-top: 15px;">
+                    <ol>
+                        <li style="padding: 8px; border-bottom: 1px solid #333;">Morgan Blackhand - 18</li>
+                        <li style="padding: 8px; border-bottom: 1px solid #333;">Corp Security - 15</li>
+                        <li style="padding: 8px; border-bottom: 1px solid #333;">Johnny Silverhand - 12</li>
+                        <li style="padding: 8px; border-bottom: 1px solid #333;">Spider Murphy - 9</li>
+                    </ol>
+                </div>
+                <button onclick="alert('Next Turn functionality would go here')">Next Turn</button>
+            `;
+        }
+        
+        function notesContent() {
+            return `
+                <h3>GM Notes</h3>
+                <textarea style="width: 100%; height: 200px; background-color: #1a1a1a; color: #ddd; border: 1px solid #333; padding: 10px;">Enter your notes here...</textarea>
+                <div style="margin-top: 10px;">
+                    <button onclick="alert('Save notes functionality would go here')">Save</button>
+                </div>
+            `;
+        }
+        
+        function combatReferenceContent() {
+            return `
+                <h3>Combat Reference</h3>
+                <h4 style="color: #05c2c7; margin-top: 15px;">Basic Attack</h4>
+                <p>Roll 1d10 + [STAT] + [SKILL] + [Bonuses] vs. DV</p>
+                
+                <h4 style="color: #05c2c7; margin-top: 15px;">DVs for Ranged Attacks</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <tr>
+                        <th style="text-align: left; border-bottom: 1px solid #333; padding: 5px;">Range</th>
+                        <th style="text-align: center; border-bottom: 1px solid #333; padding: 5px;">DV</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">0-6m (Close)</td>
+                        <td style="text-align: center; padding: 5px;">13</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">7-12m (Medium)</td>
+                        <td style="text-align: center; padding: 5px;">15</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">13-25m (Far)</td>
+                        <td style="text-align: center; padding: 5px;">20</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">26-50m (V.Far)</td>
+                        <td style="text-align: center; padding: 5px;">25</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">51-100m (Extreme)</td>
+                        <td style="text-align: center; padding: 5px;">30</td>
+                    </tr>
+                </table>
+            `;
+        }
+        
+        function skillReferenceContent() {
+            return `
+                <h3>Skill Reference</h3>
+                <h4 style="color: #05c2c7; margin-top: 15px;">Skill Check</h4>
+                <p>Roll 1d10 + [STAT] + [SKILL] vs. DV</p>
+                
+                <h4 style="color: #05c2c7; margin-top: 15px;">Standard Difficulty Values</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <tr>
+                        <th style="text-align: left; border-bottom: 1px solid #333; padding: 5px;">Task Difficulty</th>
+                        <th style="text-align: center; border-bottom: 1px solid #333; padding: 5px;">DV</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">Everyday</td>
+                        <td style="text-align: center; padding: 5px;">9</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">Average</td>
+                        <td style="text-align: center; padding: 5px;">13</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">Difficult</td>
+                        <td style="text-align: center; padding: 5px;">15</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">Very Difficult</td>
+                        <td style="text-align: center; padding: 5px;">17</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">Extreme</td>
+                        <td style="text-align: center; padding: 5px;">21</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">Legendary</td>
+                        <td style="text-align: center; padding: 5px;">24</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">Superhuman</td>
+                        <td style="text-align: center; padding: 5px;">29</td>
+                    </tr>
+                </table>
+            `;
+        }
+        
+        // Simple dice rolling function
+        function rollDice() {
+            const diceCountEl = document.getElementById('dice-count');
+            const diceTypeEl = document.getElementById('dice-type');
+            
+            if (!diceCountEl || !diceTypeEl) {
+                console.error('Dice elements not found');
+                return;
+            }
+            
+            const count = parseInt(diceCountEl.value) || 1;
+            const type = parseInt(diceTypeEl.value) || 10;
+            
+            const results = [];
+            let total = 0;
+            
+            for (let i = 0; i < count; i++) {
+                const roll = Math.floor(Math.random() * type) + 1;
+                results.push(roll);
+                total += roll;
+            }
+            
+            const resultsContainer = document.getElementById('dice-results');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = `
+                    <p>Rolled ${count}d${type}:</p>
+                    <p>${results.join(', ')}</p>
+                    <p>Total: ${total}</p>
+                `;
+            } else {
+                console.error('Results container not found');
+                alert(`Rolled ${count}d${type}: ${results.join(', ')}. Total: ${total}`);
+            }
+        }
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('cyberpunk-gm-authenticated');
+            window.location.href = 'secure-login.html';
+        }
+        
+        // Global error handler
+        window.addEventListener('error', function(event) {
+            console.error('Global error caught:', event.error);
+            
+            // Don't display errors for cross-origin scripts
+            if (event.filename && event.filename.startsWith(window.location.origin)) {
+                // Create error notification if not already present
+                if (!document.getElementById('error-notification')) {
+                    const notification = document.createElement('div');
+                    notification.id = 'error-notification';
+                    notification.style.cssText = `
+                        position: fixed;
+                        bottom: 20px;
+                        left: 20px;
+                        background: rgba(255, 0, 0, 0.8);
+                        color: white;
+                        padding: 10px;
+                        border-radius: 5px;
+                        font-family: monospace;
+                        z-index: 10000;
+                        max-width: 80%;
+                    `;
+                    notification.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 5px;">Error Detected</div>
+                        <div style="font-size: 12px;">${event.error.message || 'Unknown error'}</div>
+                        <div style="font-size: 10px; margin-top: 5px;">
+                            <a href="#" onclick="resetApp(); return false;" style="color: white; text-decoration: underline;">
+                                Reset Application
+                            </a>
+                        </div>
+                    `;
+                    document.body.appendChild(notification);
+                    
+                    // Auto-remove after 10 seconds
+                    setTimeout(() => {
+                        const el = document.getElementById('error-notification');
+                        if (el) el.remove();
+                    }, 10000);
+                }
+            }
+        });
+        
+        // Function to reset the application state
+        function resetApp() {
+            localStorage.removeItem('cyberpunk-gm-panels');
+            window.location.reload();
+        }
+        
+        // Initialize - load panel state
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Check authentication
+                if (localStorage.getItem('cyberpunk-gm-authenticated') !== 'true') {
+                    window.location.href = 'secure-login.html';
+                    return;
+                }
+                
+                // Load panels
+                loadPanelState();
+                
+                // If no panels were loaded, add a welcome panel
+                if (panels.length === 0) {
+                    addPanel('Welcome', () => `
+                        <h3>Welcome to Cyberpunk RED GM Screen</h3>
+                        <p>Use the sidebar on the left to add panels to your workspace.</p>
+                        <p>Drag panels by their headers to reposition them.</p>
+                        <p>Your layout will be automatically saved.</p>
+                        <p style="margin-top: 20px;">If you encounter any issues, click the "Reset Application" button that appears with error messages.</p>
+                    `);
+                }
+            } catch (error) {
+                console.error('Error during initialization:', error);
+                alert('Error during initialization: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+/* 
+ * Minimal CSS for Cyberpunk GM Screen
+ * This is a simplified version that will serve as a fallback
+ * if the other CSS files fail to load.
+ */
+
+:root {
+  /* Colors */
+  --primary-bg: #121212;
+  --secondary-bg: #1a1a1a;
+  --text-color: #ddd;
+  --accent-color: #39ff14;
+  --accent-cyan: #05c2c7;
+  --accent-red: #ff3a47;
+  
+  /* Typography */
+  --font-family: 'Share Tech Mono', monospace;
+  --base-font-size: 16px;
+  
+  /* Spacing */
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  
+  /* Effects */
+  --glow: 0 0 10px rgba(57, 255, 20, 0.5);
+  --shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Basic reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--primary-bg);
+  color: var(--text-color);
+  font-family: var(--font-family);
+  font-size: var(--base-font-size);
+  line-height: 1.5;
+  padding: var(--spacing-md);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--accent-color);
+  margin-bottom: var(--spacing-md);
+}
+
+h1 {
+  font-size: 2rem;
+  text-shadow: var(--glow);
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Layout components */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.panel {
+  background-color: var(--secondary-bg);
+  border: 1px solid var(--accent-color);
+  box-shadow: var(--shadow);
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  border-radius: 5px;
+}
+
+.panel-header {
+  border-bottom: 1px solid var(--accent-color);
+  color: var(--accent-color);
+  font-weight: bold;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  cursor: move;
+}
+
+.panel-content {
+  min-height: 100px;
+}
+
+/* Buttons */
+button, .button {
+  background-color: var(--secondary-bg);
+  border: 1px solid var(--accent-color);
+  color: var(--accent-color);
+  cursor: pointer;
+  font-family: var(--font-family);
+  padding: var(--spacing-sm) var(--spacing-md);
+  transition: all 0.3s ease;
+}
+
+button:hover, .button:hover {
+  background-color: var(--accent-color);
+  color: var(--primary-bg);
+}
+
+/* Form elements */
+input, select, textarea {
+  background-color: var(--secondary-bg);
+  border: 1px solid #444;
+  color: var(--text-color);
+  font-family: var(--font-family);
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+/* Utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-accent {
+  color: var(--accent-color);
+}
+
+.text-danger {
+  color: var(--accent-red);
+}
+
+.draggable-panel {
+  position: absolute;
+  background-color: var(--secondary-bg);
+  border: 1px solid var(--accent-color);
+  box-shadow: var(--shadow);
+  min-width: 300px;
+  min-height: 200px;
+  overflow: auto;
+  resize: both;
+}
+
+.resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 15px;
+  height: 15px;
+  cursor: nwse-resize;
+}
+
+/* Version indicator */
+.version-indicator {
+  position: fixed;
+  bottom: 5px;
+  left: 5px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+}
