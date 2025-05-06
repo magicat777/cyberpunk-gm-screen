@@ -12,6 +12,7 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            line-height: 1.6;
         }
         
         h1, h2 {
@@ -30,6 +31,10 @@
             border-bottom-color: #39ff14;
         }
         
+        .doc-section {
+            margin-bottom: 30px;
+        }
+        
         .doc-list {
             list-style-type: none;
             padding: 0;
@@ -40,6 +45,13 @@
             padding: 15px;
             background-color: #1a1a1a;
             border-left: 3px solid #39ff14;
+        }
+        
+        .section-title {
+            color: #ffcc00;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+            margin-top: 25px;
         }
         
         .doc-title {
@@ -67,38 +79,102 @@
             padding-top: 15px;
             border-top: 1px solid #333;
         }
+        
+        .highlight {
+            background-color: rgba(57, 255, 20, 0.1);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            padding: 3px 5px;
+            border-radius: 3px;
+        }
+        
+        .navigation-panel {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #1a1a1a;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
     <h1>Cyberpunk RED GM Screen v2.0.77</h1>
     <p>Welcome to the documentation for version 2.0.77 of the Cyberpunk RED GM Screen.</p>
     
-    <h2>Available Documentation</h2>
-    <ul class="doc-list">
-        <li>
-            <div class="doc-title"><a href="USER-GUIDE-v2.0.77.md">User Guide</a></div>
-            <div class="doc-description">Complete guide for using the v2.0.77 interface, including troubleshooting tips and keyboard shortcuts.</div>
-        </li>
-        <li>
-            <div class="doc-title"><a href="v2.0.77-CHANGELOG.md">Changelog</a></div>
-            <div class="doc-description">Detailed list of improvements and fixes in version 2.0.77.</div>
-        </li>
-        <li>
-            <div class="doc-title"><a href="README-v2.0.77.md">Readme</a></div>
-            <div class="doc-description">Overview of the v2.0.77 fork and its key features.</div>
-        </li>
-        <li>
-            <div class="doc-title"><a href="DESKTOP-INTERFACE-ANALYSIS.md">Interface Analysis</a></div>
-            <div class="doc-description">Technical analysis of the desktop interface and component connections.</div>
-        </li>
-        <li>
-            <div class="doc-title"><a href="IMPLEMENTATION-PLAN.md">Implementation Plan</a></div>
-            <div class="doc-description">Detailed plan for implementing the v2.0.77 improvements.</div>
-        </li>
-    </ul>
+    <div class="navigation-panel">
+        <a href="../index.html">Home</a>
+        <a href="../desktop-v2.0.77.html">GM Screen Interface</a>
+        <a href="../desktop-simple.html">Simple Interface</a>
+        <a href="../theme-demos-links.html">Theme Showcase</a>
+    </div>
+    
+    <div class="doc-section">
+        <h2 class="section-title">Site Navigation</h2>
+        <ul class="doc-list">
+            <li>
+                <div class="doc-title"><a href="../SITE-MAP.md">Site Map</a></div>
+                <div class="doc-description">Complete site structure with detailed descriptions of page organization and link conventions.</div>
+            </li>
+            <li>
+                <div class="doc-title"><a href="../VISUAL-SITE-MAP.md">Visual Site Map</a></div>
+                <div class="doc-description">Graphical representation of site structure, navigation flows, and component dependencies.</div>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="doc-section">
+        <h2 class="section-title">User Documentation</h2>
+        <ul class="doc-list">
+            <li>
+                <div class="doc-title"><a href="USER-GUIDE-v2.0.77.md">User Guide</a></div>
+                <div class="doc-description">Complete guide for using the v2.0.77 interface, including troubleshooting tips and keyboard shortcuts.</div>
+            </li>
+            <li>
+                <div class="doc-title"><a href="v2.0.77-CHANGELOG.md">Changelog</a></div>
+                <div class="doc-description">Detailed list of improvements and fixes in version 2.0.77.</div>
+            </li>
+            <li>
+                <div class="doc-title"><a href="README-v2.0.77.md">Readme</a></div>
+                <div class="doc-description">Overview of the v2.0.77 fork and its key features.</div>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="doc-section">
+        <h2 class="section-title">Technical Documentation</h2>
+        <ul class="doc-list">
+            <li>
+                <div class="doc-title"><a href="DESKTOP-INTERFACE-ANALYSIS.md">Interface Analysis</a></div>
+                <div class="doc-description">Technical analysis of the desktop interface and component connections.</div>
+            </li>
+            <li>
+                <div class="doc-title"><a href="IMPLEMENTATION-PLAN.md">Implementation Plan</a></div>
+                <div class="doc-description">Detailed plan for implementing the v2.0.77 improvements.</div>
+            </li>
+            <li>
+                <div class="doc-title"><a href="../GIT-WORKFLOW.md">Git Workflow</a></div>
+                <div class="doc-description">Git workflow guidelines and best practices for the project.</div>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="doc-section">
+        <h2 class="section-title">Performance Optimization</h2>
+        <ul class="doc-list">
+            <li>
+                <div class="doc-title"><a href="../docs/technical/performance-optimizations.md">Performance Optimizations</a></div>
+                <div class="doc-description">Detailed documentation of performance improvements in v2.0.78 and v2.0.79.</div>
+            </li>
+            <li>
+                <div class="doc-title"><a href="../docs/PERFORMANCE-IMPROVEMENTS-SUMMARY.md">Performance Summary</a></div>
+                <div class="doc-description">High-level overview of performance enhancements and their impact.</div>
+            </li>
+        </ul>
+    </div>
     
     <div class="back-link">
         <a href="../desktop-v2.0.77.html">← Back to GM Screen v2.0.77</a>
+        <span style="float: right;"><a href="../index.html">Home Page →</a></span>
     </div>
     
     <div class="version">v2.0.77</div>

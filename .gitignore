@@ -49,6 +49,8 @@ github-push-instructions.md
 # Task Scheduler files
 *.xml
 !cyberpunk-server-task.xml
+!sitemap.xml
+!docs/sitemap.xml
 
 # Keep essential scripts
 !setup-gm-screen-service.sh
