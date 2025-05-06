@@ -78,11 +78,16 @@
             justify-content: space-between;
             cursor: move;
             border-bottom: 1px solid #39ff14;
+            user-select: none; /* Prevent text selection during dragging */
+            position: relative;
+            z-index: 5;
         }
         
         .panel-title {
             color: #39ff14;
             font-weight: bold;
+            flex-grow: 1; /* Take up available space */
+            pointer-events: none; /* Make sure clicks go through to the header */
         }
         
         .panel-close {
@@ -91,10 +96,42 @@
             background: none;
             border: none;
             font-size: 16px;
+            margin-left: 10px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .panel-close:hover {
+            background-color: rgba(255, 58, 71, 0.2);
         }
         
         .panel-content {
             padding: 15px;
+        }
+        
+        /* Panel focus effect */
+        .panel-focus {
+            box-shadow: 0 0 0 2px #39ff14, 0 0 20px rgba(57, 255, 20, 0.4);
+            transition: box-shadow 0.2s ease;
+        }
+        
+        /* Dragging effect */
+        .dragging {
+            opacity: 0.9;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Make sure the panel header is actually clickable in its full width */
+        .panel-header * {
+            pointer-events: none;
+        }
+        
+        .panel-close {
+            pointer-events: auto !important;
         }
     </style>
 </head>
@@ -238,15 +275,45 @@
         function makeDraggable(element) {
             const header = element.querySelector('.panel-header');
             let isDragging = false;
-            let offsetX = 0;
-            let offsetY = 0;
+            let startX = 0;
+            let startY = 0;
+            let startLeft = 0;
+            let startTop = 0;
             
+            // Make the entire panel clickable to bring to front
+            element.addEventListener('mousedown', function(e) {
+                // Only handle clicks on the panel itself, not its children (unless it's the header)
+                if (e.target === element || e.target === header || header.contains(e.target)) {
+                    bringToFront(element);
+                    
+                    // If this is a click on the close button, don't prevent default
+                    const closeBtn = element.querySelector('.panel-close');
+                    if (closeBtn && (e.target === closeBtn || closeBtn.contains(e.target))) {
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                }
+            });
+            
+            // Make only the header draggable
             header.addEventListener('mousedown', startDrag);
             
             function startDrag(e) {
+                // Ignore if this is the close button
+                const closeBtn = element.querySelector('.panel-close');
+                if (closeBtn && (e.target === closeBtn || closeBtn.contains(e.target))) {
+                    return;
+                }
+                
+                // Start dragging
                 isDragging = true;
-                offsetX = e.clientX - element.getBoundingClientRect().left;
-                offsetY = e.clientY - element.getBoundingClientRect().top;
+                
+                // Record starting positions
+                startX = e.clientX;
+                startY = e.clientY;
+                startLeft = parseInt(element.style.left) || 0;
+                startTop = parseInt(element.style.top) || 0;
                 
                 // Add event listeners
                 document.addEventListener('mousemove', drag);
@@ -255,38 +322,62 @@
                 // Bring to front
                 bringToFront(element);
                 
+                // Add a visual indicator that we're dragging
+                element.classList.add('dragging');
+                
                 e.preventDefault();
             }
             
             function drag(e) {
                 if (!isDragging) return;
                 
-                const x = e.clientX - offsetX;
-                const y = e.clientY - offsetY;
+                // Calculate the distance moved
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
                 
-                element.style.left = `${x}px`;
-                element.style.top = `${y}px`;
+                // Apply the move as an offset from the starting position
+                element.style.left = `${startLeft + dx}px`;
+                element.style.top = `${startTop + dy}px`;
             }
             
-            function stopDrag() {
+            function stopDrag(e) {
+                if (!isDragging) return;
+                
+                // Stop dragging
                 isDragging = false;
                 document.removeEventListener('mousemove', drag);
                 document.removeEventListener('mouseup', stopDrag);
                 
+                // Remove dragging class
+                element.classList.remove('dragging');
+                
                 // Save state after drag
                 savePanelState();
+                
+                e.preventDefault();
             }
         }
         
         // Bring a panel to the front
         function bringToFront(panel) {
-            // Set all panels to z-index 1
-            document.querySelectorAll('.panel').forEach(p => {
-                p.style.zIndex = 1;
+            // Get all panels
+            const allPanels = document.querySelectorAll('.panel');
+            
+            // Find the highest z-index currently in use
+            let maxZ = 1;
+            allPanels.forEach(p => {
+                const zIndex = parseInt(p.style.zIndex || 1);
+                if (zIndex > maxZ) maxZ = zIndex;
             });
             
-            // Set this panel to z-index 10
-            panel.style.zIndex = 10;
+            // Set the selected panel to be one higher than the highest
+            panel.style.zIndex = maxZ + 1;
+            
+            // Add a highlight effect temporarily
+            panel.classList.add('panel-focus');
+            setTimeout(() => {
+                panel.classList.remove('panel-focus');
+            }, 300);
         }
         
         // Save panel state to localStorage
