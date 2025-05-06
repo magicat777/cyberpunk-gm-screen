@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Comparison Test - Cyberpunk RED GM Screen</title>
+    <link rel="stylesheet" href="css/cyberpunk-reset.css">
+    <link rel="stylesheet" href="css/drag-effects.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .test-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .test-header {
+            background-color: #2a2a2a;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+        }
+        
+        .test-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .test-controls {
+            display: flex;
+            align-items: center;
+        }
+        
+        .test-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .test-frame {
+            flex: 1;
+            border: none;
+            height: 100%;
+            box-sizing: border-box;
+            border-right: 1px solid #444;
+        }
+        
+        .test-frame:last-child {
+            border-right: none;
+        }
+        
+        .test-frame-container {
+            position: relative;
+            flex: 1;
+            height: 100%;
+        }
+        
+        .frame-label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #00ffff;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            z-index: 10;
+        }
+        
+        .metrics-container {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #00ffff;
+            padding: 10px;
+            border: 1px solid #00ffff;
+            font-family: monospace;
+            z-index: 100;
+            font-size: 0.9em;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-right: 20px;
+        }
+        
+        button {
+            background-color: #2a2a2a;
+            color: #00ffff;
+            border: 1px solid #00ffff;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        button:hover {
+            background-color: #3a3a3a;
+        }
+        
+        .panel-count {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+        .panel-count label {
+            margin-right: 10px;
+        }
+        
+        .panel-count input {
+            width: 60px;
+            padding: 5px;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            color: #e0e0e0;
+        }
+        
+        .results-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            overflow: auto;
+        }
+        
+        .results-panel.visible {
+            display: flex;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .results-title {
+            font-size: 1.5em;
+            color: #00ffff;
+        }
+        
+        .results-close {
+            background-color: transparent;
+            color: #00ffff;
+            border: 1px solid #00ffff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .results-data {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .result-section {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            padding: 15px;
+        }
+        
+        .result-title {
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #00ffff;
+        }
+        
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .result-table th, .result-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+        
+        .result-table th {
+            background-color: #2a2a2a;
+            color: #00ffff;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .low-fps {
+            color: #ff5555;
+        }
+        
+        .medium-fps {
+            color: #ffff55;
+        }
+        
+        .high-fps {
+            color: #55ff55;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1 class="test-title">Performance Comparison Test</h1>
+            <div class="test-controls">
+                <div class="panel-count">
+                    <label for="panel-count">Panel Count:</label>
+                    <input type="number" id="panel-count" min="1" max="100" value="10">
+                </div>
+                <div class="button-group">
+                    <button id="reset-test">Reset Test</button>
+                    <button id="add-panels">Add Panels</button>
+                    <button id="run-benchmark">Run Benchmark</button>
+                    <button id="show-results">Show Results</button>
+                </div>
+            </div>
+        </div>
+        <div class="test-content">
+            <div class="test-frame-container">
+                <div class="frame-label">Original (v1.0)</div>
+                <iframe src="about:blank" id="frame-original" class="test-frame"></iframe>
+                <div class="metrics-container" id="metrics-original">
+                    Initializing...
+                </div>
+            </div>
+            <div class="test-frame-container">
+                <div class="frame-label">v2.0.78 (RAF + Transforms)</div>
+                <iframe src="about:blank" id="frame-v2078" class="test-frame"></iframe>
+                <div class="metrics-container" id="metrics-v2078">
+                    Initializing...
+                </div>
+            </div>
+            <div class="test-frame-container">
+                <div class="frame-label">v2.0.79 (Event Delegation)</div>
+                <iframe src="about:blank" id="frame-v2079" class="test-frame"></iframe>
+                <div class="metrics-container" id="metrics-v2079">
+                    Initializing...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="results-panel" id="results-panel">
+        <div class="results-header">
+            <div class="results-title">Performance Benchmark Results</div>
+            <button class="results-close" id="results-close">×</button>
+        </div>
+        <div class="results-data" id="results-data">
+            <!-- Results will be populated here -->
+            <div class="result-section">
+                <h3 class="result-title">No benchmark data yet</h3>
+                <p>Run a benchmark test to see results.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Frame references
+        const frames = {
+            original: document.getElementById('frame-original'),
+            v2078: document.getElementById('frame-v2078'),
+            v2079: document.getElementById('frame-v2079')
+        };
+        
+        // Metrics containers
+        const metrics = {
+            original: document.getElementById('metrics-original'),
+            v2078: document.getElementById('metrics-v2078'),
+            v2079: document.getElementById('metrics-v2079')
+        };
+        
+        // Controls
+        const panelCountInput = document.getElementById('panel-count');
+        const resetButton = document.getElementById('reset-test');
+        const addPanelsButton = document.getElementById('add-panels');
+        const runBenchmarkButton = document.getElementById('run-benchmark');
+        const showResultsButton = document.getElementById('show-results');
+        const resultsPanel = document.getElementById('results-panel');
+        const resultsClose = document.getElementById('results-close');
+        const resultsData = document.getElementById('results-data');
+        
+        // Test configuration
+        const config = {
+            baseUrl: window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')),
+            frames: {
+                original: 'test-frames/original-test.html',
+                v2078: 'test-frames/v2078-test.html',
+                v2079: 'test-frames/v2079-test.html'
+            },
+            benchmarkResults: {
+                init: {},
+                drag: {},
+                multiple: {},
+                memory: {}
+            }
+        };
+        
+        // Inject test frames
+        function injectTestFrames() {
+            // Create test frame directory if needed
+            createTestFrameFiles().then(() => {
+                // Set frame sources
+                Object.keys(frames).forEach(key => {
+                    const frameSrc = `${config.baseUrl}/${config.frames[key]}`;
+                    frames[key].src = frameSrc;
+                });
+                
+                // Initialize frames with test harness
+                initializeFrameEvents();
+            });
+        }
+        
+        // Initialize communication with frames
+        function initializeFrameEvents() {
+            // Listen for messages from frames
+            window.addEventListener('message', (event) => {
+                // Verify origin for security
+                if (event.origin !== window.location.origin) return;
+                
+                const data = event.data;
+                if (!data || !data.type) return;
+                
+                // Handle different message types
+                switch (data.type) {
+                    case 'metrics-update':
+                        updateMetricsDisplay(data.version, data.metrics);
+                        break;
+                    case 'benchmark-result':
+                        storeBenchmarkResult(data);
+                        break;
+                }
+            });
+        }
+        
+        // Update metrics display for a specific version
+        function updateMetricsDisplay(version, metricsData) {
+            const container = metrics[version];
+            if (!container) return;
+            
+            // Format FPS with color
+            let fpsClass = 'low-fps';
+            if (metricsData.fps >= 50) {
+                fpsClass = 'high-fps';
+            } else if (metricsData.fps >= 30) {
+                fpsClass = 'medium-fps';
+            }
+            
+            // Update the display
+            container.innerHTML = `
+                <div>FPS: <span class="${fpsClass}">${metricsData.fps}</span></div>
+                <div>Panels: ${metricsData.panelCount}</div>
+                <div>Listeners: ${metricsData.listenerCount}</div>
+                <div>Memory: ${formatMemory(metricsData.memory)}</div>
+            `;
+        }
+        
+        // Format memory in MB
+        function formatMemory(bytes) {
+            if (!bytes) return 'N/A';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        
+        // Store benchmark result
+        function storeBenchmarkResult(data) {
+            if (!data.benchmarkType || !data.version) return;
+            
+            // Store the result
+            if (!config.benchmarkResults[data.benchmarkType]) {
+                config.benchmarkResults[data.benchmarkType] = {};
+            }
+            
+            config.benchmarkResults[data.benchmarkType][data.version] = data.results;
+            
+            // Check if all versions have reported for this benchmark type
+            const versions = Object.keys(frames);
+            const hasAllResults = versions.every(v => 
+                config.benchmarkResults[data.benchmarkType][v] !== undefined
+            );
+            
+            // If all results are in, update the results panel
+            if (hasAllResults && data.isLastTest) {
+                updateResultsPanel();
+                showResultsButton.disabled = false;
+                runBenchmarkButton.disabled = false;
+            }
+        }
+        
+        // Update the results panel with current benchmark data
+        function updateResultsPanel() {
+            resultsData.innerHTML = '';
+            
+            // Add initialization time section
+            if (config.benchmarkResults.init) {
+                addResultSection('Initialization Time', 'init', 'ms', 'Lower is better');
+            }
+            
+            // Add drag performance section
+            if (config.benchmarkResults.drag) {
+                addResultSection('Drag Performance', 'drag', 'FPS', 'Higher is better');
+            }
+            
+            // Add multiple panel performance section
+            if (config.benchmarkResults.multiple) {
+                addResultSection('Multiple Panels Performance', 'multiple', 'FPS', 'Higher is better');
+            }
+            
+            // Add memory usage section
+            if (config.benchmarkResults.memory) {
+                addResultSection('Memory Usage', 'memory', 'MB', 'Lower is better');
+            }
+        }
+        
+        // Add a result section to the results panel
+        function addResultSection(title, dataKey, unit, note) {
+            const data = config.benchmarkResults[dataKey];
+            if (!data) return;
+            
+            const section = document.createElement('div');
+            section.className = 'result-section';
+            
+            // Find best value
+            let bestValue;
+            let bestVersion;
+            let bestIsBetter = dataKey === 'drag' || dataKey === 'multiple'; // Higher is better for FPS
+            
+            Object.entries(data).forEach(([version, value]) => {
+                if (bestValue === undefined || 
+                    (bestIsBetter && value > bestValue) || 
+                    (!bestIsBetter && value < bestValue)) {
+                    bestValue = value;
+                    bestVersion = version;
+                }
+            });
+            
+            // Create section content
+            section.innerHTML = `
+                <h3 class="result-title">${title}</h3>
+                <p>${note}</p>
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>Version</th>
+                            <th>Value (${unit})</th>
+                            <th>Comparison</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Object.entries(data).map(([version, value]) => {
+                            const isBest = version === bestVersion;
+                            let comparison = '';
+                            
+                            if (version !== 'original') {
+                                const originalValue = data.original;
+                                const diff = value - originalValue;
+                                const percentChange = ((diff / originalValue) * 100).toFixed(1);
+                                const isImprovement = (bestIsBetter && diff > 0) || (!bestIsBetter && diff < 0);
+                                
+                                comparison = isImprovement 
+                                    ? `<span style="color: #55ff55;">+${percentChange}%</span>` 
+                                    : `<span style="color: #ff5555;">${percentChange}%</span>`;
+                            }
+                            
+                            return `
+                                <tr>
+                                    <td>${formatVersionName(version)}</td>
+                                    <td>${isBest ? `<span class="highlight">${value}</span>` : value}</td>
+                                    <td>${comparison}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            resultsData.appendChild(section);
+        }
+        
+        // Format version name for display
+        function formatVersionName(version) {
+            switch (version) {
+                case 'original': return 'Original (v1.0)';
+                case 'v2078': return 'v2.0.78 (RAF + Transforms)';
+                case 'v2079': return 'v2.0.79 (Event Delegation)';
+                default: return version;
+            }
+        }
+        
+        // Create test frame files if they don't exist
+        async function createTestFrameFiles() {
+            // This would normally create test frame files on the server
+            // For this demo, we'll assume they exist
+            return Promise.resolve();
+        }
+        
+        // Send command to all frames
+        function sendCommandToFrames(command, data = {}) {
+            Object.values(frames).forEach(frame => {
+                if (frame.contentWindow) {
+                    frame.contentWindow.postMessage({
+                        command, 
+                        ...data
+                    }, '*');
+                }
+            });
+        }
+        
+        // Event listeners
+        resetButton.addEventListener('click', () => {
+            sendCommandToFrames('reset');
+        });
+        
+        addPanelsButton.addEventListener('click', () => {
+            const count = parseInt(panelCountInput.value, 10) || 10;
+            sendCommandToFrames('add-panels', { count });
+        });
+        
+        runBenchmarkButton.addEventListener('click', () => {
+            // Clear previous results
+            config.benchmarkResults = {
+                init: {},
+                drag: {},
+                multiple: {},
+                memory: {}
+            };
+            
+            // Disable button during benchmark
+            runBenchmarkButton.disabled = true;
+            showResultsButton.disabled = true;
+            
+            // Run benchmarks
+            sendCommandToFrames('run-benchmark');
+        });
+        
+        showResultsButton.addEventListener('click', () => {
+            resultsPanel.classList.add('visible');
+        });
+        
+        resultsClose.addEventListener('click', () => {
+            resultsPanel.classList.remove('visible');
+        });
+        
+        // Initialize
+        injectTestFrames();
+    </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Delegation Drag Handler Test - Cyberpunk RED GM Screen</title>
+    <link rel="stylesheet" href="css/cyberpunk-reset.css">
+    <link rel="stylesheet" href="css/cyberpunk-ui.css">
+    <link rel="stylesheet" href="css/drag-effects.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .performance-monitor {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            font-family: monospace;
+            z-index: 100;
+        }
+        
+        /* Minimal panel styles if full stylesheet isn't loaded */
+        .draggable-panel {
+            position: absolute;
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            min-width: 300px;
+            min-height: 200px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .panel-header {
+            background-color: #2a2a2a;
+            padding: 10px;
+            font-weight: bold;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-content {
+            padding: 15px;
+        }
+        
+        .close-button {
+            cursor: pointer;
+            padding: 0 5px;
+        }
+        
+        /* Emergency reset button */
+        .emergency-reset {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #aa0000;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        
+        .emergency-reset:hover {
+            background-color: #ff0000;
+        }
+        
+        /* Controls container */
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border: 1px solid #00ffff;
+        }
+        
+        button {
+            background-color: #2a2a2a;
+            color: #00ffff;
+            border: 1px solid #00ffff;
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #3a3a3a;
+        }
+        
+        /* Diagnostic info panel */
+        .diagnostics {
+            position: fixed;
+            top: 20px;
+            right: 150px;
+            width: 300px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            font-family: monospace;
+            z-index: 100;
+            max-height: 500px;
+            overflow: auto;
+        }
+        
+        .panel-count {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        /* Create a grid for 10 panels */
+        .panel-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-gap: 10px;
+            margin-top: 80px;
+            margin-left: 20px;
+        }
+        
+        .panel-grid button {
+            width: 100%;
+            height: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button id="add-panel">Add New Panel</button>
+        <button id="reset-panels">Reset All Panels</button>
+        <button id="add-many-panels">Add 10 Panels</button>
+        <button id="show-diagnostics">Show Diagnostics</button>
+    </div>
+    
+    <button class="emergency-reset" id="emergency-reset">Emergency Reset</button>
+    
+    <div class="performance-monitor" id="performance-monitor">
+        FPS: 0<br>
+        Active: None<br>
+        Panels: 0
+    </div>
+    
+    <div class="diagnostics" id="diagnostics" style="display: none">
+        <h3>Diagnostics</h3>
+        <div id="diagnostic-content"></div>
+    </div>
+    
+    <div class="panel-grid" id="panel-grid">
+        <!-- Grid buttons will be added dynamically -->
+    </div>
+    
+    <!-- Initial panels will be added by JavaScript -->
+    
+    <!-- Load the event delegator first -->
+    <script src="js/event-delegation.js"></script>
+    
+    <script>
+        // Performance monitoring
+        const performanceMonitor = document.getElementById('performance-monitor');
+        const diagnosticsPanel = document.getElementById('diagnostics');
+        const diagnosticContent = document.getElementById('diagnostic-content');
+        let frameCount = 0;
+        let lastTime = performance.now();
+        let fps = 0;
+        let panelCount = 0;
+        
+        function updateFPS() {
+            const now = performance.now();
+            const elapsed = now - lastTime;
+            
+            if (elapsed >= 1000) {
+                fps = Math.round((frameCount * 1000) / elapsed);
+                frameCount = 0;
+                lastTime = now;
+                
+                // Count current panels
+                panelCount = document.querySelectorAll('.draggable-panel').length;
+                
+                const dragInfo = window.dragHandler?.getDiagnosticInfo() || {};
+                const activeStr = dragInfo.activeHandlers?.length 
+                    ? dragInfo.activeHandlers.join(', ') 
+                    : 'None';
+                
+                performanceMonitor.innerHTML = `FPS: ${fps}<br>Active: ${activeStr}<br>Panels: ${panelCount}`;
+            }
+            
+            frameCount++;
+            requestAnimationFrame(updateFPS);
+        }
+        
+        // Update diagnostics display
+        function updateDiagnostics() {
+            if (!window.dragHandler) return;
+            
+            const info = window.dragHandler.getDiagnosticInfo();
+            
+            // Format the diagnostics as JSON with indentation
+            diagnosticContent.innerHTML = `
+                <div class="panel-count">Panel Count: ${document.querySelectorAll('.draggable-panel').length}</div>
+                <pre>${JSON.stringify(info, null, 2)}</pre>
+            `;
+        }
+        
+        // Start monitoring
+        requestAnimationFrame(updateFPS);
+        
+        // Create panel grid buttons
+        function createPanelGrid() {
+            const grid = document.getElementById('panel-grid');
+            grid.innerHTML = '';
+            
+            for (let i = 1; i <= 10; i++) {
+                const button = document.createElement('button');
+                button.textContent = `Create Panel ${i}`;
+                button.addEventListener('click', () => {
+                    createPanel(`Grid Panel ${i}`, 300 + (i % 5) * 50, 200 + Math.floor(i / 5) * 40);
+                    
+                    // Initialize draggable functionality for the new panel
+                    if (window.dragHandler) {
+                        window.dragHandler.refreshDraggablePanels();
+                    }
+                });
+                grid.appendChild(button);
+            }
+        }
+        
+        // Wait for drag handler to load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                createPanelGrid();
+                initPanels();
+            }, 100);
+        });
+        
+        // Create initial panels
+        function initPanels() {
+            // Create some sample panels
+            for (let i = 0; i < 3; i++) {
+                createPanel(`Panel ${i+1}`, 100 + i*50, 100 + i*30);
+            }
+            
+            // Initialize draggable functionality
+            if (window.dragHandler) {
+                window.dragHandler.refreshDraggablePanels();
+                
+                console.log('Drag handler initialized with event delegation');
+            } else {
+                console.error('Drag handler not found! Make sure the script is loaded correctly.');
+            }
+        }
+        
+        // Create a new panel
+        function createPanel(title, left, top) {
+            const panel = document.createElement('div');
+            panel.className = 'draggable-panel';
+            panel.style.left = `${left}px`;
+            panel.style.top = `${top}px`;
+            panel.style.width = '400px';
+            panel.style.height = '300px';
+            
+            const header = document.createElement('div');
+            header.className = 'panel-header';
+            header.innerHTML = `${title} <span class="close-button">×</span>`;
+            
+            const content = document.createElement('div');
+            content.className = 'panel-content';
+            content.innerHTML = `
+                <p>This is a draggable panel using event delegation. Try dragging it by the header or resizing it from the bottom-right corner.</p>
+                <p>Using RequestAnimationFrame and transform-based positioning for smooth animations.</p>
+            `;
+            
+            panel.appendChild(header);
+            panel.appendChild(content);
+            document.body.appendChild(panel);
+            
+            return panel;
+        }
+        
+        // Add button event listeners
+        document.getElementById('add-panel').addEventListener('click', () => {
+            const count = document.querySelectorAll('.draggable-panel').length;
+            const panel = createPanel(`New Panel ${count + 1}`, 150, 150);
+            
+            // Make it draggable
+            if (window.dragHandler) {
+                window.dragHandler.refreshDraggablePanels();
+                updateDiagnostics();
+            }
+        });
+        
+        document.getElementById('reset-panels').addEventListener('click', () => {
+            document.querySelectorAll('.draggable-panel').forEach((panel, i) => {
+                panel.style.left = `${100 + i*50}px`;
+                panel.style.top = `${100 + i*30}px`;
+                panel.style.transform = 'none';
+            });
+            
+            // Sync the positions
+            if (window.dragHandler) {
+                window.dragHandler.syncPanelPositions();
+                updateDiagnostics();
+            }
+        });
+        
+        document.getElementById('add-many-panels').addEventListener('click', () => {
+            const startCount = document.querySelectorAll('.draggable-panel').length;
+            
+            for (let i = 0; i < 10; i++) {
+                const x = 100 + Math.floor(Math.random() * 500);
+                const y = 100 + Math.floor(Math.random() * 300);
+                createPanel(`Bulk Panel ${startCount + i + 1}`, x, y);
+            }
+            
+            // Refresh all panels
+            if (window.dragHandler) {
+                window.dragHandler.refreshDraggablePanels();
+                updateDiagnostics();
+            }
+        });
+        
+        document.getElementById('show-diagnostics').addEventListener('click', () => {
+            const isVisible = diagnosticsPanel.style.display !== 'none';
+            diagnosticsPanel.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
+                updateDiagnostics();
+            }
+        });
+        
+        // Update diagnostics every 2 seconds when visible
+        setInterval(() => {
+            if (diagnosticsPanel.style.display !== 'none') {
+                updateDiagnostics();
+            }
+        }, 2000);
+        
+        // Emergency reset
+        document.getElementById('emergency-reset').addEventListener('click', () => {
+            if (window.dragHandler) {
+                window.dragHandler.resetDragState();
+                updateDiagnostics();
+            }
+            
+            alert('Drag state has been reset. If panels were stuck, they should now be operational again.');
+        });
+    </script>
+    
+    <!-- Load the enhanced drag handler -->
+    <script src="js/drag-handler-v2.0.79.js"></script>
+</body>
+</html>

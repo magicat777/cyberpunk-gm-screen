@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v2.0.79 Drag Handler Test</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: sans-serif;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .draggable-panel {
+            position: absolute;
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            min-width: 300px;
+            min-height: 200px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .panel-header {
+            background-color: #2a2a2a;
+            padding: 10px;
+            font-weight: bold;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: grab;
+        }
+        
+        .panel-content {
+            padding: 15px;
+        }
+        
+        .close-button {
+            cursor: pointer;
+            padding: 0 5px;
+        }
+        
+        .resize-handle {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            right: 0;
+            bottom: 0;
+            cursor: nwse-resize;
+            z-index: 10;
+            background-color: transparent;
+        }
+        
+        .resize-handle:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Active panel styles */
+        .panel-active {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+            outline: 2px solid #00ffff;
+        }
+        
+        /* Dragging visual feedback */
+        .panel-dragging {
+            opacity: 0.9;
+            cursor: grabbing !important;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.8);
+        }
+        
+        .panel-dragging .panel-header {
+            background-color: rgba(0, 255, 255, 0.2);
+            cursor: grabbing;
+        }
+        
+        /* Resizing visual feedback */
+        .panel-resizing {
+            opacity: 0.9;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.7);
+            outline: 2px dashed rgba(255, 0, 255, 0.7);
+        }
+        
+        /* Disable user selection during drag operations */
+        body.dragging-active, 
+        body.resizing-active {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Panels will be created dynamically -->
+    
+    <script>
+        /**
+         * EventDelegator provides utilities for efficient event handling
+         * using delegation patterns to reduce the number of event listeners
+         */
+        class EventDelegator {
+            constructor() {
+                this.delegatedEvents = new Map();
+                this.eventHandlers = new Map();
+                this.instanceId = Date.now();
+                
+                // Test harness additions
+                this.delegationCount = 0;
+                this.delegationTypes = new Set();
+            }
+            
+            delegate(container, eventType, selector, handler, options = {}) {
+                if (!container || !eventType || !selector || typeof handler !== 'function') {
+                    console.error('[EventDelegator] Invalid delegation parameters');
+                    return null;
+                }
+                
+                const delegationKey = `${eventType}:${this.instanceId}-${Date.now()}`;
+                
+                // Create the delegated handler function
+                const delegatedHandler = (event) => {
+                    // Find all elements that match the selector
+                    const targetElements = Array.from(container.querySelectorAll(selector));
+                    
+                    // Check if the event target matches or is contained within matching elements
+                    const matchedElement = event.target.matches(selector) ? event.target :
+                                        event.target.closest(selector);
+                    
+                    // If there's a match, call the handler with the matched element
+                    if (matchedElement && targetElements.includes(matchedElement)) {
+                        // Call the handler with the correct element as 'this'
+                        handler.call(matchedElement, event, matchedElement);
+                    }
+                };
+                
+                // Store information about this delegation
+                this.delegatedEvents.set(delegationKey, {
+                    container,
+                    eventType,
+                    selector,
+                    options
+                });
+                
+                // Store the handler for later removal
+                this.eventHandlers.set(delegationKey, delegatedHandler);
+                
+                // Add the event listener to the container
+                container.addEventListener(eventType, delegatedHandler, options);
+                
+                // Update metrics
+                this.delegationCount++;
+                this.delegationTypes.add(eventType);
+                
+                return delegationKey;
+            }
+            
+            delegateMultiple(container, handlerMap) {
+                if (!container || !handlerMap || typeof handlerMap !== 'object') {
+                    console.error('[EventDelegator] Invalid parameters for delegateMultiple');
+                    return [];
+                }
+                
+                const delegationKeys = [];
+                
+                // Process each selector
+                Object.entries(handlerMap).forEach(([selector, handlers]) => {
+                    // For each event type and handler for this selector
+                    Object.entries(handlers).forEach(([eventType, handler]) => {
+                        if (typeof handler === 'function') {
+                            const key = this.delegate(container, eventType, selector, handler);
+                            if (key) {
+                                delegationKeys.push(key);
+                            }
+                        }
+                    });
+                });
+                
+                return delegationKeys;
+            }
+            
+            undelegate(delegationKey) {
+                if (!delegationKey || !this.delegatedEvents.has(delegationKey)) {
+                    console.warn('[EventDelegator] Invalid delegation key:', delegationKey);
+                    return false;
+                }
+                
+                const delegation = this.delegatedEvents.get(delegationKey);
+                const handler = this.eventHandlers.get(delegationKey);
+                
+                if (!delegation || !handler) {
+                    return false;
+                }
+                
+                // Remove the event listener
+                delegation.container.removeEventListener(
+                    delegation.eventType,
+                    handler,
+                    delegation.options
+                );
+                
+                // Clean up our maps
+                this.delegatedEvents.delete(delegationKey);
+                this.eventHandlers.delete(delegationKey);
+                
+                // Update metrics
+                this.delegationCount--;
+                
+                // Check if we still have delegations of this type
+                let hasEventType = false;
+                this.delegatedEvents.forEach(d => {
+                    if (d.eventType === delegation.eventType) {
+                        hasEventType = true;
+                    }
+                });
+                
+                if (!hasEventType) {
+                    this.delegationTypes.delete(delegation.eventType);
+                }
+                
+                return true;
+            }
+            
+            undelegateAll() {
+                const count = this.delegatedEvents.size;
+                
+                // Create an array of keys to avoid modifying the map during iteration
+                const keys = Array.from(this.delegatedEvents.keys());
+                
+                // Remove each delegation
+                keys.forEach(key => this.undelegate(key));
+                
+                // Reset metrics
+                this.delegationCount = 0;
+                this.delegationTypes.clear();
+                
+                return count;
+            }
+            
+            getDiagnosticInfo() {
+                const delegations = Array.from(this.delegatedEvents.entries()).map(([key, delegation]) => ({
+                    key,
+                    eventType: delegation.eventType,
+                    selector: delegation.selector
+                }));
+                
+                return {
+                    totalDelegations: this.delegationCount,
+                    eventTypes: Array.from(this.delegationTypes),
+                    delegations
+                };
+            }
+        }
+        
+        // Create global instance
+        window.eventDelegator = new EventDelegator();
+        
+        // Enhanced DragHandler class (v2.0.79) with Event Delegation
+        class DragHandler {
+            constructor() {
+                // Panel tracking
+                this.currentPanel = null;
+                this.panelPositions = new Map(); // Cache panel positions
+                
+                // Interaction state
+                this.initialX = 0;
+                this.initialY = 0;
+                this.offsetX = 0;
+                this.offsetY = 0;
+                this.resizing = false;
+                this.resizeHandle = null;
+                this.dragLock = false;
+                
+                // Performance optimization
+                this.moveRAF = null;
+                this.resizeRAF = null;
+                this.lastSaveTime = 0;
+                
+                // Event delegation tracking
+                this.delegationKeys = [];
+                this.activeHandlers = new Set();
+                
+                // Test harness additions
+                this.metrics = {
+                    fps: 0,
+                    frameCount: 0,
+                    lastTime: performance.now(),
+                    panelCount: 0,
+                    listenerCount: 0,
+                    memory: 0,
+                    startTime: 0,
+                    dragStartTime: 0,
+                    dragDurationSum: 0,
+                    dragCount: 0
+                };
+                
+                // Start measuring FPS
+                this.updateFPS();
+                
+                // Report metrics periodically
+                setInterval(() => this.reportMetrics(), 1000);
+            }
+            
+            initDraggablePanels(panels) {
+                try {
+                    // Record initialization time
+                    this.metrics.startTime = performance.now();
+                    
+                    if (!panels || !panels.length) {
+                        console.warn('[DragHandler] No panels provided to initialize');
+                        return;
+                    }
+                    
+                    // Set up container-level event delegation for panel interactions
+                    this.setupPanelEventDelegation();
+                    
+                    // Initialize each panel
+                    panels.forEach(panel => this.makeDraggable(panel));
+                    
+                    // Record init completion time
+                    const initTime = performance.now() - this.metrics.startTime;
+                    this.metrics.initTime = initTime;
+                    
+                    // Update panel count and listener count
+                    this.metrics.panelCount = panels.length;
+                    this.metrics.listenerCount = this.delegationKeys.length + 2; // +2 for document level handlers
+                    
+                    console.log(`[DragHandler] Initialized ${panels.length} draggable panels in ${initTime.toFixed(2)}ms`);
+                } catch (error) {
+                    console.error('[DragHandler] Error initializing draggable panels:', error);
+                    this.resetDragState();
+                }
+            }
+            
+            setupPanelEventDelegation() {
+                // Only set up once - clean up any existing delegations first
+                this.cleanupEventDelegation();
+                
+                // Find the common parent of all panels
+                let container = document.body;
+                
+                // Set up delegation for panel interaction
+                const delegationMap = {
+                    '.panel-header': {
+                        'mousedown': this.handleHeaderMouseDown.bind(this)
+                    },
+                    '.resize-handle': {
+                        'mousedown': this.handleResizeMouseDown.bind(this)
+                    },
+                    '.draggable-panel': {
+                        'mousedown': this.handlePanelMouseDown.bind(this)
+                    },
+                    '.close-button': {
+                        'click': this.handleCloseButtonClick.bind(this)
+                    }
+                };
+                
+                // Add the delegations
+                this.delegationKeys = window.eventDelegator.delegateMultiple(container, delegationMap);
+                
+                // Add document-level move and up handlers with proper binding
+                document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+                document.addEventListener('mouseup', this.handleMouseUp.bind(this));
+                
+                console.log(`[DragHandler] Established ${this.delegationKeys.length} event delegations`);
+            }
+            
+            cleanupEventDelegation() {
+                // Clean up existing delegations
+                this.delegationKeys.forEach(key => {
+                    window.eventDelegator.undelegate(key);
+                });
+                
+                this.delegationKeys = [];
+            }
+            
+            makeDraggable(panel) {
+                if (!panel) {
+                    console.warn('[DragHandler] Attempted to make undefined panel draggable');
+                    return;
+                }
+
+                // Skip if already initialized
+                if (panel.getAttribute('data-draggable-initialized') === 'true') {
+                    return;
+                }
+                
+                // Cache initial position - will be used for transforms
+                const style = window.getComputedStyle(panel);
+                const left = parseInt(style.left, 10) || 0;
+                const top = parseInt(style.top, 10) || 0;
+                
+                // Store initial position in data attributes for recovery
+                panel.setAttribute('data-initial-x', left);
+                panel.setAttribute('data-initial-y', top);
+                
+                // Cache in our position map
+                this.panelPositions.set(panel, { x: left, y: top });
+                
+                // Add resize handle if not present
+                this.addResizeHandle(panel);
+                
+                // Mark as initialized
+                panel.setAttribute('data-draggable-initialized', 'true');
+                
+                // Assign a unique ID if not present (needed for delegation)
+                if (!panel.id) {
+                    panel.id = `panel-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+                }
+            }
+            
+            addResizeHandle(panel) {
+                // Create resize handle if not present
+                if (!panel.querySelector('.resize-handle')) {
+                    const resizeHandle = document.createElement('div');
+                    resizeHandle.className = 'resize-handle';
+                    panel.appendChild(resizeHandle);
+                }
+            }
+            
+            handleHeaderMouseDown(e, header) {
+                // Ignore if clicking on buttons or controls in the header
+                if (e.target.closest('.panel-control, .close-button')) {
+                    return;
+                }
+                
+                // Prevent default to avoid text selection
+                e.preventDefault();
+                
+                // Record drag start time for measuring
+                this.metrics.dragStartTime = performance.now();
+                
+                // If we're in the middle of another drag operation, ignore
+                if (this.dragLock) {
+                    console.warn('[DragHandler] Drag operation already in progress');
+                    return;
+                }
+                
+                // Find the parent panel
+                const panel = header.closest('.draggable-panel');
+                if (!panel) return;
+                
+                // Set drag lock
+                this.dragLock = true;
+                
+                // Add dragging visual indicator
+                panel.classList.add('panel-dragging');
+                document.body.classList.add('dragging-active');
+                
+                // Bring panel to front
+                this.bringToFront(panel);
+                
+                // Get current transform or initialize
+                const position = this.panelPositions.get(panel) || { x: 0, y: 0 };
+                
+                // Get initial position
+                this.initialX = e.clientX;
+                this.initialY = e.clientY;
+                this.offsetX = position.x;
+                this.offsetY = position.y;
+                this.currentPanel = panel;
+                
+                // Prepare for transform-based movement by setting will-change
+                panel.style.willChange = 'transform';
+                
+                // Set active handler
+                this.activeHandlers.add('move');
+                
+                console.log(`[DragHandler] Started dragging panel: ${panel.id || 'unnamed'}`);
+            }
+            
+            handleResizeMouseDown(e, resizeHandle) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // If we're in the middle of another operation, ignore
+                if (this.dragLock) {
+                    console.warn('[DragHandler] Operation already in progress');
+                    return;
+                }
+                
+                // Find the parent panel
+                const panel = resizeHandle.closest('.draggable-panel');
+                if (!panel) return;
+                
+                // Set drag lock
+                this.dragLock = true;
+                
+                // Add resizing visual indicator
+                panel.classList.add('panel-resizing');
+                document.body.classList.add('resizing-active');
+                
+                this.bringToFront(panel);
+                this.resizing = true;
+                this.currentPanel = panel;
+                this.resizeHandle = resizeHandle;
+                this.initialX = e.clientX;
+                this.initialY = e.clientY;
+                this.initialWidth = parseFloat(getComputedStyle(panel).width);
+                this.initialHeight = parseFloat(getComputedStyle(panel).height);
+                
+                // Prepare for dimension changes by setting will-change
+                panel.style.willChange = 'width, height';
+                
+                // Set active handler
+                this.activeHandlers.add('resize');
+                
+                console.log(`[DragHandler] Started resizing panel: ${panel.id || 'unnamed'}`);
+            }
+            
+            handlePanelMouseDown(e, panel) {
+                // Skip if clicking on header or resize handle (they have their own handlers)
+                if (e.target.closest('.panel-header, .resize-handle')) {
+                    return;
+                }
+                
+                // Just bring to front, don't start drag operation
+                this.bringToFront(panel);
+                
+                // Add active class
+                panel.classList.add('panel-active');
+            }
+            
+            handleCloseButtonClick(e, closeButton) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Find the parent panel
+                const panel = closeButton.closest('.draggable-panel');
+                if (!panel) return;
+                
+                // Remove the panel
+                panel.remove();
+                
+                // Clean up any cached data
+                this.panelPositions.delete(panel);
+                
+                // Update metrics
+                this.metrics.panelCount--;
+                
+                console.log(`[DragHandler] Closed panel: ${panel.id || 'unnamed'}`);
+            }
+            
+            handleMouseMove(e) {
+                if (this.activeHandlers.has('move')) {
+                    this.handlePanelMove(e);
+                } else if (this.activeHandlers.has('resize')) {
+                    this.handlePanelResize(e);
+                }
+            }
+            
+            handleMouseUp(e) {
+                if (this.activeHandlers.has('move')) {
+                    this.stopMoving();
+                } else if (this.activeHandlers.has('resize')) {
+                    this.stopResizing();
+                }
+            }
+            
+            bringToFront(panel) {
+                try {
+                    // Get all panels
+                    const panels = document.querySelectorAll('.draggable-panel');
+                    
+                    // Set all panels to z-index 1 and remove active class
+                    panels.forEach(p => {
+                        p.style.zIndex = '1';
+                        p.classList.remove('panel-active');
+                    });
+                    
+                    // Set the current panel to z-index 10 and add active class
+                    panel.style.zIndex = '10';
+                    panel.classList.add('panel-active');
+                } catch (error) {
+                    console.error('[DragHandler] Error in bringToFront:', error);
+                }
+            }
+            
+            handlePanelMove(e) {
+                if (!this.currentPanel) return;
+                
+                // Debounce the move operation using requestAnimationFrame
+                if (this.moveRAF) {
+                    cancelAnimationFrame(this.moveRAF);
+                }
+                
+                this.moveRAF = requestAnimationFrame(() => {
+                    try {
+                        // Calculate new position
+                        const x = this.offsetX + e.clientX - this.initialX;
+                        const y = this.offsetY + e.clientY - this.initialY;
+                        
+                        // Apply new position using transform for better performance
+                        this.currentPanel.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+                        
+                        // Update cached position
+                        this.panelPositions.set(this.currentPanel, { x, y });
+                    } catch (error) {
+                        console.error('[DragHandler] Error in handlePanelMove:', error);
+                        this.resetDragState();
+                    }
+                });
+            }
+            
+            stopMoving() {
+                try {
+                    if (this.currentPanel) {
+                        // Calculate drag duration for metrics
+                        if (this.metrics.dragStartTime > 0) {
+                            const dragDuration = performance.now() - this.metrics.dragStartTime;
+                            this.metrics.dragDurationSum += dragDuration;
+                            this.metrics.dragCount++;
+                            this.metrics.dragStartTime = 0;
+                        }
+                        
+                        // Get final position
+                        const position = this.panelPositions.get(this.currentPanel);
+                        
+                        // Update the actual left/top properties for persistence
+                        if (position) {
+                            this.currentPanel.style.left = `${position.x}px`;
+                            this.currentPanel.style.top = `${position.y}px`;
+                            
+                            // Reset transform now that we've applied actual positioning
+                            this.currentPanel.style.transform = 'none';
+                        }
+                        
+                        // Remove visual classes
+                        this.currentPanel.classList.remove('panel-dragging');
+                        document.body.classList.remove('dragging-active');
+                        
+                        // Reset will-change to free GPU resources
+                        this.currentPanel.style.willChange = 'auto';
+                    }
+                    
+                    // Cancel any pending animation frames
+                    if (this.moveRAF) {
+                        cancelAnimationFrame(this.moveRAF);
+                        this.moveRAF = null;
+                    }
+                    
+                    // Clear references
+                    this.currentPanel = null;
+                    
+                    // Remove from active handlers
+                    this.activeHandlers.delete('move');
+                    
+                    // Release drag lock
+                    this.dragLock = false;
+                    
+                    console.log('[DragHandler] Stopped panel movement');
+                } catch (error) {
+                    console.error('[DragHandler] Error in stopMoving:', error);
+                    this.resetDragState();
+                }
+            }
+            
+            handlePanelResize(e) {
+                if (!this.resizing || !this.currentPanel) return;
+                
+                // Debounce the resize operation using requestAnimationFrame
+                if (this.resizeRAF) {
+                    cancelAnimationFrame(this.resizeRAF);
+                }
+                
+                this.resizeRAF = requestAnimationFrame(() => {
+                    try {
+                        // Calculate new dimensions
+                        const width = Math.max(300, this.initialWidth + e.clientX - this.initialX);
+                        const height = Math.max(200, this.initialHeight + e.clientY - this.initialY);
+                        
+                        // Apply new dimensions all at once to minimize reflows
+                        this.currentPanel.style.width = `${width}px`;
+                        this.currentPanel.style.height = `${height}px`;
+                    } catch (error) {
+                        console.error('[DragHandler] Error in handlePanelResize:', error);
+                        this.resetDragState();
+                    }
+                });
+            }
+            
+            stopResizing() {
+                try {
+                    if (this.currentPanel) {
+                        // Remove visual classes
+                        this.currentPanel.classList.remove('panel-resizing');
+                        document.body.classList.remove('resizing-active');
+                        
+                        // Reset will-change to free GPU resources
+                        this.currentPanel.style.willChange = 'auto';
+                    }
+                    
+                    // Cancel any pending animation frames
+                    if (this.resizeRAF) {
+                        cancelAnimationFrame(this.resizeRAF);
+                        this.resizeRAF = null;
+                    }
+                    
+                    // Clear state
+                    this.resizing = false;
+                    this.currentPanel = null;
+                    this.resizeHandle = null;
+                    
+                    // Remove from active handlers
+                    this.activeHandlers.delete('resize');
+                    
+                    // Release drag lock
+                    this.dragLock = false;
+                    
+                    console.log('[DragHandler] Stopped panel resizing');
+                } catch (error) {
+                    console.error('[DragHandler] Error in stopResizing:', error);
+                    this.resetDragState();
+                }
+            }
+            
+            refreshDraggablePanels() {
+                try {
+                    const panels = document.querySelectorAll('.draggable-panel');
+                    this.initDraggablePanels(panels);
+                    console.log(`[DragHandler] Refreshed ${panels.length} draggable panels`);
+                } catch (error) {
+                    console.error('[DragHandler] Error refreshing draggable panels:', error);
+                }
+            }
+            
+            syncPanelPositions() {
+                try {
+                    const panels = document.querySelectorAll('.draggable-panel');
+                    
+                    panels.forEach(panel => {
+                        const style = window.getComputedStyle(panel);
+                        const left = parseInt(style.left, 10) || 0;
+                        const top = parseInt(style.top, 10) || 0;
+                        
+                        this.panelPositions.set(panel, { x: left, y: top });
+                    });
+                    
+                    console.log('[DragHandler] Panel positions synchronized');
+                } catch (error) {
+                    console.error('[DragHandler] Error synchronizing panel positions:', error);
+                }
+            }
+            
+            resetDragState() {
+                console.warn('[DragHandler] Performing emergency reset of drag state');
+                
+                // Cancel animation frames
+                if (this.moveRAF) {
+                    cancelAnimationFrame(this.moveRAF);
+                    this.moveRAF = null;
+                }
+                
+                if (this.resizeRAF) {
+                    cancelAnimationFrame(this.resizeRAF);
+                    this.resizeRAF = null;
+                }
+                
+                // Reset visual states
+                if (this.currentPanel) {
+                    this.currentPanel.classList.remove('panel-dragging', 'panel-resizing');
+                    this.currentPanel.style.willChange = 'auto';
+                }
+                
+                document.body.classList.remove('dragging-active', 'resizing-active');
+                
+                // Reset properties
+                this.currentPanel = null;
+                this.resizing = false;
+                this.resizeHandle = null;
+                
+                // Clear active handlers
+                this.activeHandlers.clear();
+                
+                // Release drag lock
+                this.dragLock = false;
+            }
+            
+            // Test harness methods
+            updateFPS() {
+                const now = performance.now();
+                const elapsed = now - this.metrics.lastTime;
+                
+                this.metrics.frameCount++;
+                
+                if (elapsed >= 1000) {
+                    this.metrics.fps = Math.round((this.metrics.frameCount * 1000) / elapsed);
+                    this.metrics.frameCount = 0;
+                    this.metrics.lastTime = now;
+                    
+                    // Update memory usage if available
+                    if (window.performance && window.performance.memory) {
+                        this.metrics.memory = window.performance.memory.usedJSHeapSize;
+                    }
+                }
+                
+                requestAnimationFrame(() => this.updateFPS());
+            }
+            
+            reportMetrics() {
+                // Count panels
+                this.metrics.panelCount = document.querySelectorAll('.draggable-panel').length;
+                
+                // Count actual event listeners
+                this.metrics.listenerCount = this.delegationKeys.length + 2; // +2 for document level handlers
+                
+                // Post metrics to parent window
+                if (window.parent) {
+                    window.parent.postMessage({
+                        type: 'metrics-update',
+                        version: 'v2079',
+                        metrics: {
+                            fps: this.metrics.fps,
+                            panelCount: this.metrics.panelCount,
+                            listenerCount: this.metrics.listenerCount,
+                            memory: this.metrics.memory
+                        }
+                    }, '*');
+                }
+            }
+            
+            // Benchmark methods
+            runBenchmark() {
+                console.log('Running benchmark...');
+                
+                // Reset metrics for benchmarking
+                this.metrics.dragDurationSum = 0;
+                this.metrics.dragCount = 0;
+                
+                // Test 1: Initialization time (already captured)
+                const initResult = this.metrics.initTime || 0;
+                this.reportBenchmarkResult('init', initResult);
+                
+                // Test 2: Drag performance (measure FPS during drag)
+                this.simulateDrags(5).then(dragFPS => {
+                    this.reportBenchmarkResult('drag', dragFPS);
+                    
+                    // Test 3: Multiple panels performance
+                    this.testMultiplePanels().then(multiFPS => {
+                        this.reportBenchmarkResult('multiple', multiFPS);
+                        
+                        // Test 4: Memory usage
+                        const memoryUsage = this.metrics.memory / (1024 * 1024); // Convert to MB
+                        this.reportBenchmarkResult('memory', parseFloat(memoryUsage.toFixed(1)), true);
+                    });
+                });
+            }
+            
+            async simulateDrags(count) {
+                // Create a test panel if none exists
+                if (document.querySelectorAll('.draggable-panel').length === 0) {
+                    createPanel('Test Panel', 100, 100);
+                    this.refreshDraggablePanels();
+                }
+                
+                const panel = document.querySelector('.draggable-panel');
+                if (!panel) return 0;
+                
+                // Initial FPS measurement
+                const initialFPS = this.metrics.fps;
+                const dragFPSArray = [];
+                
+                for (let i = 0; i < count; i++) {
+                    // Simulate drag
+                    await this.simulateDrag(panel, 100, 100, 300, 300);
+                    
+                    // Capture FPS after drag
+                    dragFPSArray.push(this.metrics.fps);
+                    
+                    // Wait a moment between drags
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                // Calculate average drag FPS
+                const avgDragFPS = dragFPSArray.reduce((sum, fps) => sum + fps, 0) / dragFPSArray.length;
+                return Math.round(avgDragFPS);
+            }
+            
+            async simulateDrag(panel, startX, startY, endX, endY) {
+                const header = panel.querySelector('.panel-header');
+                if (!header) return;
+                
+                // Simulate mousedown
+                const mousedownEvent = new MouseEvent('mousedown', {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: startX,
+                    clientY: startY
+                });
+                header.dispatchEvent(mousedownEvent);
+                
+                // Wait a moment
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Simulate mousemove
+                const mousemoveEvent = new MouseEvent('mousemove', {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: endX,
+                    clientY: endY
+                });
+                document.dispatchEvent(mousemoveEvent);
+                
+                // Wait a moment
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Simulate mouseup
+                const mouseupEvent = new MouseEvent('mouseup', {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: endX,
+                    clientY: endY
+                });
+                document.dispatchEvent(mouseupEvent);
+                
+                // Wait for completion
+                return new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            async testMultiplePanels() {
+                // Ensure we have multiple panels
+                const panelCount = document.querySelectorAll('.draggable-panel').length;
+                
+                if (panelCount < 10) {
+                    // Create additional panels
+                    const countToAdd = 10 - panelCount;
+                    for (let i = 0; i < countToAdd; i++) {
+                        const x = 100 + Math.floor(Math.random() * 500);
+                        const y = 100 + Math.floor(Math.random() * 300);
+                        createPanel(`Panel ${panelCount + i + 1}`, x, y);
+                    }
+                    
+                    this.refreshDraggablePanels();
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                // Move multiple panels simultaneously
+                const panels = document.querySelectorAll('.draggable-panel');
+                const moveTasks = [];
+                
+                panels.forEach((panel, i) => {
+                    // Only move half the panels to avoid overloading
+                    if (i % 2 === 0) {
+                        const startX = 100 + (i * 20);
+                        const startY = 100 + (i * 20);
+                        const endX = 300 + (i * 20);
+                        const endY = 300 + (i * 20);
+                        
+                        moveTasks.push(this.simulateDrag(panel, startX, startY, endX, endY));
+                    }
+                });
+                
+                // Wait for all movements to complete
+                await Promise.all(moveTasks);
+                
+                // Return the measured FPS during multiple panel movement
+                return this.metrics.fps;
+            }
+            
+            reportBenchmarkResult(benchmarkType, result, isLastTest = false) {
+                // Post result to parent window
+                if (window.parent) {
+                    window.parent.postMessage({
+                        type: 'benchmark-result',
+                        benchmarkType,
+                        version: 'v2079',
+                        results: result,
+                        isLastTest
+                    }, '*');
+                }
+            }
+        }
+        
+        // Create a panel element
+        function createPanel(title, left, top) {
+            const panel = document.createElement('div');
+            panel.className = 'draggable-panel';
+            panel.style.left = `${left}px`;
+            panel.style.top = `${top}px`;
+            panel.style.width = '400px';
+            panel.style.height = '300px';
+            
+            const header = document.createElement('div');
+            header.className = 'panel-header';
+            header.innerHTML = `${title} <span class="close-button">×</span>`;
+            
+            const content = document.createElement('div');
+            content.className = 'panel-content';
+            content.innerHTML = `
+                <p>v2.0.79 drag handler with event delegation</p>
+                <p>Panel content goes here.</p>
+            `;
+            
+            panel.appendChild(header);
+            panel.appendChild(content);
+            document.body.appendChild(panel);
+            
+            return panel;
+        }
+        
+        // Initialize drag handler
+        const dragHandler = new DragHandler();
+        
+        // Create initial test panels
+        function initPanels() {
+            for (let i = 0; i < 3; i++) {
+                createPanel(`Panel ${i+1}`, 100 + i*50, 100 + i*30);
+            }
+            
+            dragHandler.refreshDraggablePanels();
+        }
+        
+        // Initialize
+        initPanels();
+        
+        // Handle messages from parent frame
+        window.addEventListener('message', (event) => {
+            // Verify origin for security
+            if (event.origin !== window.location.origin) return;
+            
+            const data = event.data;
+            if (!data || !data.command) return;
+            
+            // Handle commands
+            switch (data.command) {
+                case 'reset':
+                    // Remove all panels
+                    document.querySelectorAll('.draggable-panel').forEach(panel => panel.remove());
+                    // Create initial panels
+                    initPanels();
+                    break;
+                    
+                case 'add-panels':
+                    // Add specified number of panels
+                    const count = data.count || 10;
+                    for (let i = 0; i < count; i++) {
+                        const x = 100 + Math.floor(Math.random() * 500);
+                        const y = 100 + Math.floor(Math.random() * 300);
+                        createPanel(`New Panel ${i+1}`, x, y);
+                    }
+                    dragHandler.refreshDraggablePanels();
+                    break;
+                    
+                case 'run-benchmark':
+                    // Run benchmark tests
+                    dragHandler.runBenchmark();
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

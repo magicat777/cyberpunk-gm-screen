@@ -1,0 +1,71 @@
+/**
+ * Cyberpunk RED GM Screen - Drag Effects
+ * CSS for visual feedback during dragging and resizing operations
+ */
+
+/* Active panel styles */
+.panel-active {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+    outline: 2px solid #00ffff;
+}
+
+/* Dragging visual feedback */
+.panel-dragging {
+    opacity: 0.9;
+    cursor: grabbing !important;
+    transition: box-shadow 0.15s ease-out;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.8);
+}
+
+.panel-dragging .panel-header {
+    background-color: rgba(0, 255, 255, 0.2);
+}
+
+/* Resizing visual feedback */
+.panel-resizing {
+    opacity: 0.9;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.7);
+    outline: 2px dashed rgba(255, 0, 255, 0.7);
+}
+
+/* Global body state when dragging */
+body.dragging-active {
+    cursor: grabbing;
+}
+
+/* Resize handle visual enhancement */
+.resize-handle {
+    background-color: transparent;
+    transition: background-color 0.2s ease;
+}
+
+.resize-handle:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.panel-resizing .resize-handle {
+    background-color: rgba(255, 0, 255, 0.3);
+}
+
+/* Animation optimizations */
+.draggable-panel {
+    /* Use hardware acceleration for transforms */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Panel header grab cursor */
+.panel-header {
+    cursor: grab;
+}
+
+.panel-dragging .panel-header {
+    cursor: grabbing;
+}
+
+/* Disable user selection during drag operations */
+body.dragging-active, 
+body.resizing-active {
+    user-select: none;
+    -webkit-user-select: none;
+}
