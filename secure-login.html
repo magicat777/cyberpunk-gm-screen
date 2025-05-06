@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SECURE SYSTEM ACCESS - Cyberpunk RED GM Interface</title>
+    <!-- Navigation Stylesheet -->
+    <link rel="stylesheet" href="css/cyberpunk-navigation.css">
     <style>
         /* Base styles */
         :root {
@@ -34,12 +36,19 @@
             background-color: var(--dark-bg);
             color: var(--text-color);
             font-family: 'Rajdhani', 'Share Tech Mono', monospace;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
             position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .login-page-content {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 40px 0;
         }
 
         /* Grid background */
@@ -553,21 +562,74 @@
     </style>
 </head>
 <body>
-    <!-- Background Grid -->
-    <div class="grid-bg"></div>
+    <!-- Primary Navigation -->
+    <nav class="primary-nav" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <!-- Mobile navigation toggle -->
+            <button class="mobile-nav-toggle" aria-expanded="false" aria-controls="nav-menu">
+                <span class="toggle-icon"></span>
+                <span class="toggle-text">Menu</span>
+            </button>
 
-    <!-- Glitch Effect -->
-    <div class="glitch-effect"></div>
+            <!-- Site logo -->
+            <a href="index.html" class="site-logo">
+                Cyberpunk RED <span>GM Screen v2.0.77</span>
+            </a>
 
-    <!-- Scanlines -->
-    <div class="scanlines"></div>
-
-    <!-- Login Container -->
-    <div class="login-container" id="login-form">
-        <div class="login-header">
-            <h1>Netrunner Access</h1>
-            <div class="cyber-subtitle">Cyberpunk RED GM Interface</div>
+            <!-- Navigation menu -->
+            <ul id="nav-menu" class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" aria-expanded="false" aria-haspopup="true">Tools</a>
+                    <ul class="dropdown-menu" aria-label="Tools submenu">
+                        <li><a href="desktop.html" class="dropdown-item">GM Dashboard</a></li>
+                        <li><a href="desktop-cyberpunk.html" class="dropdown-item">GM Interface</a></li>
+                        <li><a href="initiative-tracker.html" class="dropdown-item">Initiative Tracker</a></li>
+                        <li><a href="character-manager.html" class="dropdown-item">Character Manager</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" aria-expanded="false" aria-haspopup="true">Reference</a>
+                    <ul class="dropdown-menu" aria-label="Reference submenu">
+                        <li><a href="rules-reference.html" class="dropdown-item">Rules Reference</a></li>
+                        <li><a href="combat-reference.html" class="dropdown-item">Combat Reference</a></li>
+                        <li><a href="netrunning-reference.html" class="dropdown-item">Netrunning Guide</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" aria-expanded="false" aria-haspopup="true">Documentation</a>
+                    <ul class="dropdown-menu" aria-label="Documentation submenu">
+                        <li><a href="docs/user-guides/getting-started.html" class="dropdown-item">Getting Started</a></li>
+                        <li><a href="docs/user-guides/gm-tools-guide.html" class="dropdown-item">GM Tools Guide</a></li>
+                        <li><a href="docs/user-guides/ui-customization.html" class="dropdown-item">UI Customization</a></li>
+                        <li><a href="docs/technical/deployment.html" class="dropdown-item">Deployment Guide</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="secure-login.html" class="nav-link active">Login</a>
+                </li>
+            </ul>
         </div>
+    </nav>
+
+    <div class="login-page-content">
+        <!-- Background Grid -->
+        <div class="grid-bg"></div>
+
+        <!-- Glitch Effect -->
+        <div class="glitch-effect"></div>
+
+        <!-- Scanlines -->
+        <div class="scanlines"></div>
+
+        <!-- Login Container -->
+        <div class="login-container" id="login-form">
+            <div class="login-header">
+                <h1>Netrunner Access</h1>
+                <div class="cyber-subtitle">Cyberpunk RED GM Interface</div>
+            </div>
 
         <div class="form-group">
             <label for="username">Identity Verification</label>
@@ -607,6 +669,7 @@
     </div>
 
     <script src="js/auth-handler.js"></script>
+    <script src="js/cyberpunk-navigation.js"></script>
     <script>
         // Check if already authenticated
         if (authHandler.isAuthenticated()) {

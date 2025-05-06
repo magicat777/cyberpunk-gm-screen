@@ -1,0 +1,303 @@
+/**
+ * Cyberpunk RED GM Screen - Navigation Styles
+ * Consistent navigation component with responsive design and accessibility features
+ */
+
+:root {
+    --neon-pink: #ff00a5;
+    --neon-blue: #00f0ff;
+    --neon-green: #00ff66;
+    --neon-yellow: #ffcc00;
+    --dark-bg: #0d0d0f;
+    --cyber-red: #ff003c;
+    --text-color: #f0f0f0;
+    --transition-speed: 0.3s;
+}
+
+/* Main navigation */
+.primary-nav {
+    background-color: rgba(10, 10, 15, 0.9);
+    border-bottom: 1px solid var(--neon-blue);
+    position: relative;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 240, 255, 0.3);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 20px;
+}
+
+.site-logo {
+    display: flex;
+    align-items: center;
+    color: var(--neon-pink);
+    font-family: 'Cyberpunk', 'Rajdhani', sans-serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(255, 0, 165, 0.5);
+}
+
+.site-logo span {
+    color: var(--neon-blue);
+    font-size: 0.8rem;
+    margin-left: 8px;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    position: relative;
+    margin: 0 5px;
+}
+
+.nav-link {
+    display: block;
+    padding: 0 15px;
+    line-height: 60px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-family: 'Rajdhani', sans-serif;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    transition: color var(--transition-speed);
+}
+
+.nav-link:hover, 
+.nav-link:focus {
+    color: var(--neon-green);
+}
+
+.nav-link.active {
+    color: var(--neon-blue);
+    box-shadow: inset 0 -3px 0 var(--neon-blue);
+}
+
+/* Dropdown menus */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    background-color: rgba(10, 10, 15, 0.95);
+    border: 1px solid var(--neon-blue);
+    border-top: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity var(--transition-speed), visibility var(--transition-speed), transform var(--transition-speed);
+    z-index: 100;
+}
+
+.dropdown:hover .dropdown-menu,
+.dropdown:focus-within .dropdown-menu,
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: block;
+    padding: 12px 15px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: background-color var(--transition-speed);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: rgba(0, 240, 255, 0.1);
+    color: var(--neon-green);
+}
+
+/* Mobile menu */
+.mobile-nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.toggle-icon {
+    display: block;
+    width: 25px;
+    height: 2px;
+    background-color: var(--text-color);
+    position: relative;
+    transition: background-color var(--transition-speed);
+}
+
+.toggle-icon::before,
+.toggle-icon::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+    left: 0;
+    transition: transform var(--transition-speed);
+}
+
+.toggle-icon::before {
+    top: -8px;
+}
+
+.toggle-icon::after {
+    bottom: -8px;
+}
+
+.mobile-nav-toggle[aria-expanded="true"] .toggle-icon {
+    background-color: transparent;
+}
+
+.mobile-nav-toggle[aria-expanded="true"] .toggle-icon::before {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.mobile-nav-toggle[aria-expanded="true"] .toggle-icon::after {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+.toggle-text {
+    display: none;
+}
+
+/* Breadcrumb navigation */
+.breadcrumb-nav {
+    background-color: rgba(10, 10, 15, 0.7);
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.breadcrumb-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+}
+
+.breadcrumb-item:not(:last-child)::after {
+    content: '/';
+    margin: 0 8px;
+    color: var(--neon-blue);
+}
+
+.breadcrumb-link {
+    color: var(--neon-blue);
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+
+.breadcrumb-link:hover {
+    color: var(--neon-green);
+    text-decoration: underline;
+}
+
+.breadcrumb-current {
+    color: var(--neon-pink);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .mobile-nav-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-menu {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background-color: rgba(10, 10, 15, 0.95);
+        border-bottom: 1px solid var(--neon-blue);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height var(--transition-speed);
+        z-index: 99;
+    }
+
+    .nav-menu.show {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .nav-item {
+        margin: 0;
+        width: 100%;
+    }
+
+    .nav-link {
+        padding: 12px 20px;
+        line-height: 1.5;
+        border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+    }
+
+    .dropdown-menu {
+        position: static;
+        width: 100%;
+        border: none;
+        box-shadow: none;
+        background-color: rgba(0, 0, 0, 0.2);
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height var(--transition-speed);
+    }
+
+    .dropdown-menu.show {
+        max-height: 500px;
+    }
+
+    .dropdown-toggle {
+        position: relative;
+    }
+
+    .dropdown-toggle::after {
+        content: '+';
+        position: absolute;
+        right: 20px;
+        transition: transform var(--transition-speed);
+    }
+
+    .dropdown-toggle.active::after {
+        transform: rotate(45deg);
+    }
+}

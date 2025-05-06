@@ -2,16 +2,20 @@ name: Navigation Validation
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, feature/**, develop ]
     paths:
-      - 'docs/**/*.html'
-      - 'docs/**/*.css'
+      - '**/*.html'
+      - 'css/**/*.css'
+      - 'css/cyberpunk-navigation.css'
+      - 'js/cyberpunk-navigation.js'
       - 'ci/validate-navigation.js'
   pull_request:
-    branches: [ master ]
+    branches: [ master, develop ]
     paths:
-      - 'docs/**/*.html'
-      - 'docs/**/*.css'
+      - '**/*.html'
+      - 'css/**/*.css'
+      - 'css/cyberpunk-navigation.css'
+      - 'js/cyberpunk-navigation.js'
       - 'ci/validate-navigation.js'
   workflow_dispatch:
     # Manual trigger
@@ -35,12 +39,12 @@ jobs:
     
     - name: Validate navigation
       run: |
-        node ci/validate-navigation.js docs
+        node ci/validate-navigation.js ./
     
     - name: Check breadcrumbs consistency
       run: |
         echo "Checking breadcrumb consistency..."
-        find docs -name "*.html" -exec grep -l 'breadcrumb' {} \; | xargs -I{} grep -o -E 'href="[^"]+"' {} | sort | uniq -c | sort -nr
+        find . -name "*.html" -exec grep -l 'breadcrumb' {} \; | xargs -I{} grep -o -E 'href="[^"]+"' {} | sort | uniq -c | sort -nr
     
     - name: Generate navigation report
       if: always()
