@@ -1,0 +1,61 @@
+/**
+ * Anti-Flash Fix for Cyberpunk GM Screen
+ * Prevents white flashing when applying style changes
+ * 
+ * Enhanced with cross-browser compatibility fixes and
+ * additional protections against unwanted transitions.
+ */
+
+/* This class has no visible changes but forces style recalculation */
+.cp-recalculate-styles {
+  /* Force hardware acceleration without visual changes */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  
+  /* These have no visual effect but trigger recalculation */
+  will-change: transform;
+  
+  /* Ensure background color doesn't flash */
+  background-color: var(--bg-color, #050709) !important;
+}
+
+/* Override any transitions that may cause flashing */
+body, html, .cp-app, .cp-panel, .cp-panel__content, .cp-sidebar {
+  transition: none !important;
+  -webkit-transition: none !important;
+  animation: none !important;
+  -webkit-animation: none !important;
+}
+
+/* Ensure background colors remain consistent */
+body {
+  background-color: var(--bg-color, #050709) !important;
+}
+
+/* Prevent browser-specific issues */
+* {
+  /* Prevent text size adjustments on theme change */
+  -webkit-text-size-adjust: none;
+  -ms-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+/* Force dark background on body and html at all times */
+html, body {
+  background: var(--night-black, #050709) !important;
+  color-scheme: dark;
+}
+
+/* Special class for when settings are loading to prevent flashing */
+.cp-loading-settings {
+  opacity: 1 !important;
+  background-color: var(--bg-color, #050709) !important;
+  transition: none !important;
+  -webkit-transition: none !important;
+}
+
+/* Make sure modal doesn't flash either when opened */
+.cp-modal {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}

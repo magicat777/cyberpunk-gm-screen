@@ -1,0 +1,477 @@
+/**
+ * Cyberpunk RED GM Screen - GM Tools Styling
+ */
+
+/* ---------- GM Tools Common Styles ---------- */
+.gm-panel {
+    min-width: 320px;
+    min-height: 250px;
+}
+
+.gm-panel .panel-content {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ---------- GM Notes Styles ---------- */
+.gm-notes-toolbar {
+    display: flex;
+    padding: 8px;
+    border-bottom: 1px solid var(--border-color, #444);
+    gap: 8px;
+    background-color: var(--panel-header-bg, #222);
+}
+
+/* Custom styles for the notes toolbar buttons */
+.gm-notes-toolbar .cp-button {
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color, #444);
+    background-color: var(--panel-bg, #333);
+}
+
+.gm-notes-toolbar .cp-button:hover {
+    background-color: var(--accent-bg, #00526e);
+    border-color: var(--accent-color, #00ffff);
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+}
+
+/* Download button special styling */
+#download-notes-btn {
+    background-color: var(--accent-bg, #00526e);
+    border-color: var(--accent-color, #00ffff);
+    color: var(--accent-color, #00ffff);
+}
+
+#download-notes-btn:hover {
+    background-color: var(--accent-color, #00ffff);
+    color: #000;
+}
+
+.gm-notes-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#gm-notes-textarea {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    outline: none;
+    resize: none;
+    background-color: var(--panel-bg, #333);
+    color: var(--text-color, #eee);
+    font-family: 'Share Tech Mono', 'Consolas', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 200px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+#gm-notes-textarea:focus {
+    background-color: var(--input-bg, #444);
+    box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.05);
+}
+
+.gm-notes-history {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--panel-bg, #333);
+    z-index: 10;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border-color, #444);
+}
+
+.history-header h3 {
+    margin: 0;
+    color: var(--accent-color, #00ffff);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.history-item {
+    background-color: var(--panel-header-bg, #222);
+    border: 1px solid var(--border-color, #444);
+    border-radius: 4px;
+    padding: 10px;
+    transition: all 0.2s ease;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.history-item:hover {
+    border-color: var(--accent-color, #00ffff);
+    box-shadow: 0 2px 8px rgba(0, 255, 255, 0.1);
+}
+
+.history-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    border-bottom: 1px dotted var(--border-color, #444);
+    padding-bottom: 5px;
+}
+
+.history-item-title {
+    font-weight: bold;
+    color: var(--accent-color, #00ffff);
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+}
+
+.history-item-time {
+    color: var(--muted-color, #aaa);
+    font-size: 12px;
+    font-style: italic;
+}
+
+.history-item-preview {
+    font-size: 13px;
+    line-height: 1.5;
+    max-height: 60px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    color: var(--text-color, #eee);
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.history-item-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.history-item-actions .cp-button {
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color, #444);
+}
+
+.load-history-btn {
+    background-color: var(--panel-bg, #333);
+}
+
+.load-history-btn:hover {
+    background-color: var(--accent-bg, #00526e);
+    border-color: var(--accent-color, #00ffff);
+}
+
+.download-history-btn {
+    background-color: var(--accent-bg, #00526e);
+    border-color: var(--accent-color, #00ffff);
+    color: var(--accent-color, #00ffff);
+}
+
+.download-history-btn:hover {
+    background-color: var(--accent-color, #00ffff);
+    color: #000;
+}
+
+/* Delete button styling */
+.delete-history-btn {
+    background-color: rgba(80, 0, 0, 0.5);
+    border-color: #ff3333;
+    color: #ff8888;
+}
+
+.delete-history-btn:hover {
+    background-color: #ff3333;
+    color: #fff;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}
+
+.history-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted-color, #aaa);
+    font-style: italic;
+}
+
+/* ---------- Dice Roller Styles ---------- */
+.dice-roller-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.dice-input-area {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color, #444);
+    background-color: var(--panel-header-bg, #222);
+}
+
+.dice-presets {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.dice-presets label {
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.dice-presets select {
+    flex: 1;
+    padding: 6px;
+    background-color: var(--input-bg, #444);
+    color: var(--text-color, #eee);
+    border: 1px solid var(--border-color, #555);
+    border-radius: 4px;
+}
+
+.dice-custom {
+    margin-bottom: 10px;
+}
+
+.dice-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.dice-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dice-input {
+    width: 50px;
+    padding: 5px;
+    background-color: var(--input-bg, #444);
+    color: var(--text-color, #eee);
+    border: 1px solid var(--border-color, #555);
+    border-radius: 4px;
+    text-align: center;
+}
+
+.dice-modifier {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+select {
+    padding: 5px;
+    background-color: var(--input-bg, #444);
+    color: var(--text-color, #eee);
+    border: 1px solid var(--border-color, #555);
+    border-radius: 4px;
+}
+
+#roll-dice-btn {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.dice-result-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.current-roll-result {
+    padding: 10px;
+    background-color: var(--panel-bg, #333);
+    border-bottom: 1px solid var(--border-color, #444);
+}
+
+.result-header {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--accent-color, #00ffff);
+}
+
+.result-box {
+    padding: 10px;
+    background-color: var(--panel-header-bg, #222);
+    border: 1px solid var(--border-color, #444);
+    border-radius: 4px;
+}
+
+.roll-formula {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.roll-details {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: var(--muted-color, #aaa);
+}
+
+.roll-numbers {
+    font-family: 'Consolas', monospace;
+}
+
+.roll-total {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 5px;
+    color: var(--accent-color, #00ffff);
+}
+
+.exploding-dice {
+    color: #00ff00;
+}
+
+.imploding-dice {
+    color: #ff5555;
+}
+
+.dice-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.dice-history .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.dice-history-item {
+    margin-bottom: 8px;
+}
+
+.dice-history-item .history-item-formula {
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+}
+
+/* ---------- Rules Reference Styles ---------- */
+.rules-ref-container {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+}
+
+.rules-sidebar {
+    width: 150px;
+    background-color: var(--panel-header-bg, #222);
+    border-right: 1px solid var(--border-color, #444);
+    overflow-y: auto;
+}
+
+.rules-categories {
+    display: flex;
+    flex-direction: column;
+}
+
+.rules-category {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color, #444);
+    transition: background-color 0.2s;
+}
+
+.rules-category:hover {
+    background-color: var(--hover-bg, #444);
+}
+
+.rules-category.active {
+    background-color: var(--accent-bg, #00526e);
+    color: var(--accent-color, #00ffff);
+    font-weight: bold;
+}
+
+.rules-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.rules-section {
+    margin-bottom: 20px;
+}
+
+.rules-section h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border-color, #444);
+    color: var(--accent-color, #00ffff);
+}
+
+.rules-content-body {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.rules-content-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+.rules-content-body th {
+    background-color: var(--panel-header-bg, #222);
+    color: var(--accent-color, #00ffff);
+    padding: 8px;
+    text-align: left;
+    border: 1px solid var(--border-color, #444);
+}
+
+.rules-content-body td {
+    padding: 6px 8px;
+    border: 1px solid var(--border-color, #444);
+}
+
+.rules-content-body tr:nth-child(even) {
+    background-color: var(--panel-header-bg, #222);
+}
+
+/* ---------- Notification ---------- */
+#gm-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: var(--notification-bg, #444);
+    color: var(--text-color, #eee);
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+#gm-notification.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+#gm-notification.error {
+    background-color: var(--error-bg, #5e2d2d);
+    color: var(--error-color, #ff6b6b);
+}

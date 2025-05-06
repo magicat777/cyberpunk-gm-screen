@@ -1,0 +1,189 @@
+/* 
+ * Cyberpunk RED GM Screen - Cloud Status Indicator
+ * Styling for the cloud storage status indicator
+ */
+
+.cloud-status-container {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.8rem;
+    background-color: rgba(20, 20, 20, 0.8);
+    padding: 8px 12px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--cp-color-border);
+    color: var(--cp-color-text);
+    transition: all 0.3s ease;
+    opacity: 1;
+}
+
+.cloud-status-container.hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+.cloud-status-container:hover {
+    background-color: rgba(30, 30, 30, 0.9);
+}
+
+.cloud-status-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.cloud-status-online .cloud-status-icon {
+    background-color: #4CAF50;
+    box-shadow: 0 0 5px #4CAF50;
+}
+
+.cloud-status-offline .cloud-status-icon {
+    background-color: #FFC107;
+    box-shadow: 0 0 5px #FFC107;
+}
+
+.cloud-status-error .cloud-status-icon {
+    background-color: #F44336;
+    box-shadow: 0 0 5px #F44336;
+}
+
+.cloud-status-text {
+    margin-right: 5px;
+}
+
+.cloud-status-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.cloud-status-retry {
+    background-color: transparent;
+    border: 1px solid var(--cp-color-accent);
+    color: var(--cp-color-accent);
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+}
+
+.cloud-status-retry:hover {
+    background-color: var(--cp-color-accent);
+    color: #000;
+}
+
+.cloud-status-badge {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 9998;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--cp-color-border);
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.cloud-status-badge.online {
+    background-color: #4CAF50;
+    box-shadow: 0 0 5px #4CAF50;
+}
+
+.cloud-status-badge.offline {
+    background-color: #FFC107;
+    box-shadow: 0 0 5px #FFC107;
+}
+
+.cloud-status-badge.error {
+    background-color: #F44336;
+    box-shadow: 0 0 5px #F44336;
+}
+
+.cloud-status-badge.hidden {
+    opacity: 0;
+    transform: scale(0);
+    pointer-events: none;
+}
+
+.cloud-sync-spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: cloud-spin 1s ease-in-out infinite;
+    margin-left: 5px;
+}
+
+@keyframes cloud-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Animation for new data synced notification */
+@keyframes cloud-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.cloud-status-synced {
+    animation: cloud-pulse 0.5s ease-in-out;
+}
+
+/* Tooltip styles */
+.cloud-status-tooltip {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background-color: rgba(20, 20, 20, 0.9);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--cp-color-border);
+    margin-bottom: 5px;
+}
+
+.cloud-status-badge:hover .cloud-status-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 768px) {
+    .cloud-status-container {
+        bottom: 5px;
+        right: 5px;
+        font-size: 0.7rem;
+        padding: 5px 8px;
+    }
+    
+    .cloud-status-badge {
+        bottom: 5px;
+        right: 5px;
+        width: 16px;
+        height: 16px;
+    }
+}
