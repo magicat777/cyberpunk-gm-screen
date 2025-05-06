@@ -1,1 +1,57 @@
-**/.claude/settings.local.json
+# Local scripts and batch files
+*.bat
+*.sh
+*.ps1
+
+# Workflow files
+setup-github-push.bat
+push-*.bat
+fix-*.bat
+copy-*.bat
+*-feature.bat
+*-changes.bat
+*-work.bat
+*-history.bat
+github-push*.sh
+deploy-*.sh
+fix-*.sh
+commit-*.sh
+
+# Editor and OS specific files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment files
+.env
+.env.local
+config.local.js
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.log
+
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+*.py[cod]
+
+# Personal tokens
+github-push-instructions.md
+*-token.bat
+
+# Task Scheduler files
+*.xml
+!cyberpunk-server-task.xml
+
+# Keep essential scripts
+!setup-gm-screen-service.sh
+!start-server.sh
+!launch-cyberpunk-gm.bat
+!run-cyberpunk-server.bat
