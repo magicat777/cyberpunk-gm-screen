@@ -1,0 +1,366 @@
+/**
+ * Cyberpunk RED GM Screen - Main UI Stylesheet
+ * Combines all cyberpunk UI components and styles
+ */
+
+/* Core resets and variables */
+@import url('cyberpunk-reset.css');
+@import url('cyberpunk-variables.css');
+
+/* Grid system and layout */
+@import url('cyberpunk-grid.css');
+
+/* UI Components */
+@import url('cyberpunk-components.css');
+@import url('cyberpunk-sidebar-fix.css');
+@import url('cyberpunk-panels.css');
+@import url('cyberpunk-custom-ui.css');
+
+/* Effects and animations */
+@import url('cyberpunk-effects.css');
+
+/* UI scaling system */
+@import url('cyberpunk-ui-scaling.css');
+
+/* Custom font declarations */
+@import url('cyberpunk-fonts.css');
+
+/* Web Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+/**
+ * Main layout for Cyberpunk RED GM Screen
+ * These styles define the top-level structure of the application
+ */
+
+/* Root and body reset */
+html, body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  position: fixed;
+}
+
+/* Main content layout */
+.cp-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Admin bar styling */
+.cp-admin-bar {
+  height: var(--cyber-header-height);
+  background: var(--gradient-night-city);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-small);
+  position: relative;
+  z-index: var(--z-index-sticky);
+  box-shadow: var(--shadow-md);
+}
+
+.cp-logo {
+  font-family: var(--font-accent);
+  font-size: 1.5rem;
+  font-weight: var(--weight-bold);
+  color: var(--neon-blue);
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  display: flex;
+  align-items: center;
+}
+
+.cp-logo span {
+  font-size: 0.8rem;
+  margin-left: var(--spacing-tiny);
+  opacity: 0.7;
+  font-weight: normal;
+}
+
+.cp-admin-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-small);
+}
+
+/* Dropdown styling */
+.cp-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.cp-dropdown-button {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-tiny) var(--spacing-small);
+  background-color: rgba(0, 240, 255, 0.1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-color);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-small);
+  cursor: pointer;
+  transition: all var(--transition-standard);
+}
+
+.cp-dropdown-button:hover {
+  background-color: rgba(0, 240, 255, 0.2);
+  border-color: var(--neon-blue);
+}
+
+.cp-dropdown-button::after {
+  content: '▼';
+  font-size: 0.7em;
+  margin-left: var(--spacing-tiny);
+}
+
+.cp-dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-index-dropdown);
+  overflow: hidden;
+}
+
+.cp-dropdown-content.active {
+  display: block;
+  animation: dropdownAppear 0.2s ease;
+}
+
+@keyframes dropdownAppear {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cp-dropdown-content a {
+  display: block;
+  padding: var(--spacing-tiny) var(--spacing-small);
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: var(--font-size-small);
+  transition: all var(--transition-quick);
+}
+
+.cp-dropdown-content a:hover {
+  background-color: rgba(0, 240, 255, 0.1);
+  color: var(--neon-blue);
+}
+
+.cp-dropdown-content hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: var(--spacing-micro) 0;
+}
+
+/* Main content container */
+.cp-content-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Sidebar styling */
+.cp-sidebar {
+  width: var(--cyber-sidebar-width);
+  height: 100%;
+  background-color: var(--bg-surface);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width var(--transition-standard);
+  position: relative;
+  z-index: var(--z-index-above);
+}
+
+.cp-sidebar.collapsed {
+  width: var(--cyber-sidebar-collapsed-width);
+}
+
+.cp-sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 40px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all var(--transition-standard);
+}
+
+.cp-sidebar-toggle:hover {
+  background-color: rgba(0, 240, 255, 0.1);
+}
+
+/* Main desktop area */
+.cp-main-content {
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+  background-color: var(--bg-color);
+}
+
+/* Typography utility classes */
+.cp-text-h1 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-h1);
+  font-weight: var(--weight-bold);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--spacing-small);
+}
+
+.cp-text-h2 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-h2);
+  font-weight: var(--weight-bold);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--spacing-small);
+}
+
+.cp-text-h3 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-h3);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--spacing-tiny);
+}
+
+.cp-text-h4 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-h4);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--spacing-tiny);
+}
+
+.cp-text-mono {
+  font-family: var(--font-mono);
+}
+
+.cp-text-accent {
+  font-family: var(--font-accent);
+}
+
+.cp-text-sm {
+  font-size: var(--font-size-small);
+}
+
+.cp-text-xs {
+  font-size: var(--font-size-micro);
+}
+
+/* Utility classes */
+.cp-border {
+  border: 1px solid var(--border-color);
+}
+
+.cp-rounded {
+  border-radius: var(--border-radius-sm);
+}
+
+.cp-shadow {
+  box-shadow: var(--shadow-md);
+}
+
+.cp-p-xs { padding: var(--spacing-micro); }
+.cp-p-sm { padding: var(--spacing-tiny); }
+.cp-p-md { padding: var(--spacing-small); }
+.cp-p-lg { padding: var(--spacing-medium); }
+.cp-p-xl { padding: var(--spacing-large); }
+
+.cp-m-xs { margin: var(--spacing-micro); }
+.cp-m-sm { margin: var(--spacing-tiny); }
+.cp-m-md { margin: var(--spacing-small); }
+.cp-m-lg { margin: var(--spacing-medium); }
+.cp-m-xl { margin: var(--spacing-large); }
+
+.cp-text-center { text-align: center; }
+.cp-text-left { text-align: left; }
+.cp-text-right { text-align: right; }
+
+.cp-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .cp-logo {
+    font-size: 1.2rem;
+  }
+  
+  .cp-logo span {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .cp-admin-controls {
+    gap: var(--spacing-tiny);
+  }
+  
+  .cp-dropdown-button {
+    padding: var(--spacing-micro) var(--spacing-tiny);
+    font-size: var(--font-size-micro);
+  }
+  
+  .cp-sidebar.expanded {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: var(--z-index-fixed);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .cp-admin-bar {
+    flex-direction: column;
+    height: auto;
+    padding: var(--spacing-tiny);
+  }
+  
+  .cp-logo {
+    margin-bottom: var(--spacing-tiny);
+  }
+  
+  .cp-admin-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

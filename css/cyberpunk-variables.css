@@ -1,0 +1,244 @@
+/**
+ * Cyberpunk RED GM Screen - Design System Variables
+ * Core variables that define the look and feel of the application
+ */
+
+:root {
+  /* Color System - Primary Colors */
+  --night-black: #050709;
+  --neon-blue: #00f0ff;
+  --neon-pink: #ff2a6d;
+  --cyber-red: #ff003c;
+  --neon-green: #05ffa1;
+  --neon-purple: #bb46ff;
+  --neon-orange: #ff9e4f;
+  
+  /* Color System - Secondary Colors */
+  --steel-gray: #1a1a2e;
+  --midnight-purple: #2b2147;
+  --electric-yellow: #ffcc00;
+  --terminal-green: #0df5e3;
+  --dark-steel: #131625;
+  --deep-blue: #092140;
+  --tech-blue: #104677;
+  --cyber-teal: #02d8b9;
+  
+  /* Color RGB Values for Opacity Control */
+  --neon-blue-rgb: 0, 240, 255;
+  --neon-pink-rgb: 255, 42, 109;
+  --neon-green-rgb: 5, 255, 161;
+  --neon-purple-rgb: 187, 70, 255;
+  --cyber-red-rgb: 255, 0, 60;
+  --electric-yellow-rgb: 255, 204, 0;
+  --night-black-rgb: 5, 7, 9;
+  --steel-gray-rgb: 26, 26, 46;
+  --midnight-purple-rgb: 43, 33, 71;
+  --dark-steel-rgb: 19, 22, 37;
+  
+  /* Semantic Colors */
+  --bg-color: var(--night-black);
+  --bg-surface: var(--dark-steel);
+  --bg-elevated: var(--steel-gray);
+  --bg-gradient-start: rgba(19, 22, 37, 0.95);
+  --bg-gradient-end: rgba(5, 7, 9, 0.9);
+  --text-color: #f0f0f0;
+  --text-highlight: #ffffff;
+  --text-muted: rgba(240, 240, 240, 0.7);
+  --text-disabled: rgba(240, 240, 240, 0.5);
+  --border-color: rgba(0, 240, 255, 0.3);
+  --accent-color: var(--neon-blue);
+  --secondary-accent: var(--neon-pink);
+  --tertiary-accent: var(--neon-purple);
+  --success-color: var(--neon-green);
+  --warning-color: var(--electric-yellow);
+  --error-color: var(--cyber-red);
+  --info-color: var(--terminal-green);
+  
+  /* UI Component Colors */
+  --cp-color-bg-primary: var(--night-black);
+  --cp-color-bg-secondary: var(--dark-steel);
+  --cp-color-bg-tertiary: var(--steel-gray);
+  --cp-color-text-primary: var(--text-color);
+  --cp-color-text-secondary: var(--text-muted);
+  --cp-color-text-highlight: var(--text-highlight);
+  --cp-color-accent-primary: var(--neon-blue);
+  --cp-color-accent-secondary: var(--neon-pink);
+  --cp-color-accent-tertiary: var(--neon-purple);
+  --cp-color-neon-primary: var(--neon-blue);
+  --cp-color-neon-secondary: var(--neon-pink);
+  --cp-color-neon-tertiary: var(--neon-purple);
+  --cp-color-success: var(--neon-green);
+  --cp-color-warning: var(--electric-yellow);
+  --cp-color-danger: var(--cyber-red);
+  --cp-color-info: var(--terminal-green);
+  --cp-color-border: var(--border-color);
+  --cp-color-accent: var(--accent-color);
+  --cp-color-text: var(--text-color);
+  
+  /* UI Component RGB Values */
+  --cp-bg-primary-rgb: var(--night-black-rgb);
+  --cp-bg-secondary-rgb: var(--dark-steel-rgb);
+  --cp-bg-tertiary-rgb: var(--steel-gray-rgb);
+  --cp-accent-primary-rgb: var(--neon-blue-rgb);
+  --cp-accent-secondary-rgb: var(--neon-pink-rgb);
+  --cp-accent-tertiary-rgb: var(--neon-purple-rgb);
+  --cp-neon-primary-rgb: var(--neon-blue-rgb);
+  --cp-neon-secondary-rgb: var(--neon-pink-rgb);
+  --cp-neon-tertiary-rgb: var(--neon-purple-rgb);
+  --cp-success-rgb: var(--neon-green-rgb);
+  --cp-warning-rgb: var(--electric-yellow-rgb);
+  --cp-danger-rgb: var(--cyber-red-rgb);
+  
+  /* Typography - Font Families */
+  --font-rajdhani: 'Rajdhani', 'Exo 2', sans-serif;
+  --font-share-tech: 'Share Tech Mono', 'Courier New', monospace;
+  --font-exo: 'Exo 2', Arial, sans-serif;
+  --font-cyberpunk: 'Cyberpunk', 'Orbitron', sans-serif;
+  --font-acquire: 'Acquire', 'Share Tech Mono', monospace;
+  --font-venite: 'Venite Adoremus', 'Rajdhani', sans-serif;
+  --font-angora: 'Angora', Arial, sans-serif;
+  
+  /* Typography - Default Usage */
+  --font-heading: var(--font-rajdhani);
+  --font-body: var(--font-exo);
+  --font-mono: var(--font-share-tech);
+  --font-accent: var(--font-cyberpunk);
+  
+  /* Typography - Font Sizes */
+  --font-size-h1: 2.5rem;
+  --font-size-h2: 2rem;
+  --font-size-h3: 1.5rem;
+  --font-size-h4: 1.25rem;
+  --font-size-body: 1rem;
+  --font-size-small: 0.875rem;
+  --font-size-micro: 0.75rem;
+  
+  /* Typography - Font Weights */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  
+  /* Typography - Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-loose: 1.8;
+  
+  /* Spacing Scale */
+  --spacing-micro: 0.25rem;   /* 4px */
+  --spacing-tiny: 0.5rem;     /* 8px */
+  --spacing-small: 1rem;      /* 16px */
+  --spacing-medium: 1.5rem;   /* 24px */
+  --spacing-large: 2rem;      /* 32px */
+  --spacing-xl: 3rem;         /* 48px */
+  --spacing-xxl: 4rem;        /* 64px */
+  
+  /* Border Radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+  --border-radius-pill: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  --shadow-glow-blue: 0 0 8px rgba(0, 240, 255, 0.5);
+  --shadow-glow-pink: 0 0 8px rgba(255, 42, 109, 0.5);
+  --shadow-glow-green: 0 0 8px rgba(5, 255, 161, 0.5);
+  
+  /* Transitions */
+  --transition-quick: 150ms ease-out;
+  --transition-standard: 250ms ease;
+  --transition-elaborate: 400ms cubic-bezier(0.19, 1, 0.22, 1);
+  
+  /* Z-index Stack */
+  --z-index-base: 0;
+  --z-index-above: 10;
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1100;
+  --z-index-fixed: 1200;
+  --z-index-modal-backdrop: 1300;
+  --z-index-modal: 1400;
+  --z-index-popover: 1500;
+  --z-index-tooltip: 1600;
+  
+  /* Layout */
+  --cyber-header-height: 48px;
+  --cyber-sidebar-width: 240px;
+  --cyber-sidebar-collapsed-width: 60px;
+  --max-width-container: 1440px;
+  
+  /* Effects */
+  --glitch-intensity: 0.15;
+  --scanline-opacity: 0.1;
+  --noise-opacity: 0.05;
+  
+  /* UI Scaling Variables */
+  --cp-ui-scale: 1;
+  --cp-content-scale: 1;
+  --cp-base-font-size: 16px;
+  
+  /* Responsive Adjustments (will be set via media queries) */
+  --responsive-padding: var(--spacing-medium);
+}
+
+/* Media Queries for Responsive Adjustments */
+@media (max-width: 1440px) {
+  :root {
+    --font-size-h1: 2.25rem;
+    --font-size-h2: 1.75rem;
+    --font-size-h3: 1.375rem;
+    --responsive-padding: var(--spacing-small);
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --cyber-header-height: 40px;
+    --cyber-sidebar-width: 220px;
+    --responsive-padding: var(--spacing-small);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --font-size-h1: 2rem;
+    --font-size-h2: 1.5rem;
+    --font-size-h3: 1.25rem;
+    --font-size-h4: 1.125rem;
+    --responsive-padding: var(--spacing-small);
+    --cyber-sidebar-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --font-size-body: 0.9375rem;
+    --responsive-padding: var(--spacing-tiny);
+  }
+}
+
+/* Define common gradients as reusable custom properties */
+:root {
+  --gradient-cyberpunk-horizon: linear-gradient(to right, var(--neon-pink), var(--neon-green));
+  --gradient-night-city: linear-gradient(to bottom, var(--steel-gray), var(--night-black));
+  --gradient-neon-glow: linear-gradient(to right, var(--neon-blue), var(--terminal-green));
+  --gradient-digital-dreams: linear-gradient(45deg, var(--midnight-purple), var(--steel-gray));
+  --gradient-cyber-panel: linear-gradient(180deg, rgba(19, 22, 37, 0.9), rgba(5, 7, 9, 0.8));
+}
+
+/* Utility classes for common color applications */
+.text-neon-blue { color: var(--neon-blue); }
+.text-neon-pink { color: var(--neon-pink); }
+.text-neon-green { color: var(--neon-green); }
+.text-cyber-red { color: var(--cyber-red); }
+.text-electric-yellow { color: var(--electric-yellow); }
+
+.bg-night-black { background-color: var(--night-black); }
+.bg-steel-gray { background-color: var(--steel-gray); }
+.bg-dark-steel { background-color: var(--dark-steel); }
+
+.border-neon-blue { border-color: var(--neon-blue); }
+.border-neon-pink { border-color: var(--neon-pink); }
+.border-neon-green { border-color: var(--neon-green); }

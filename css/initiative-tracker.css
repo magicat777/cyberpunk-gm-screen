@@ -1,0 +1,314 @@
+/**
+ * Cyberpunk RED GM Screen - Initiative Tracker Styles
+ */
+
+/* Panel specific styles */
+.initiative-panel {
+    min-width: 520px;
+    min-height: 300px;
+}
+
+/* Toolbar styles */
+.initiative-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: var(--cp-panel-header-bg);
+    border-radius: 4px;
+}
+
+.initiative-status {
+    display: flex;
+    gap: 15px;
+    color: var(--cp-text-color);
+}
+
+.initiative-status span {
+    font-family: var(--cp-font-mono);
+    border-bottom: 1px solid var(--cp-primary-color);
+    padding-bottom: 2px;
+}
+
+#combat-status {
+    position: relative;
+}
+
+#combat-status::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+    background-color: var(--cp-danger-color);
+}
+
+#combat-status.active::before {
+    background-color: var(--cp-success-color);
+    box-shadow: 0 0 5px var(--cp-success-color);
+    animation: pulse 2s infinite;
+}
+
+.initiative-actions {
+    display: flex;
+    gap: 5px;
+}
+
+/* Character list styles */
+.initiative-characters {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--cp-border-color);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.initiative-header {
+    display: flex;
+    background-color: var(--cp-panel-header-bg);
+    padding: 8px 10px;
+    font-weight: bold;
+    border-bottom: 1px solid var(--cp-border-color);
+}
+
+.initiative-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.initiative-item {
+    display: flex;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.2s;
+}
+
+.initiative-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.initiative-item.active-turn {
+    background-color: rgba(var(--cp-primary-color-rgb), 0.15);
+    border-left: 3px solid var(--cp-primary-color);
+}
+
+.initiative-empty {
+    padding: 15px;
+    text-align: center;
+    color: var(--cp-text-muted);
+    font-style: italic;
+}
+
+/* Column styles */
+.init-col {
+    padding: 0 5px;
+}
+
+.init-name {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.init-role {
+    display: inline-block;
+    font-size: 0.8em;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background-color: rgba(var(--cp-tertiary-color-rgb), 0.2);
+    color: var(--cp-tertiary-color);
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.init-role.playerCharacter {
+    background-color: rgba(var(--cp-primary-color-rgb), 0.2);
+    color: var(--cp-primary-color);
+}
+
+.init-role.npc {
+    background-color: rgba(var(--cp-secondary-color-rgb), 0.2);
+    color: var(--cp-secondary-color);
+}
+
+.init-value {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.init-value-display {
+    font-family: var(--cp-font-mono);
+    font-weight: bold;
+    min-width: 30px;
+    text-align: center;
+}
+
+.init-hp {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.init-hp-bar {
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 3px;
+}
+
+.init-hp-fill {
+    height: 100%;
+    background-color: var(--cp-success-color);
+    transition: width 0.3s ease;
+}
+
+.init-hp-fill.healthy {
+    background-color: var(--cp-success-color);
+}
+
+.init-hp-fill.wounded {
+    background-color: var(--cp-warning-color);
+}
+
+.init-hp-fill.critical {
+    background-color: var(--cp-danger-color);
+}
+
+.init-hp-value {
+    font-size: 0.85em;
+    text-align: center;
+}
+
+.init-actions {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+/* Footer styles */
+.initiative-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.turn-controls, .character-controls {
+    display: flex;
+    gap: 5px;
+}
+
+/* Modal styles for character selection */
+.cp-char-select-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--cp-border-color);
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.cp-char-select-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cp-char-select-item:last-child {
+    border-bottom: none;
+}
+
+.cp-char-select-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.cp-char-name {
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.cp-char-role {
+    font-size: 0.9em;
+    color: var(--cp-text-muted);
+}
+
+/* Value input styles */
+.init-value-input {
+    width: 60px;
+    padding: 2px 5px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--cp-border-color);
+    border-radius: 3px;
+    color: var(--cp-text-color);
+}
+
+/* Animation for combat active indicator */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .initiative-panel {
+        min-width: 320px;
+    }
+    
+    .initiative-toolbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .initiative-status {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .initiative-item {
+        flex-wrap: wrap;
+    }
+    
+    .init-name, .init-value {
+        flex: 1 0 50%;
+    }
+    
+    .init-hp, .init-actions {
+        flex: 1 0 50%;
+        margin-top: 5px;
+    }
+    
+    .initiative-footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .turn-controls, .character-controls {
+        justify-content: center;
+    }
+}

@@ -1,0 +1,73 @@
+/**
+ * Minimal CSS-only fix for Cyberpunk GM Screen
+ * This file provides essential fixes for font and UI scaling issues
+ * without any JavaScript overhead.
+ */
+
+/* Ensure proper CSS variables and dark background */
+:root {
+  --cp-base-font-size: 16px;
+  --cp-font-family: 'Share Tech Mono', monospace;
+  --cp-ui-scale: 1;
+  --cp-content-scale: 1;
+}
+
+/* Force dark background at all times */
+html, body {
+  background-color: #050709 !important;
+  color: #f0f0f0;
+  transition: none !important;
+}
+
+/* Apply font size and family to all panel content */
+.cp-panel__content,
+.cp-panel__content table,
+.cp-panel__content th,
+.cp-panel__content td,
+.cp-sidebar-content,
+.cp-accordion-item,
+.cp-text-mono {
+  font-size: var(--cp-base-font-size) !important;
+  font-family: var(--cp-font-family) !important;
+}
+
+/* Specifically target stubborn panels */
+[data-component="standard-dv"] .cp-panel__content,
+[data-component="standard-dv"] .cp-panel__content table,
+[data-component="standard-dv"] .cp-panel__content th,
+[data-component="standard-dv"] .cp-panel__content td,
+[data-component="character-states"] .cp-panel__content,
+[data-component="character-states"] .cp-panel__content table,
+[data-component="character-states"] .cp-panel__content th,
+[data-component="character-states"] .cp-panel__content td {
+  font-size: var(--cp-base-font-size) !important;
+  font-family: var(--cp-font-family) !important;
+}
+
+/* Improve UI scaling */
+.cp-app {
+  transform: scale(var(--cp-ui-scale)) !important;
+  transform-origin: top left !important;
+}
+
+/* Disable any problematic transitions */
+.cp-app, .cp-panel, .cp-panel__content, .cp-sidebar {
+  transition: none !important;
+}
+
+/* Add better visibility for scaling modal */
+#cp-scaling-modal.visible {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 9999 !important;
+}
+
+/* Style for the preview box */
+.cp-preview-box {
+  padding: 10px;
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  margin-top: 15px;
+  margin-bottom: 15px;
+  background-color: rgba(0, 0, 0, 0.3);
+}

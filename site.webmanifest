@@ -1,0 +1,51 @@
+{
+  "name": "Cyberpunk RED GM Screen",
+  "short_name": "CP RED GM",
+  "description": "A comprehensive digital game master screen for Cyberpunk RED tabletop RPG",
+  "start_url": "/desktop.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#e31937",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "games"],
+  "screenshots": [
+    {
+      "src": "/images/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/screenshot2.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Desktop Interface",
+      "short_name": "Desktop",
+      "description": "Open the desktop interface",
+      "url": "/desktop.html"
+    },
+    {
+      "name": "Original Interface",
+      "short_name": "Original",
+      "description": "Open the original tabbed interface",
+      "url": "/index.html"
+    }
+  ]
+}

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Customization Persistence Test</title>
+    <style>
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: #00b0ff;
+            text-align: center;
+        }
+
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #252525;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #00b0ff;
+            color: #121212;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px 0;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background-color: #0090e0;
+        }
+
+        .results {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border-radius: 3px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .light-theme {
+            background-color: #f0f0f0;
+            color: #121212;
+        }
+
+        .light-theme .container {
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .light-theme .test-section {
+            background-color: #e8e8e8;
+        }
+
+        .light-theme h1 {
+            color: #0070c0;
+        }
+
+        .light-theme .results {
+            background-color: #d5d5d5;
+        }
+
+        .light-theme button {
+            background-color: #0070c0;
+            color: white;
+        }
+
+        .light-theme button:hover {
+            background-color: #005b9e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>UI Customization Persistence Test</h1>
+        
+        <div class="test-section">
+            <h2>Current Settings</h2>
+            <button id="show-settings">Show Current Settings</button>
+            <button id="clear-settings">Clear All Settings</button>
+            <div id="settings-display" class="results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Theme Test</h2>
+            <button id="toggle-theme">Toggle Dark/Light Theme</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>UI Scaling Test</h2>
+            <button id="increase-scale">Increase UI Scale (+10%)</button>
+            <button id="decrease-scale">Decrease UI Scale (-10%)</button>
+            <button id="reset-scale">Reset to Default (100%)</button>
+            <div id="scale-display" class="results">Current Scale: 100%</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Font Settings Test</h2>
+            <button id="increase-font">Increase Font Size (+1px)</button>
+            <button id="decrease-font">Decrease Font Size (-1px)</button>
+            <button id="reset-font">Reset to Default (16px)</button>
+            <div id="font-display" class="results">Current Font Size: 16px</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Font Family Test</h2>
+            <select id="font-family">
+                <option value="Share Tech Mono">Share Tech Mono (Default)</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Arial">Arial</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Times New Roman">Times New Roman</option>
+            </select>
+            <button id="apply-font">Apply Font</button>
+            <div id="font-family-display" class="results">Current Font: Share Tech Mono</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Test Persistence</h2>
+            <p>Click the button below to reload the page and test if settings are persisted:</p>
+            <button id="reload-page">Reload Page</button>
+        </div>
+    </div>
+
+    <script>
+        // Settings key
+        const SETTINGS_KEY = 'cyberpunk-gm-settings';
+        
+        // Default settings
+        const defaultSettings = {
+            theme: 'dark',
+            animations: true,
+            scaling: {
+                uiScale: 100,
+                fontSize: 16,
+                fontFamily: 'Share Tech Mono',
+                contentScale: 100,
+                autoAdjust: true
+            },
+            version: '2.0.77'
+        };
+        
+        // Current settings object
+        let settings = { ...defaultSettings };
+        
+        // Load settings
+        function loadSettings() {
+            try {
+                const savedSettings = localStorage.getItem(SETTINGS_KEY);
+                if (savedSettings) {
+                    settings = JSON.parse(savedSettings);
+                    applySettings();
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+        
+        // Save settings
+        function saveSettings() {
+            try {
+                localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+                console.log('Settings saved:', settings);
+                updateSettingsDisplay();
+            } catch (error) {
+                console.error('Error saving settings:', error);
+            }
+        }
+        
+        // Apply settings to UI
+        function applySettings() {
+            // Apply theme
+            if (settings.theme === 'light') {
+                document.body.classList.add('light-theme');
+            } else {
+                document.body.classList.remove('light-theme');
+            }
+            
+            // Apply font size
+            document.documentElement.style.fontSize = `${settings.scaling.fontSize}px`;
+            
+            // Apply UI scale
+            document.documentElement.style.setProperty('--ui-scale', settings.scaling.uiScale / 100);
+            
+            // Apply font family
+            document.body.style.fontFamily = settings.scaling.fontFamily;
+            
+            // Update displays
+            updateScaleDisplay();
+            updateFontDisplay();
+            updateFontFamilyDisplay();
+            updateSettingsDisplay();
+        }
+        
+        // Update settings display
+        function updateSettingsDisplay() {
+            const display = document.getElementById('settings-display');
+            display.textContent = JSON.stringify(settings, null, 2);
+        }
+        
+        // Update scale display
+        function updateScaleDisplay() {
+            const display = document.getElementById('scale-display');
+            display.textContent = `Current Scale: ${settings.scaling.uiScale}%`;
+        }
+        
+        // Update font display
+        function updateFontDisplay() {
+            const display = document.getElementById('font-display');
+            display.textContent = `Current Font Size: ${settings.scaling.fontSize}px`;
+        }
+        
+        // Update font family display
+        function updateFontFamilyDisplay() {
+            const display = document.getElementById('font-family-display');
+            display.textContent = `Current Font: ${settings.scaling.fontFamily}`;
+        }
+        
+        // Initialize the page
+        function init() {
+            // Load settings
+            loadSettings();
+            
+            // Show settings button
+            document.getElementById('show-settings').addEventListener('click', updateSettingsDisplay);
+            
+            // Clear settings button
+            document.getElementById('clear-settings').addEventListener('click', () => {
+                localStorage.removeItem(SETTINGS_KEY);
+                settings = { ...defaultSettings };
+                applySettings();
+                alert('Settings cleared.');
+            });
+            
+            // Theme toggle button
+            document.getElementById('toggle-theme').addEventListener('click', () => {
+                settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
+                saveSettings();
+                applySettings();
+            });
+            
+            // Scale buttons
+            document.getElementById('increase-scale').addEventListener('click', () => {
+                settings.scaling.uiScale = Math.min(200, settings.scaling.uiScale + 10);
+                saveSettings();
+                applySettings();
+            });
+            
+            document.getElementById('decrease-scale').addEventListener('click', () => {
+                settings.scaling.uiScale = Math.max(50, settings.scaling.uiScale - 10);
+                saveSettings();
+                applySettings();
+            });
+            
+            document.getElementById('reset-scale').addEventListener('click', () => {
+                settings.scaling.uiScale = 100;
+                saveSettings();
+                applySettings();
+            });
+            
+            // Font size buttons
+            document.getElementById('increase-font').addEventListener('click', () => {
+                settings.scaling.fontSize = Math.min(24, settings.scaling.fontSize + 1);
+                saveSettings();
+                applySettings();
+            });
+            
+            document.getElementById('decrease-font').addEventListener('click', () => {
+                settings.scaling.fontSize = Math.max(10, settings.scaling.fontSize - 1);
+                saveSettings();
+                applySettings();
+            });
+            
+            document.getElementById('reset-font').addEventListener('click', () => {
+                settings.scaling.fontSize = 16;
+                saveSettings();
+                applySettings();
+            });
+            
+            // Font family
+            document.getElementById('apply-font').addEventListener('click', () => {
+                const fontSelect = document.getElementById('font-family');
+                settings.scaling.fontFamily = fontSelect.value;
+                saveSettings();
+                applySettings();
+            });
+            
+            // Set font family select to current value
+            document.getElementById('font-family').value = settings.scaling.fontFamily;
+            
+            // Reload page button
+            document.getElementById('reload-page').addEventListener('click', () => {
+                window.location.reload();
+            });
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

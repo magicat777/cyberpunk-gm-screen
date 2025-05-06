@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+    <title>Cyberpunk RED GM Screen | Original Interface</title>
+    
+    <!-- Redirect to Secure Login Page -->
+    <meta http-equiv="refresh" content="0; URL=secure-login.html">
+    <!-- After authentication, users will be redirected to desktop-cyberpunk.html -->
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta name="keywords" content="cyberpunk red, game master screen, rpg tools, tabletop rpg, gm screen, cyberpunk, role-playing game, dice roller, character management">
+    <meta name="author" content="Cyberpunk RED GM Screen Project">
+    <meta name="robots" content="index, follow">
+    <meta name="application-name" content="Cyberpunk RED GM Screen">
+    <meta name="theme-color" content="#121212">
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    
+    <!-- Open Graph / Facebook Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/index.html">
+    <meta property="og:title" content="Cyberpunk RED GM Screen | Original Interface">
+    <meta property="og:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta property="og:image" content="https://yourdomain.com/images/og-image.jpg">
+    
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yourdomain.com/index.html">
+    <meta name="twitter:title" content="Cyberpunk RED GM Screen | Original Interface">
+    <meta name="twitter:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta name="twitter:image" content="https://yourdomain.com/images/twitter-image.jpg">
+    
+    <!-- Stylesheet Links -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/gm-tools.css?v=1.3">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Canonical URL - Helps prevent duplicate content issues -->
+    <link rel="canonical" href="https://yourdomain.com/index.html">
+    
+    <!-- Structured Data - For better search engine understanding -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Cyberpunk RED GM Screen",
+      "description": "A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "url": "https://yourdomain.com/index.html",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      },
+      "genre": "Tabletop RPG Tool",
+      "softwareVersion": "2.0.77",
+      "author": {
+        "@type": "Organization",
+        "name": "Cyberpunk RED GM Screen Project"
+      },
+      "featureList": "Rule references, character management, GM notes, dice roller, custom layouts",
+      "copyrightYear": "2023",
+      "keywords": "cyberpunk red, game master screen, rpg tools, tabletop rpg, gm screen"
+    }
+    </script>
+</head>
+<body>
+    <div id="splash-screen" class="splash">
+        <div class="glitch-wrapper">
+            <h1 class="glitch" data-text="CYBERPUNK RED">CYBERPUNK RED</h1>
+            <h2>GM INTERFACE v2.0.77</h2>
+        </div>
+        
+        <div class="config-grid">
+            <div class="config-section">
+                <h3>Core Rules</h3>
+                <label><input type="checkbox" checked data-component="stats"> Stats</label>
+                <label><input type="checkbox" checked data-component="skills"> Skills</label>
+                <label><input type="checkbox" checked data-component="skill-resolution"> Skill Resolution</label>
+                <label><input type="checkbox" checked data-component="exploding-dice"> Exploding/Imploding Dice</label>
+                <label><input type="checkbox" checked data-component="rule-of-cool"> Rule of Cool</label>
+                <label><input type="checkbox" checked data-component="standard-dv"> Standard DV Table</label>
+            </div>
+            
+            <div class="config-section">
+                <h3>Combat</h3>
+                <label><input type="checkbox" checked data-component="combat-basics"> Combat Basics</label>
+                <label><input type="checkbox" checked data-component="initiative"> Initiative & Combat Time</label>
+                <label><input type="checkbox" checked data-component="actions"> Actions</label>
+                <label><input type="checkbox" checked data-component="movement"> Movement</label>
+                <label><input type="checkbox" checked data-component="ranged-combat"> Ranged Combat</label>
+                <label><input type="checkbox" checked data-component="ranged-dv"> Ranged DV Table</label>
+                <label><input type="checkbox" checked data-component="autofire-dv"> Autofire DV Table</label>
+            </div>
+            
+            <div class="config-section">
+                <h3>Melee & Defense</h3>
+                <label><input type="checkbox" checked data-component="brawling"> Brawling Combat</label>
+                <label><input type="checkbox" checked data-component="martial-arts"> Martial Arts Damage</label>
+                <label><input type="checkbox" checked data-component="thrown-weapons"> Thrown Weapons</label>
+                <label><input type="checkbox" checked data-component="thrown-dv"> Thrown Weapons DV</label>
+                <label><input type="checkbox" checked data-component="surprise"> Surprise Attacks</label>
+                <label><input type="checkbox" checked data-component="cover"> Cover</label>
+                <label><input type="checkbox" checked data-component="armor"> Armor</label>
+            </div>
+            
+            <div class="config-section">
+                <h3>Damage & Health</h3>
+                <label><input type="checkbox" checked data-component="damage"> Damage System</label>
+                <label><input type="checkbox" checked data-component="critical-injury"> Critical Injury Chart</label>
+                <label><input type="checkbox" checked data-component="wounds"> Wounds</label>
+                <label><input type="checkbox" checked data-component="death"> Death Rules</label>
+                <label><input type="checkbox" checked data-component="stabilization"> Stabilization</label>
+                <label><input type="checkbox" checked data-component="healing"> Healing</label>
+            </div>
+            
+            <div class="config-section">
+                <h3>Netrunning</h3>
+                <label><input type="checkbox" checked data-component="netrunning"> Netrunning Basics</label>
+                <label><input type="checkbox" checked data-component="quickhacking"> Quickhacking</label>
+                <label><input type="checkbox" checked data-component="net-actions"> Net Actions Table</label>
+            </div>
+        </div>
+        
+        <button id="start-session" class="cyber-button">INITIALIZE INTERFACE</button>
+    </div>
+    
+    <div id="gm-screen" class="hidden">
+        <nav class="cyber-nav">
+            <div class="nav-logo">CYBERPUNK RED</div>
+            <div class="tabs">
+                <button class="tab active" data-tab="overview">OVERVIEW</button>
+                <button class="tab" data-tab="combat">COMBAT</button>
+                <button class="tab" data-tab="damage">DAMAGE</button>
+                <button class="tab" data-tab="netrunning">NETRUNNING</button>
+                <button class="tab" data-tab="reference">REFERENCE</button>
+            </div>
+            <button id="save-layout" class="cyber-button small">SAVE LAYOUT</button>
+        </nav>
+        
+        <div class="tab-content">
+            <div id="overview" class="tab-panel active"></div>
+            <div id="combat" class="tab-panel"></div>
+            <div id="damage" class="tab-panel"></div>
+            <div id="netrunning" class="tab-panel"></div>
+            <div id="reference" class="tab-panel"></div>
+        </div>
+    </div>
+    
+    <!-- Core functionality - use defer for better performance -->
+    <script src="js/data-handler.js" defer></script>
+    <script src="js/game-data.js" defer></script>
+    <script src="js/drag-handler.js" defer></script>
+    <script src="js/character-manager.js?v=1.1" defer></script>
+    <script src="js/layout-manager.js?v=1.3" defer></script>
+    <script src="js/gm-tools.js?v=1.4" defer></script>
+    <script src="js/debug-helper.js?v=1.0" defer></script>
+    <script src="js/main.js" defer></script>
+</body>
+</html>

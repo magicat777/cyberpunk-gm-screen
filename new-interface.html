@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk RED GM Screen</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/desktop-layout.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;700&family=Share+Tech+Mono&family=Orbitron:wght@400;700&family=Syncopate&family=Audiowide&family=Iceland&family=Roboto+Mono&family=Inconsolata&display=swap" rel="stylesheet">
+    <style>
+        /* Inline critical styles to ensure UI is usable before external CSS loads */
+        :root {
+            --cyber-red: #ff003c;
+            --cyber-blue: #00b3e6;
+            --cyber-yellow: #ffff00;
+            --cyber-purple: #9b30ff;
+            --cyber-bg: #111;
+            --cyber-text: #eee;
+        }
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--cyber-bg);
+            color: var(--cyber-text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .cyber-button {
+            background: linear-gradient(135deg, #222, #333);
+            color: var(--cyber-red);
+            border: 2px solid var(--cyber-red);
+            padding: 10px 20px;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 0 5px var(--cyber-red);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cyber-button:hover {
+            box-shadow: 0 0 10px var(--cyber-red), 0 0 20px var(--cyber-red);
+        }
+        
+        .cyber-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 0, 60, 0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+        
+        .cyber-button:hover::after {
+            opacity: 1;
+        }
+        
+        .draggable-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--cyber-blue);
+            box-shadow: 0 0 10px var(--cyber-blue);
+            padding: 15px;
+            margin: 10px;
+            position: absolute;
+            min-width: 300px;
+            min-height: 200px;
+            border-radius: 5px;
+            overflow: hidden;
+            resize: both;
+        }
+        
+        .panel-header {
+            background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+            padding: 5px 10px;
+            margin: -15px -15px 10px -15px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-title {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 1.1em;
+            color: #fff;
+            text-shadow: 0 0 5px var(--cyber-blue);
+        }
+        
+        .panel-controls {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .panel-button {
+            background: transparent;
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-blue);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .panel-button:hover {
+            background: var(--cyber-blue);
+            color: #000;
+        }
+        
+        /* Grid layout for tab panels */
+        .tab-panel {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .tab-panel.active {
+            display: grid;
+        }
+        
+        /* Splash screen */
+        .splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--cyber-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .glitch-wrapper {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .glitch {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--cyber-red);
+            text-shadow: 0 0 10px var(--cyber-red);
+            position: relative;
+            margin: 0;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            color: var(--cyber-blue);
+            animation: glitch-animation 3s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            color: var(--cyber-yellow);
+            animation: glitch-animation 2s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-animation {
+            0% {
+                clip-path: inset(80% 0 0 0);
+            }
+            5% {
+                clip-path: inset(20% 0 60% 0);
+            }
+            10% {
+                clip-path: inset(40% 0 40% 0);
+            }
+            15% {
+                clip-path: inset(60% 0 20% 0);
+            }
+            20% {
+                clip-path: inset(10% 0 70% 0);
+            }
+            25% {
+                clip-path: inset(30% 0 50% 0);
+            }
+            100% {
+                clip-path: inset(0 0 0 0);
+            }
+        }
+        
+        /* Config grid */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin-bottom: 40px;
+        }
+        
+        .config-section {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--cyber-blue);
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .config-section h3 {
+            color: var(--cyber-blue);
+            text-transform: uppercase;
+            margin-top: 0;
+            border-bottom: 1px solid var(--cyber-blue);
+            padding-bottom: 5px;
+        }
+        
+        .config-section label {
+            display: block;
+            margin: 5px 0;
+        }
+        
+        /* Navbar styles */
+        .cyber-nav {
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid var(--cyber-red);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-logo {
+            color: var(--cyber-red);
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-shadow: 0 0 5px var(--cyber-red);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .tab {
+            background: transparent;
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-blue);
+            padding: 8px 15px;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: rgba(0, 179, 230, 0.2);
+        }
+        
+        .tab.active {
+            background: var(--cyber-blue);
+            color: #000;
+        }
+        
+        .small {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        
+        /* Content styles */
+        .content-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--cyber-blue);
+            border-radius: 5px;
+            padding: 15px;
+            height: 100%;
+        }
+        
+        .content-card h3 {
+            color: var(--cyber-blue);
+            border-bottom: 1px solid var(--cyber-blue);
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        th, td {
+            border: 1px solid rgba(0, 179, 230, 0.3);
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background: rgba(0, 179, 230, 0.2);
+            color: var(--cyber-blue);
+        }
+        
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="splash-screen" class="splash">
+        <div class="glitch-wrapper">
+            <h1 class="glitch" data-text="CYBERPUNK RED">CYBERPUNK RED</h1>
+            <h2>GM INTERFACE v2.0.77</h2>
+        </div>
+        
+        <div class="config-grid">
+            <div class="config-section">
+                <h3>Core Rules</h3>
+                <label><input type="checkbox" checked data-component="stats"> Stats</label>
+                <label><input type="checkbox" checked data-component="skills"> Skills</label>
+                <label><input type="checkbox" checked data-component="skill-resolution"> Skill Resolution</label>
+                <label><input type="checkbox" checked data-component="exploding-dice"> Exploding/Imploding Dice</label>
+                <label><input type="checkbox" checked data-component="rule-of-cool"> Rule of Cool</label>
+                <label><input type="checkbox" checked data-component="standard-dv"> Standard DV Table</label>
+            </div>
+            
+            <div class="config-section">
+                <h3>Combat</h3>
+                <label><input type="checkbox" checked data-component="combat-basics"> Combat Basics</label>
+                <label><input type="checkbox" checked data-component="initiative"> Initiative & Combat Time</label>
+                <label><input type="checkbox" checked data-component="actions"> Actions</label>
+                <label><input type="checkbox" checked data-component="movement"> Movement</label>
+                <label><input type="checkbox" checked data-component="ranged-combat"> Ranged Combat</label>
+                <label><input type="checkbox" checked data-component="ranged-dv"> Ranged DV Table</label>
+                <label><input type="checkbox" checked data-component="autofire-dv"> Autofire DV Table</label>
+            </div>
+            
+            <div class="config-section">
+                <h3>Melee & Defense</h3>
+                <label><input type="checkbox" checked data-component="brawling"> Brawling Combat</label>
+                <label><input type="checkbox" checked data-component="martial-arts"> Martial Arts Damage</label>
+                <label><input type="checkbox" checked data-component="thrown-weapons"> Thrown Weapons</label>
+                <label><input type="checkbox" checked data-component="thrown-dv"> Thrown Weapons DV</label>
+                <label><input type="checkbox" checked data-component="surprise"> Surprise Attacks</label>
+                <label><input type="checkbox" checked data-component="cover"> Cover</label>
+                <label><input type="checkbox" checked data-component="armor"> Armor</label>
+            </div>
+            
+            <div class="config-section">
+                <h3>Damage & Health</h3>
+                <label><input type="checkbox" checked data-component="damage"> Damage System</label>
+                <label><input type="checkbox" checked data-component="critical-injury"> Critical Injury Chart</label>
+                <label><input type="checkbox" checked data-component="wounds"> Wounds</label>
+                <label><input type="checkbox" checked data-component="death"> Death Rules</label>
+                <label><input type="checkbox" checked data-component="stabilization"> Stabilization</label>
+                <label><input type="checkbox" checked data-component="healing"> Healing</label>
+            </div>
+            
+            <div class="config-section">
+                <h3>Netrunning</h3>
+                <label><input type="checkbox" checked data-component="netrunning"> Netrunning Basics</label>
+                <label><input type="checkbox" checked data-component="quickhacking"> Quickhacking</label>
+                <label><input type="checkbox" checked data-component="net-actions"> Net Actions Table</label>
+            </div>
+        </div>
+        
+        <button id="start-session" class="cyber-button">INITIALIZE INTERFACE</button>
+    </div>
+    
+    <div id="gm-screen" class="hidden">
+        <nav class="cyber-nav">
+            <div class="nav-logo">CYBERPUNK RED</div>
+            <div class="tabs">
+                <button class="tab active" data-tab="overview">OVERVIEW</button>
+                <button class="tab" data-tab="combat">COMBAT</button>
+                <button class="tab" data-tab="damage">DAMAGE</button>
+                <button class="tab" data-tab="netrunning">NETRUNNING</button>
+                <button class="tab" data-tab="reference">REFERENCE</button>
+            </div>
+            <button id="save-layout" class="cyber-button small">SAVE LAYOUT</button>
+        </nav>
+        
+        <div class="tab-content">
+            <div id="overview" class="tab-panel active">
+                <!-- Will be populated with draggable components via JavaScript -->
+            </div>
+            <div id="combat" class="tab-panel">
+                <!-- Combat related panels -->
+            </div>
+            <div id="damage" class="tab-panel">
+                <!-- Damage related panels -->
+            </div>
+            <div id="netrunning" class="tab-panel">
+                <!-- Netrunning related panels -->
+            </div>
+            <div id="reference" class="tab-panel">
+                <!-- Reference materials -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Main JavaScript functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM elements
+            const splashScreen = document.getElementById('splash-screen');
+            const gmScreen = document.getElementById('gm-screen');
+            const startButton = document.getElementById('start-session');
+            const saveLayoutButton = document.getElementById('save-layout');
+            const tabButtons = document.querySelectorAll('.tab');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            
+            // Component configuration checkboxes
+            const componentCheckboxes = document.querySelectorAll('input[data-component]');
+            
+            // Event listeners
+            startButton.addEventListener('click', initializeInterface);
+            saveLayoutButton.addEventListener('click', saveLayout);
+            
+            // Initialize tabs
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanels.forEach(panel => panel.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    button.classList.add('active');
+                    
+                    // Show corresponding panel
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Initialize interface
+            function initializeInterface() {
+                // Hide splash screen
+                splashScreen.classList.add('hidden');
+                
+                // Show GM screen
+                gmScreen.classList.remove('hidden');
+                
+                // Create components based on checkboxes
+                const selectedComponents = [];
+                componentCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedComponents.push(checkbox.getAttribute('data-component'));
+                    }
+                });
+                
+                // Load layout if exists, otherwise create default
+                const savedLayout = localStorage.getItem('cyberpunk-gm-layout');
+                if (savedLayout) {
+                    restoreLayout(JSON.parse(savedLayout));
+                } else {
+                    createDefaultLayout(selectedComponents);
+                }
+            }
+            
+            // Create default layout
+            function createDefaultLayout(components) {
+                // Example component data (will be replaced with actual game data)
+                const componentData = {
+                    'stats': {
+                        title: 'Character Stats',
+                        content: `
+                            <table>
+                                <tr>
+                                    <th>STAT</th>
+                                    <th>DESCRIPTION</th>
+                                    <th>TYPICAL</th>
+                                </tr>
+                                <tr>
+                                    <td>INT</td>
+                                    <td>Intelligence, knowledge, memory</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr>
+                                    <td>REF</td>
+                                    <td>Reflexes, coordination, physical reaction</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr>
+                                    <td>DEX</td>
+                                    <td>Dexterity, agility, fine motor control</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr>
+                                    <td>TECH</td>
+                                    <td>Technical aptitude</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr>
+                                    <td>COOL</td>
+                                    <td>Willpower, composure, stress tolerance</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr>
+                                    <td>WILL</td>
+                                    <td>Determination, mental fortitude</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr>
+                                    <td>LUCK</td>
+                                    <td>Fortune, player pool, replenishes session start</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr>
+                                    <td>MOVE</td>
+                                    <td>Movement capability (meters per Turn)</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr>
+                                    <td>BODY</td>
+                                    <td>Strength, endurance, constitution</td>
+                                    <td>5</td>
+                                </tr>
+                                <tr>
+                                    <td>EMP</td>
+                                    <td>Empathy, interpersonal intelligence</td>
+                                    <td>5</td>
+                                </tr>
+                            </table>
+                        `
+                    },
+                    'skills': {
+                        title: 'Skills List',
+                        content: `
+                            <div style="column-count: 2; column-gap: 20px;">
+                                <p><strong>INTELLIGENCE</strong></p>
+                                <ul>
+                                    <li>Accounting</li>
+                                    <li>Animal Handling</li>
+                                    <li>Concentration</li>
+                                    <li>Education & Gen. Knowledge</li>
+                                    <li>Gambling</li>
+                                    <li>Language (Various)</li>
+                                    <li>Tactics</li>
+                                    <li>Wilderness Survival</li>
+                                </ul>
+                                
+                                <p><strong>REFLEXES</strong></p>
+                                <ul>
+                                    <li>Brawling</li>
+                                    <li>Evasion</li>
+                                    <li>Martial Arts (Various)</li>
+                                    <li>Melee Weapon</li>
+                                    <li>Driving</li>
+                                </ul>
+                                
+                                <p><strong>DEXTERITY</strong></p>
+                                <ul>
+                                    <li>Archery</li>
+                                    <li>Athletics</li>
+                                    <li>Autofire</li>
+                                    <li>Handgun</li>
+                                    <li>Heavy Weapons</li>
+                                    <li>Shoulder Arms</li>
+                                    <li>Stealth</li>
+                                </ul>
+                                
+                                <p><strong>TECHNIQUE</strong></p>
+                                <ul>
+                                    <li>Basic Tech</li>
+                                    <li>Cybertech</li>
+                                    <li>First Aid</li>
+                                    <li>Forgery</li>
+                                    <li>Paramedic</li>
+                                    <li>Photography/Film</li>
+                                    <li>Pick Lock</li>
+                                </ul>
+                                
+                                <p><strong>COOL</strong></p>
+                                <ul>
+                                    <li>Acting</li>
+                                    <li>Interrogation</li>
+                                    <li>Intimidation</li>
+                                    <li>Perception</li>
+                                    <li>Persuasion</li>
+                                    <li>Resist Torture/Drugs</li>
+                                </ul>
+                                
+                                <p><strong>WILL</strong></p>
+                                <ul>
+                                    <li>Concentration</li>
+                                    <li>Resist Torture/Drugs</li>
+                                </ul>
+                                
+                                <p><strong>EMPATHY</strong></p>
+                                <ul>
+                                    <li>Human Perception</li>
+                                    <li>Conversation</li>
+                                    <li>Trading</li>
+                                    <li>Social</li>
+                                    <li>Persuasion</li>
+                                    <li>Performance</li>
+                                </ul>
+                            </div>
+                        `
+                    },
+                    'skill-resolution': {
+                        title: 'Skill Resolution',
+                        content: `
+                            <p>To perform an action, player rolls:</p>
+                            <p><strong>STAT + SKILL + 1d10 vs DV</strong></p>
+                            <p>A result equal to or higher than the DV means success.</p>
+                            <p><strong>Critical Success:</strong> If a natural 10 is rolled on the d10, roll again and add (exploding dice).</p>
+                            <p><strong>Critical Failure:</strong> If a natural 1 is rolled on the d10, roll again and subtract (imploding dice).</p>
+                        `
+                    },
+                    // Add more component data here
+                    'standard-dv': {
+                        title: 'Standard DV Table',
+                        content: `
+                            <table>
+                                <tr>
+                                    <th>DV</th>
+                                    <th>DIFFICULTY</th>
+                                    <th>DESCRIPTION</th>
+                                </tr>
+                                <tr>
+                                    <td>9</td>
+                                    <td>Everyday</td>
+                                    <td>Simple task that most people could do</td>
+                                </tr>
+                                <tr>
+                                    <td>13</td>
+                                    <td>Average</td>
+                                    <td>Task requiring some competence</td>
+                                </tr>
+                                <tr>
+                                    <td>15</td>
+                                    <td>Difficult</td>
+                                    <td>Task requiring significant skill</td>
+                                </tr>
+                                <tr>
+                                    <td>17</td>
+                                    <td>Very Difficult</td>
+                                    <td>Task requiring expertise</td>
+                                </tr>
+                                <tr>
+                                    <td>21</td>
+                                    <td>Hard</td>
+                                    <td>Task requiring significant expertise</td>
+                                </tr>
+                                <tr>
+                                    <td>24</td>
+                                    <td>Very Hard</td>
+                                    <td>Task requiring mastery</td>
+                                </tr>
+                                <tr>
+                                    <td>29</td>
+                                    <td>Near Impossible</td>
+                                    <td>Task at the edge of human capability</td>
+                                </tr>
+                            </table>
+                        `
+                    },
+                    'combat-basics': {
+                        title: 'Combat Basics',
+                        content: `
+                            <p><strong>COMBAT TURNS</strong></p>
+                            <p>Combat is broken into Rounds of 3 second Turns.</p>
+                            <p><strong>ON YOUR TURN</strong></p>
+                            <ul>
+                                <li>Move up to your MOVE value in meters</li>
+                                <li>Take 1 Action</li>
+                            </ul>
+                            <p><strong>ACTIONS</strong></p>
+                            <ul>
+                                <li>Attack (any offensive action)</li>
+                                <li>Move (additional movement)</li>
+                                <li>Activate (use item/interface)</li>
+                                <li>Grab item from nearby</li>
+                                <li>Communicate (not a simple gesture)</li>
+                                <li>Change posture or stance</li>
+                            </ul>
+                        `
+                    }
+                };
+                
+                // Create panels for each component
+                components.forEach((componentId, index) => {
+                    if (componentData[componentId]) {
+                        const component = componentData[componentId];
+                        const panel = createPanel(componentId, component.title, component.content);
+                        
+                        // Determine which tab to add the component to
+                        let targetTab;
+                        if (['stats', 'skills', 'skill-resolution', 'standard-dv', 'exploding-dice', 'rule-of-cool'].includes(componentId)) {
+                            targetTab = document.getElementById('overview');
+                        } else if (['combat-basics', 'initiative', 'actions', 'movement', 'ranged-combat', 'ranged-dv', 'autofire-dv', 'brawling', 'martial-arts', 'thrown-weapons', 'thrown-dv', 'surprise', 'cover', 'armor'].includes(componentId)) {
+                            targetTab = document.getElementById('combat');
+                        } else if (['damage', 'critical-injury', 'wounds', 'death', 'stabilization', 'healing'].includes(componentId)) {
+                            targetTab = document.getElementById('damage');
+                        } else if (['netrunning', 'quickhacking', 'net-actions'].includes(componentId)) {
+                            targetTab = document.getElementById('netrunning');
+                        } else {
+                            targetTab = document.getElementById('reference');
+                        }
+                        
+                        if (targetTab) {
+                            // Position panel
+                            const x = (index % 3) * 320 + 20;
+                            const y = Math.floor(index / 3) * 250 + 20;
+                            panel.style.left = `${x}px`;
+                            panel.style.top = `${y}px`;
+                            
+                            targetTab.appendChild(panel);
+                        }
+                    }
+                });
+                
+                initializeDragPanels();
+            }
+            
+            // Create panel element
+            function createPanel(id, title, content) {
+                const panel = document.createElement('div');
+                panel.className = 'draggable-panel';
+                panel.id = `panel-${id}`;
+                panel.setAttribute('data-component', id);
+                
+                panel.innerHTML = `
+                    <div class="panel-header">
+                        <div class="panel-title">${title}</div>
+                        <div class="panel-controls">
+                            <button class="panel-button minimize">_</button>
+                            <button class="panel-button close">×</button>
+                        </div>
+                    </div>
+                    <div class="panel-content">
+                        ${content}
+                    </div>
+                `;
+                
+                // Add event listeners for panel controls
+                panel.querySelector('.close').addEventListener('click', () => {
+                    panel.remove();
+                });
+                
+                panel.querySelector('.minimize').addEventListener('click', () => {
+                    const content = panel.querySelector('.panel-content');
+                    content.style.display = content.style.display === 'none' ? 'block' : 'none';
+                });
+                
+                return panel;
+            }
+            
+            // Initialize draggable panels
+            function initializeDragPanels() {
+                const panels = document.querySelectorAll('.draggable-panel');
+                
+                panels.forEach(panel => {
+                    const header = panel.querySelector('.panel-header');
+                    
+                    header.addEventListener('mousedown', function(e) {
+                        // Prevent default to avoid text selection
+                        e.preventDefault();
+                        
+                        // Bring panel to front
+                        panels.forEach(p => p.style.zIndex = 1);
+                        panel.style.zIndex = 10;
+                        
+                        // Get initial position
+                        const initialX = e.clientX;
+                        const initialY = e.clientY;
+                        const offsetX = panel.offsetLeft;
+                        const offsetY = panel.offsetTop;
+                        
+                        // Define move function
+                        function movePanel(e) {
+                            panel.style.left = `${offsetX + e.clientX - initialX}px`;
+                            panel.style.top = `${offsetY + e.clientY - initialY}px`;
+                        }
+                        
+                        // Define stop function
+                        function stopMoving() {
+                            document.removeEventListener('mousemove', movePanel);
+                            document.removeEventListener('mouseup', stopMoving);
+                        }
+                        
+                        // Add event listeners
+                        document.addEventListener('mousemove', movePanel);
+                        document.addEventListener('mouseup', stopMoving);
+                    });
+                });
+            }
+            
+            // Save layout to local storage
+            function saveLayout() {
+                const panels = document.querySelectorAll('.draggable-panel');
+                const layout = [];
+                
+                panels.forEach(panel => {
+                    layout.push({
+                        id: panel.id,
+                        component: panel.getAttribute('data-component'),
+                        left: panel.style.left,
+                        top: panel.style.top,
+                        width: panel.style.width,
+                        height: panel.style.height,
+                        tabId: panel.closest('.tab-panel').id,
+                        minimized: panel.querySelector('.panel-content').style.display === 'none'
+                    });
+                });
+                
+                localStorage.setItem('cyberpunk-gm-layout', JSON.stringify(layout));
+                alert('Layout saved successfully!');
+            }
+            
+            // Restore layout from saved data
+            function restoreLayout(layoutData) {
+                // Clear all panels first
+                document.querySelectorAll('.tab-panel').forEach(panel => {
+                    panel.innerHTML = '';
+                });
+                
+                // Re-create panels from saved data
+                layoutData.forEach(item => {
+                    const componentId = item.component;
+                    // For simplicity, we'll use a dummy component - in a full implementation,
+                    // you would load the actual component data here
+                    const component = {
+                        title: 'Component ' + componentId,
+                        content: 'Content for ' + componentId
+                    };
+                    
+                    const panel = createPanel(componentId, component.title, component.content);
+                    
+                    // Restore position and size
+                    panel.style.left = item.left;
+                    panel.style.top = item.top;
+                    if (item.width) panel.style.width = item.width;
+                    if (item.height) panel.style.height = item.height;
+                    
+                    // Restore minimized state
+                    if (item.minimized) {
+                        panel.querySelector('.panel-content').style.display = 'none';
+                    }
+                    
+                    // Add to correct tab
+                    document.getElementById(item.tabId).appendChild(panel);
+                });
+                
+                initializeDragPanels();
+            }
+        });
+    </script>
+</body>
+</html>

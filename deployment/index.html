@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyberpunk RED GM Screen - Login</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background-color: #1e1e2d;
+            border: 1px solid #00ccff;
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+        }
+        .title {
+            color: #00ccff;
+            margin-bottom: 20px;
+        }
+        input {
+            background-color: #2a2a3a;
+            color: #e0e0e0;
+            border: 1px solid #00ccff;
+            padding: 8px;
+            width: 100%;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #1e3a5a;
+            color: #00ccff;
+            border: 1px solid #00ccff;
+            padding: 8px 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #254b75;
+        }
+        .error-message {
+            color: #ff4f4f;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2 class="title">Cyberpunk RED GM Screen</h2>
+        <div>
+            <input type="password" id="password" placeholder="Enter password">
+            <button id="login-button">Login</button>
+            <p class="error-message" id="error-message">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+    <script src="auth.js"></script>
+</body>
+</html>

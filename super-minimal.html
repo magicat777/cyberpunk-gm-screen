@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyberpunk RED - Super Minimal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Toolbar with dropdown menus -->
+    <div class="toolbar">
+        <div class="title">Cyberpunk RED GM Screen</div>
+        
+        <!-- Panel menu -->
+        <div class="dropdown">
+            <button class="dropbtn">Add Panel</button>
+            <div class="dropdown-content">
+                <div class="menu-category">GM Tools</div>
+                <a href="#" id="add-notes">Notes</a>
+                <a href="#" id="add-dice">Dice Roller</a>
+                <a href="#" id="add-initiative">Initiative Tracker</a>
+                <a href="#" id="add-timer">Game Timer</a>
+                <a href="#" id="add-calculator">Calculator</a>
+                
+                <div class="menu-category">Reference</div>
+                <a href="#" id="add-rules">Rules Reference</a>
+                <a href="#" id="add-weapons">Weapons Table</a>
+                <a href="#" id="add-armor">Armor Table</a>
+                <a href="#" id="add-critical">Critical Injury Table</a>
+                <a href="#" id="add-netrunning">Netrunning Reference</a>
+                
+                <div class="menu-category">Characters</div>
+                <a href="#" id="add-character">Character Sheet</a>
+                <a href="#" id="add-npc">NPC Generator</a>
+                <a href="#" id="add-loot">Loot Generator</a>
+                
+                <div class="menu-category">World</div>
+                <a href="#" id="add-names">Name Generator</a>
+                <a href="#" id="add-corps">Corporations</a>
+                <a href="#" id="add-locations">Night City Locations</a>
+            </div>
+        </div>
+        
+        <!-- Layout menu -->
+        <div class="dropdown">
+            <button class="dropbtn">Layout</button>
+            <div class="dropdown-content">
+                <a href="#" id="clear-all">Clear All Panels</a>
+                <a href="#" id="arrange-panels">Auto-Arrange Panels</a>
+                <a href="#" id="save-layout">Save Layout</a>
+                <a href="#" id="load-layout">Load Layout</a>
+            </div>
+        </div>
+        
+        <!-- Settings menu -->
+        <div class="dropdown">
+            <button class="dropbtn">Settings</button>
+            <div class="dropdown-content">
+                <a href="#" id="toggle-sidebar">Toggle Font Controls</a>
+                <a href="#" id="toggle-colors">Change Color Theme</a>
+                <a href="#" id="toggle-animations">Toggle Animations</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Font controls -->
+    <div class="controls">
+        <div class="font-options">
+            <label>Font Size:</label>
+            <div class="font-buttons">
+                <button class="font-size-btn" data-size="12">12px</button>
+                <button class="font-size-btn" data-size="14">14px</button>
+                <button class="font-size-btn active" data-size="16">16px</button>
+                <button class="font-size-btn" data-size="18">18px</button>
+            </div>
+        </div>
+        <div class="font-options">
+            <label>Font Family:</label>
+            <select id="font-family">
+                <option value="monospace">Monospace</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Courier New', monospace">Courier New</option>
+            </select>
+        </div>
+        <button id="apply-font">Apply Font</button>
+    </div>
+
+    <script>
+        // Panel counter for positioning
+        let panelCount = 0;
+        let currentFontSize = 16;
+        let currentFontFamily = "monospace";
+        
+        // All panel creation functions
+        function createPanel(title) {
+            panelCount++;
+            
+            // Create panel
+            const panel = document.createElement('div');
+            panel.className = 'panel';
+            panel.style.left = (50 + panelCount * 30) + 'px';
+            panel.style.top = (50 + panelCount * 20) + 'px';
+            panel.style.zIndex = panelCount;
+            
+            // Add header and content
+            panel.innerHTML = `
+                <div class="panel-header">
+                    <div>${title}</div>
+                    <button class="close-button">×</button>
+                </div>
+                <div class="panel-content"></div>
+                <div class="resize-handle"></div>
+            `;
+            
+            // Add panel to document
+            document.body.appendChild(panel);
+            
+            // Make panel draggable
+            makeDraggable(panel);
+            
+            // Make panel resizable
+            makeResizable(panel);
+            
+            // Add close functionality
+            panel.querySelector('.close-button').addEventListener('click', function() {
+                panel.remove();
+            });
+            
+            return panel;
+        }
+
+        function createNotesPanel() {
+            const panel = createPanel('Notes');
+            const content = panel.querySelector('.panel-content');
+            
+            content.innerHTML = '<textarea placeholder="Enter your notes here..."></textarea>';
+            
+            return panel;
+        }
+        
+        // Wait for DOM to be fully loaded before attaching event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Panel creation event listeners
+            document.getElementById('add-notes').addEventListener('click', function(e) {
+                e.preventDefault();
+                createNotesPanel();
+            });
+        
+        document.getElementById('add-dice').addEventListener('click', function(e) {
+            e.preventDefault();
+            createDicePanel();
+        });
+        
+        document.getElementById('add-rules').addEventListener('click', function(e) {
+            e.preventDefault();
+            createRulesPanel();
+        });
+        
+        document.getElementById('add-initiative').addEventListener('click', function(e) {
+            e.preventDefault();
+            createInitiativePanel();
+        });
+        
+        document.getElementById('add-timer').addEventListener('click', function(e) {
+            e.preventDefault();
+            createTimerPanel();
+        });
+        
+        document.getElementById('add-calculator').addEventListener('click', function(e) {
+            e.preventDefault();
+            createCalculatorPanel();
+        });
+        
+        document.getElementById('add-weapons').addEventListener('click', function(e) {
+            e.preventDefault();
+            createWeaponsPanel();
+        });
+        
+        document.getElementById('add-armor').addEventListener('click', function(e) {
+            e.preventDefault();
+            createArmorPanel();
+        });
+        
+        document.getElementById('add-critical').addEventListener('click', function(e) {
+            e.preventDefault();
+            createCriticalInjuryPanel();
+        });
+        
+        document.getElementById('add-netrunning').addEventListener('click', function(e) {
+            e.preventDefault();
+            createNetrunningPanel();
+        });
+        
+        document.getElementById('add-character').addEventListener('click', function(e) {
+            e.preventDefault();
+            createCharacterPanel();
+        });
+        
+        document.getElementById('add-npc').addEventListener('click', function(e) {
+            e.preventDefault();
+            createNPCPanel();
+        });
+        
+        document.getElementById('add-loot').addEventListener('click', function(e) {
+            e.preventDefault();
+            createLootPanel();
+        });
+        
+        document.getElementById('add-names').addEventListener('click', function(e) {
+            e.preventDefault();
+            createNameGeneratorPanel();
+        });
+        
+        document.getElementById('add-corps').addEventListener('click', function(e) {
+            e.preventDefault();
+            createCorporationsPanel();
+        });
+        
+        document.getElementById('add-locations').addEventListener('click', function(e) {
+            e.preventDefault();
+            createLocationsPanel();
+        });
+        
+        // Layout controls
+        document.getElementById('clear-all').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to remove all panels?')) {
+                const panels = document.querySelectorAll('.panel');
+                panels.forEach(panel => panel.remove());
+            }
+        });
+        
+        document.getElementById('arrange-panels').addEventListener('click', function(e) {
+            e.preventDefault();
+            autoArrangePanels();
+        });
+        
+        document.getElementById('save-layout').addEventListener('click', function(e) {
+            e.preventDefault();
+            saveLayout();
+        });
+        
+        document.getElementById('load-layout').addEventListener('click', function(e) {
+            e.preventDefault();
+            loadLayout();
+        });
+        
+        // Settings controls
+        document.getElementById('toggle-sidebar').addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleFontControls();
+        });
+        
+        document.getElementById('toggle-colors').addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleColorTheme();
+        });
+        
+        document.getElementById('toggle-animations').addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleAnimations();
+        });
+        
+        // Font size buttons
+        const fontButtons = document.querySelectorAll('.font-size-btn');
+        fontButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                fontButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                currentFontSize = parseInt(this.getAttribute('data-size'));
+            });
+        });
+        
+        // Font family select
+        document.getElementById('font-family').addEventListener('change', function() {
+            currentFontFamily = this.value;
+        });
+        
+        // Apply font button
+        document.getElementById('apply-font').addEventListener('click', function() {
+            document.body.style.fontSize = currentFontSize + 'px';
+            document.body.style.fontFamily = currentFontFamily;
+            
+            // Apply to all panels
+            const panels = document.querySelectorAll('.panel-content');
+            panels.forEach(panel => {
+                panel.style.fontSize = currentFontSize + 'px';
+                panel.style.fontFamily = currentFontFamily;
+            });
+            
+            alert(`Font applied: ${currentFontSize}px ${currentFontFamily}`);
+        });
+        
+        // Create a notes panel
+        function createNotesPanel() {
+            const panel = createPanel('Notes');
+            panel.querySelector('.panel-content').innerHTML = '<textarea placeholder="Enter your notes here..."></textarea>';
+            return panel;
+        }
+        
+        // Create a dice roller panel
+        function createDicePanel() {
+            const panel = createPanel('Dice Roller');
+            const content = panel.querySelector('.panel-content');
+            
+            content.innerHTML = `
+                <div class="dice-container">
+                    <div class="dice-controls">
+                        <select id="dice-count">
+                            <option>1</option><option>2</option><option>3</option>
+                            <option>4</option><option>5</option><option>6</option>
+                        </select>
+                        d
+                        <select id="dice-type">
+                            <option>4</option><option>6</option><option>8</option>
+                            <option>10</option><option>12</option><option>20</option>
+                            <option>100</option>
+                        </select>
+                        <button id="roll-dice">Roll</button>
+                    </div>
+                    <div id="dice-result">
+                        Result will appear here
+                    </div>
+                </div>
+            `;
+            
+            // Add roll functionality
+            content.querySelector('#roll-dice').addEventListener('click', function() {
+                const count = parseInt(content.querySelector('#dice-count').value);
+                const type = parseInt(content.querySelector('#dice-type').value);
+                let total = 0;
+                let rolls = [];
+                
+                for (let i = 0; i < count; i++) {
+                    const roll = Math.floor(Math.random() * type) + 1;
+                    rolls.push(roll);
+                    total += roll;
+                }
+                
+                content.querySelector('#dice-result').innerHTML = `
+                    <div>Rolls: ${rolls.join(', ')}</div>
+                    <div class="dice-total">${total}</div>
+                `;
+            });
+            
+            return panel;
+        }
+        
+        // Create a rules panel
+        function createRulesPanel() {
+            const panel = createPanel('Rules Reference');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <select id="rule-section" class="panel-rule-section">
+                    <option value="combat">Combat Basics</option>
+                    <option value="damage">Damage</option>
+                    <option value="skills">Skills</option>
+                    <option value="stats">Character Stats</option>
+                    <option value="gear">Gear</option>
+                </select>
+                <div id="rule-content" class="panel-content-section">
+                    <p><strong>Combat Basics</strong></p>
+                    <p>Combat in Cyberpunk RED is handled in Rounds (3 second increments) and Turns.</p>
+                    <p>To make an attack, roll 1d10 + STAT + SKILL + Bonus vs DV.</p>
+                    <p>Initiative = 1d10 + REF + Bonus.</p>
+                </div>
+            `;
+            
+            // Add rule selection functionality
+            const select = panel.querySelector('#rule-section');
+            const content = panel.querySelector('#rule-content');
+            
+            select.addEventListener('change', function() {
+                const value = this.value;
+                
+                if (value === 'combat') {
+                    content.innerHTML = `
+                        <p><strong>Combat Basics</strong></p>
+                        <p>Combat in Cyberpunk RED is handled in Rounds (3 second increments) and Turns.</p>
+                        <p>To make an attack, roll 1d10 + STAT + SKILL + Bonus vs DV.</p>
+                        <p>Initiative = 1d10 + REF + Bonus.</p>
+                    `;
+                } else if (value === 'damage') {
+                    content.innerHTML = `
+                        <p><strong>Damage & Health</strong></p>
+                        <p>HP = 10 + (5 × BODY).</p>
+                        <p>Serious Wound: HP at ≤ ½ max = -2 to all actions.</p>
+                        <p>Death Save: When at 0 HP, roll BODY + 1d10 ≥ 10.</p>
+                    `;
+                } else if (value === 'skills') {
+                    content.innerHTML = `
+                        <p><strong>Skill Checks</strong></p>
+                        <p>Roll 1d10 + STAT + SKILL vs DV.</p>
+                        <p>Critical Success: Roll 10 on 1d10, roll again and add.</p>
+                        <p>Critical Failure: Roll 1 on 1d10, roll again and subtract.</p>
+                    `;
+                } else if (value === 'stats') {
+                    content.innerHTML = `
+                        <p><strong>Character Stats</strong></p>
+                        <p>INT: Intelligence - Knowledge and perception</p>
+                        <p>REF: Reflexes - Coordination and movement</p>
+                        <p>DEX: Dexterity - Fine motor control</p>
+                        <p>TECH: Technical - Technical knowledge</p>
+                        <p>COOL: Cool - Keeping it together under pressure</p>
+                        <p>WILL: Willpower - Mental resilience</p>
+                        <p>LUCK: Luck - Good fortune and fate</p>
+                        <p>MOVE: Movement - How fast you can move</p>
+                        <p>BODY: Body - Physical strength and endurance</p>
+                        <p>EMP: Empathy - Interpersonal ability and humanity</p>
+                    `;
+                } else if (value === 'gear') {
+                    content.innerHTML = `
+                        <p><strong>Gear & Equipment</strong></p>
+                        <p>Weapons have damage values (DV) like 2d6 or 3d6.</p>
+                        <p>Armor has Stopping Power (SP) that reduces damage.</p>
+                        <p>Gear can provide bonuses to skill checks.</p>
+                        <p>Cyberware can enhance abilities but costs Humanity.</p>
+                    `;
+                }
+            });
+            
+            return panel;
+        }
+        
+        // Create an initiative tracker panel
+        function createInitiativePanel() {
+            const panel = createPanel('Initiative Tracker');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div class="initiative-form">
+                    <input type="text" id="init-name" placeholder="Name">
+                    <input type="number" id="init-value" placeholder="Roll">
+                    <button id="init-add">Add</button>
+                </div>
+                <div id="init-list" class="initiative-table">
+                    <div class="initiative-empty">No combatants added</div>
+                </div>
+                <div class="initiative-controls">
+                    <button id="init-next">Next Turn</button>
+                    <button id="init-reset">Reset</button>
+                    <button id="init-roll">Roll For All</button>
+                </div>
+            `;
+            
+            // Initiative state
+            const initState = {
+                combatants: [],
+                currentTurn: -1
+            };
+            
+            // Add functionality
+            const addButton = panel.querySelector('#init-add');
+            const nameInput = panel.querySelector('#init-name');
+            const valueInput = panel.querySelector('#init-value');
+            const listElement = panel.querySelector('#init-list');
+            const nextButton = panel.querySelector('#init-next');
+            const resetButton = panel.querySelector('#init-reset');
+            const rollButton = panel.querySelector('#init-roll');
+            
+            // Add combatant
+            addButton.addEventListener('click', function() {
+                const name = nameInput.value.trim();
+                const initiative = parseInt(valueInput.value) || 0;
+                
+                if (!name) {
+                    alert('Please enter a name');
+                    return;
+                }
+                
+                // Add to state
+                initState.combatants.push({
+                    name: name,
+                    initiative: initiative,
+                    isNPC: name.startsWith('NPC') || name.startsWith('Enemy')
+                });
+                
+                // Sort by initiative
+                initState.combatants.sort((a, b) => b.initiative - a.initiative);
+                
+                // Reset inputs
+                nameInput.value = '';
+                valueInput.value = '';
+                nameInput.focus();
+                
+                // Refresh display
+                refreshInitiativeList();
+            });
+            
+            // Next turn
+            nextButton.addEventListener('click', function() {
+                if (initState.combatants.length === 0) return;
+                
+                initState.currentTurn = (initState.currentTurn + 1) % initState.combatants.length;
+                refreshInitiativeList();
+            });
+            
+            // Reset
+            resetButton.addEventListener('click', function() {
+                initState.currentTurn = -1;
+                refreshInitiativeList();
+            });
+            
+            // Roll for all
+            rollButton.addEventListener('click', function() {
+                initState.combatants.forEach(combatant => {
+                    // REF bonus between 2-7 for NPCs, 4-8 for PCs
+                    const refBonus = combatant.isNPC ? 
+                        Math.floor(Math.random() * 6) + 2 : 
+                        Math.floor(Math.random() * 5) + 4;
+                    
+                    // Roll d10 + REF
+                    combatant.initiative = Math.floor(Math.random() * 10) + 1 + refBonus;
+                });
+                
+                // Sort by initiative
+                initState.combatants.sort((a, b) => b.initiative - a.initiative);
+                
+                // Reset turn
+                initState.currentTurn = -1;
+                
+                // Refresh display
+                refreshInitiativeList();
+            });
+            
+            // Refresh initiative list
+            function refreshInitiativeList() {
+                if (initState.combatants.length === 0) {
+                    listElement.innerHTML = `<div class="initiative-empty">No combatants added</div>`;
+                    return;
+                }
+                
+                let html = '';
+                
+                initState.combatants.forEach((combatant, index) => {
+                    const isActive = index === initState.currentTurn;
+                    const itemClass = `initiative-item ${isActive ? 'initiative-active' : (combatant.isNPC ? 'initiative-npc' : 'initiative-pc')}`;
+                    
+                    html += `
+                        <div class="${itemClass}">
+                            <div>${combatant.name}</div>
+                            <div>${combatant.initiative}</div>
+                            <button class="initiative-remove" data-index="${index}">×</button>
+                        </div>
+                    `;
+                });
+                
+                listElement.innerHTML = html;
+                
+                // Add remove buttons
+                const removeButtons = listElement.querySelectorAll('.initiative-remove');
+                removeButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        
+                        // Adjust current turn if needed
+                        if (index === initState.currentTurn) {
+                            initState.currentTurn = -1;
+                        } else if (index < initState.currentTurn) {
+                            initState.currentTurn--;
+                        }
+                        
+                        // Remove combatant
+                        initState.combatants.splice(index, 1);
+                        
+                        // Refresh display
+                        refreshInitiativeList();
+                    });
+                });
+            }
+            
+            return panel;
+        }
+        
+        // Create a timer panel
+        function createTimerPanel() {
+            const panel = createPanel('Game Timer');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div class="text-centered margin-bottom">
+                    <div id="timer-display" class="timer-display">00:00:00</div>
+                    <div class="flex-row">
+                        <button id="timer-start">Start</button>
+                        <button id="timer-pause">Pause</button>
+                        <button id="timer-reset">Reset</button>
+                    </div>
+                </div>
+                <div class="margin-top">
+                    <div class="margin-bottom">Quick Add:</div>
+                    <div class="flex-row flex-wrap">
+                        <button class="timer-add" data-minutes="5">+5m</button>
+                        <button class="timer-add" data-minutes="15">+15m</button>
+                        <button class="timer-add" data-minutes="30">+30m</button>
+                        <button class="timer-add" data-minutes="60">+1h</button>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <div style="margin-bottom: 5px;">Game Time:</div>
+                    <div id="game-time" style="padding: 10px; border: 1px solid #00ccff; text-align: center;">
+                        Day 1, 20:00 (Evening)
+                    </div>
+                </div>
+            `;
+            
+            // Timer state
+            const timerState = {
+                startTime: null,
+                elapsedTime: 0,
+                interval: null,
+                gameHour: 20,
+                gameMinute: 0,
+                gameDay: 1
+            };
+            
+            // Get elements
+            const display = panel.querySelector('#timer-display');
+            const startButton = panel.querySelector('#timer-start');
+            const pauseButton = panel.querySelector('#timer-pause');
+            const resetButton = panel.querySelector('#timer-reset');
+            const gameTimeDisplay = panel.querySelector('#game-time');
+            const addButtons = panel.querySelectorAll('.timer-add');
+            
+            // Start timer
+            startButton.addEventListener('click', function() {
+                if (timerState.interval) return;
+                
+                timerState.startTime = Date.now() - timerState.elapsedTime;
+                timerState.interval = setInterval(updateTimer, 1000);
+            });
+            
+            // Pause timer
+            pauseButton.addEventListener('click', function() {
+                if (!timerState.interval) return;
+                
+                clearInterval(timerState.interval);
+                timerState.interval = null;
+                timerState.elapsedTime = Date.now() - timerState.startTime;
+            });
+            
+            // Reset timer
+            resetButton.addEventListener('click', function() {
+                clearInterval(timerState.interval);
+                timerState.interval = null;
+                timerState.startTime = null;
+                timerState.elapsedTime = 0;
+                display.textContent = '00:00:00';
+            });
+            
+            // Quick add buttons
+            addButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const minutes = parseInt(this.getAttribute('data-minutes'));
+                    advanceGameTime(minutes);
+                    updateGameTimeDisplay();
+                });
+            });
+            
+            // Update timer display
+            function updateTimer() {
+                const now = Date.now();
+                const elapsed = now - timerState.startTime;
+                
+                const hours = Math.floor(elapsed / 3600000);
+                const minutes = Math.floor((elapsed % 3600000) / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                
+                display.textContent = [
+                    hours.toString().padStart(2, '0'),
+                    minutes.toString().padStart(2, '0'),
+                    seconds.toString().padStart(2, '0')
+                ].join(':');
+            }
+            
+            // Advance game time
+            function advanceGameTime(minutes) {
+                timerState.gameMinute += minutes;
+                
+                // Handle minute overflow
+                while (timerState.gameMinute >= 60) {
+                    timerState.gameMinute -= 60;
+                    timerState.gameHour += 1;
+                }
+                
+                // Handle hour overflow
+                while (timerState.gameHour >= 24) {
+                    timerState.gameHour -= 24;
+                    timerState.gameDay += 1;
+                }
+            }
+            
+            // Update game time display
+            function updateGameTimeDisplay() {
+                let timeOfDay = '';
+                if (timerState.gameHour >= 5 && timerState.gameHour < 12) {
+                    timeOfDay = 'Morning';
+                } else if (timerState.gameHour >= 12 && timerState.gameHour < 17) {
+                    timeOfDay = 'Afternoon';
+                } else if (timerState.gameHour >= 17 && timerState.gameHour < 21) {
+                    timeOfDay = 'Evening';
+                } else {
+                    timeOfDay = 'Night';
+                }
+                
+                const hourDisplay = timerState.gameHour.toString().padStart(2, '0');
+                const minuteDisplay = timerState.gameMinute.toString().padStart(2, '0');
+                
+                gameTimeDisplay.textContent = `Day ${timerState.gameDay}, ${hourDisplay}:${minuteDisplay} (${timeOfDay})`;
+            }
+            
+            // Initial display
+            updateGameTimeDisplay();
+            
+            return panel;
+        }
+        
+        // Create a calculator panel
+        function createCalculatorPanel() {
+            const panel = createPanel('Calculator');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <input type="text" id="calc-display" style="width: 100%; text-align: right; font-size: 20px; padding: 5px; margin-bottom: 10px; background-color: #1e1e2d; color: #00ccff; border: 1px solid #00ccff;" readonly>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
+                        <button class="calc-btn" data-value="7">7</button>
+                        <button class="calc-btn" data-value="8">8</button>
+                        <button class="calc-btn" data-value="9">9</button>
+                        <button class="calc-btn" data-value="/">/</button>
+                        <button class="calc-btn" data-value="4">4</button>
+                        <button class="calc-btn" data-value="5">5</button>
+                        <button class="calc-btn" data-value="6">6</button>
+                        <button class="calc-btn" data-value="*">*</button>
+                        <button class="calc-btn" data-value="1">1</button>
+                        <button class="calc-btn" data-value="2">2</button>
+                        <button class="calc-btn" data-value="3">3</button>
+                        <button class="calc-btn" data-value="-">-</button>
+                        <button class="calc-btn" data-value="0">0</button>
+                        <button class="calc-btn" data-value=".">.</button>
+                        <button class="calc-btn" data-value="=">=</button>
+                        <button class="calc-btn" data-value="+">+</button>
+                        <button class="calc-btn" data-value="d" style="grid-column: span 2;">d (dice)</button>
+                        <button class="calc-btn" data-value="C" style="grid-column: span 2;">Clear</button>
+                    </div>
+                </div>
+                <div id="calc-history" style="border: 1px solid #00ccff; padding: 10px; margin-top: 10px; overflow-y: auto; max-height: 100px;">
+                    <div style="text-align: center; color: #888;">Calculator history will appear here</div>
+                </div>
+            `;
+            
+            // Calculator state
+            const calcState = {
+                currentValue: '',
+                previousValue: null,
+                operator: null,
+                diceMode: false,
+                history: []
+            };
+            
+            // Get elements
+            const display = panel.querySelector('#calc-display');
+            const buttons = panel.querySelectorAll('.calc-btn');
+            const history = panel.querySelector('#calc-history');
+            
+            // Add button handlers
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    handleInput(value);
+                });
+            });
+            
+            // Handle calculator input
+            function handleInput(value) {
+                // Handle clear
+                if (value === 'C') {
+                    calcState.currentValue = '';
+                    calcState.previousValue = null;
+                    calcState.operator = null;
+                    calcState.diceMode = false;
+                    display.value = '';
+                    return;
+                }
+                
+                // Handle equals
+                if (value === '=') {
+                    calculate();
+                    return;
+                }
+                
+                // Handle dice operator
+                if (value === 'd') {
+                    if (calcState.currentValue === '') return;
+                    
+                    calcState.previousValue = calcState.currentValue;
+                    calcState.operator = 'd';
+                    calcState.diceMode = true;
+                    calcState.currentValue = '';
+                    display.value = calcState.previousValue + 'd';
+                    return;
+                }
+                
+                // Handle operators
+                if (['+', '-', '*', '/'].includes(value)) {
+                    if (calcState.currentValue === '') return;
+                    
+                    if (calcState.previousValue !== null) {
+                        calculate();
+                    }
+                    
+                    calcState.previousValue = calcState.currentValue;
+                    calcState.operator = value;
+                    calcState.currentValue = '';
+                    display.value = calcState.previousValue + ' ' + value + ' ';
+                    return;
+                }
+                
+                // Handle digits
+                calcState.currentValue += value;
+                if (calcState.diceMode) {
+                    display.value = calcState.previousValue + 'd' + calcState.currentValue;
+                } else if (calcState.operator) {
+                    display.value = calcState.previousValue + ' ' + calcState.operator + ' ' + calcState.currentValue;
+                } else {
+                    display.value = calcState.currentValue;
+                }
+            }
+            
+            // Calculate result
+            function calculate() {
+                if (calcState.previousValue === null || calcState.currentValue === '') return;
+                
+                const prev = parseFloat(calcState.previousValue);
+                const current = parseFloat(calcState.currentValue);
+                let result;
+                
+                // Calculate based on operator
+                switch (calcState.operator) {
+                    case '+':
+                        result = prev + current;
+                        break;
+                    case '-':
+                        result = prev - current;
+                        break;
+                    case '*':
+                        result = prev * current;
+                        break;
+                    case '/':
+                        result = prev / current;
+                        break;
+                    case 'd':
+                        // Dice roll: XdY
+                        result = 0;
+                        const rolls = [];
+                        for (let i = 0; i < prev; i++) {
+                            const roll = Math.floor(Math.random() * current) + 1;
+                            rolls.push(roll);
+                            result += roll;
+                        }
+                        // Add to history
+                        addToHistory(`${prev}d${current}: [${rolls.join(', ')}] = ${result}`);
+                        break;
+                }
+                
+                // Format and display result
+                const expression = calcState.diceMode ? 
+                    `${calcState.previousValue}d${calcState.currentValue}` : 
+                    `${calcState.previousValue} ${calcState.operator} ${calcState.currentValue}`;
+                
+                // Add non-dice calculations to history
+                if (calcState.operator !== 'd') {
+                    addToHistory(`${expression} = ${result}`);
+                }
+                
+                // Update state
+                calcState.currentValue = result.toString();
+                calcState.previousValue = null;
+                calcState.operator = null;
+                calcState.diceMode = false;
+                
+                // Update display
+                display.value = calcState.currentValue;
+            }
+            
+            // Add calculation to history
+            function addToHistory(text) {
+                calcState.history.unshift(text);
+                if (calcState.history.length > 10) {
+                    calcState.history.pop();
+                }
+                
+                // Update history display
+                history.innerHTML = calcState.history.map(item => 
+                    `<div style="margin-bottom: 5px;">${item}</div>`
+                ).join('');
+            }
+            
+            return panel;
+        }
+        
+        // Create a weapons table panel
+        function createWeaponsPanel() {
+            const panel = createPanel('Weapons Table');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                    <thead>
+                        <tr style="background-color: #1e3a5a;">
+                            <th style="padding: 8px; text-align: left; border: 1px solid #00ccff;">Weapon</th>
+                            <th style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DMG</th>
+                            <th style="padding: 8px; text-align: center; border: 1px solid #00ccff;">ROF</th>
+                            <th style="padding: 8px; text-align: center; border: 1px solid #00ccff;">Range</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Light Pistol</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">2d6</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">2</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">50m</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Medium Pistol</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">3d6</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">2</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">50m</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Heavy Pistol</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">4d6</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">1</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">50m</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">SMG</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">2d6</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">3</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">150m</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Assault Rifle</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">5d6</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">3</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">400m</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Sniper Rifle</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">5d6</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">1</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">800m</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Shotgun</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">5d6</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">1</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">50m</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="font-size: 12px; margin-top: 10px;">
+                    <p><strong>ROF</strong>: Rate of Fire (attacks per turn)</p>
+                    <p><strong>Range</strong>: Effective range without penalties</p>
+                </div>
+            `;
+            
+            return panel;
+        }
+        
+        // Create an armor table panel
+        function createArmorPanel() {
+            const panel = createPanel('Armor Table');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                    <thead>
+                        <tr style="background-color: #1e3a5a;">
+                            <th style="padding: 8px; text-align: left; border: 1px solid #00ccff;">Armor Type</th>
+                            <th style="padding: 8px; text-align: center; border: 1px solid #00ccff;">SP</th>
+                            <th style="padding: 8px; text-align: center; border: 1px solid #00ccff;">Penalty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Leathers</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">4</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">0</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Kevlar</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">7</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">0</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Light Armorjack</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">11</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">0</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Medium Armorjack</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">12</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">0</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Heavy Armorjack</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">13</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">-2 REF</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Flak</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">15</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">-2 REF</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Metalgear</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">18</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">-4 REF</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="font-size: 12px; margin-top: 10px;">
+                    <p><strong>SP</strong>: Stopping Power (damage reduction)</p>
+                    <p><strong>Penalty</strong>: Any stat penalties for wearing</p>
+                </div>
+            `;
+            
+            return panel;
+        }
+        
+        // Create a critical injury table panel
+        function createCriticalInjuryPanel() {
+            const panel = createPanel('Critical Injuries');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <button id="roll-crit" style="width: 100%;">Roll Critical Injury (1d10)</button>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                    <thead>
+                        <tr style="background-color: #1e3a5a;">
+                            <th style="padding: 8px; text-align: center; border: 1px solid #00ccff;">Roll</th>
+                            <th style="padding: 8px; text-align: left; border: 1px solid #00ccff;">Injury</th>
+                            <th style="padding: 8px; text-align: center; border: 1px solid #00ccff;">Effect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">1</td>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Dismembered Arm</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DV 15</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">2</td>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Dismembered Leg</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DV 15</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">3</td>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Damaged Eye</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DV 13</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">4</td>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Damaged Ear</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DV 13</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">5</td>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Crushed Fingers</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DV 13</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">6</td>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Foreign Object</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DV 13</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">7</td>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Broken Ribs</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DV 13</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">8</td>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Broken Arm</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DV 13</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">9</td>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Broken Leg</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DV 13</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">10</td>
+                            <td style="padding: 8px; border: 1px solid #00ccff;">Spinal Injury</td>
+                            <td style="padding: 8px; text-align: center; border: 1px solid #00ccff;">DV 15</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="crit-result" style="padding: 10px; border: 1px solid #00ccff; margin-top: 10px; text-align: center; display: none;"></div>
+            `;
+            
+            // Add roll functionality
+            const rollButton = panel.querySelector('#roll-crit');
+            const resultDiv = panel.querySelector('#crit-result');
+            
+            rollButton.addEventListener('click', function() {
+                const roll = Math.floor(Math.random() * 10) + 1;
+                let injury, effect;
+                
+                switch(roll) {
+                    case 1:
+                        injury = "Dismembered Arm";
+                        effect = "Lost an arm. -4 to all actions requiring two arms. DV 15.";
+                        break;
+                    case 2:
+                        injury = "Dismembered Leg";
+                        effect = "Lost a leg. Move reduced to 1m/turn. -4 to Dodge. DV 15.";
+                        break;
+                    case 3:
+                        injury = "Damaged Eye";
+                        effect = "-4 to Ranged Attacks, Perception, and Driving. DV 13.";
+                        break;
+                    case 4:
+                        injury = "Damaged Ear";
+                        effect = "-4 to Perception and Initiative. DV 13.";
+                        break;
+                    case 5:
+                        injury = "Crushed Fingers";
+                        effect = "-2 to Fine Manipulation tasks. DV 13.";
+                        break;
+                    case 6:
+                        injury = "Foreign Object";
+                        effect = "1 direct damage per turn until stabilized. DV 13.";
+                        break;
+                    case 7:
+                        injury = "Broken Ribs";
+                        effect = "-2 to all actions. Physical damage increased by 2. DV 13.";
+                        break;
+                    case 8:
+                        injury = "Broken Arm";
+                        effect = "Arm unusable. -4 to actions requiring two arms. DV 13.";
+                        break;
+                    case 9:
+                        injury = "Broken Leg";
+                        effect = "Move reduced to 1m/turn. -2 to all actions. DV 13.";
+                        break;
+                    case 10:
+                        injury = "Spinal Injury";
+                        effect = "Move reduced to 1m/turn. -2 to all actions. DV 15.";
+                        break;
+                }
+                
+                resultDiv.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">Roll: ${roll} - ${injury}</div>
+                    <div>${effect}</div>
+                `;
+                resultDiv.style.display = 'block';
+            });
+            
+            return panel;
+        }
+        
+        // Create a netrunning reference panel
+        function createNetrunningPanel() {
+            const panel = createPanel('Netrunning Reference');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <select id="netrunning-section" style="width: 100%; margin-bottom: 10px;">
+                    <option value="basics">Netrunning Basics</option>
+                    <option value="actions">NET Actions</option>
+                    <option value="programs">Programs</option>
+                    <option value="demons">Demons & ICE</option>
+                </select>
+                <div id="netrunning-content" style="border: 1px solid #00ccff; padding: 10px;">
+                    <p><strong>Netrunning Basics</strong></p>
+                    <p>Netrunners jack into Architecture to perform NET Actions.</p>
+                    <p>Each NET Action costs 1 turn of meat space time.</p>
+                    <p>Netrunners roll INT + Interface + 1d10 vs DV.</p>
+                    <p>Programs provide bonuses to specific actions.</p>
+                </div>
+            `;
+            
+            // Add section selection functionality
+            const select = panel.querySelector('#netrunning-section');
+            const content = panel.querySelector('#netrunning-content');
+            
+            select.addEventListener('change', function() {
+                const section = this.value;
+                
+                switch(section) {
+                    case 'basics':
+                        content.innerHTML = `
+                            <p><strong>Netrunning Basics</strong></p>
+                            <p>Netrunners jack into Architecture to perform NET Actions.</p>
+                            <p>Each NET Action costs 1 turn of meat space time.</p>
+                            <p>Netrunners roll INT + Interface + 1d10 vs DV.</p>
+                            <p>Programs provide bonuses to specific actions.</p>
+                        `;
+                        break;
+                    case 'actions':
+                        content.innerHTML = `
+                            <p><strong>NET Actions</strong></p>
+                            <p><b>Interface</b>: Spot Demons/Programs (DV6)</p>
+                            <p><b>Backdoor</b>: Bypass Password/Port (DV6+)</p>
+                            <p><b>Pathfinder</b>: Find specific branch (DV6)</p>
+                            <p><b>Control</b>: Operate device (DV6+)</p>
+                            <p><b>Eye-Dee</b>: Identify program (DV6)</p>
+                            <p><b>Slide</b>: Hide from other Netrunners (DV6)</p>
+                            <p><b>Virus</b>: Damages Architecture (DV6)</p>
+                            <p><b>Zap</b>: Damages program/user (DV6)</p>
+                        `;
+                        break;
+                    case 'programs':
+                        content.innerHTML = `
+                            <p><strong>Netrunner Programs</strong></p>
+                            <p><b>Sword</b>: +2 to Zap</p>
+                            <p><b>See Ya</b>: +2 to Slide</p>
+                            <p><b>Worm</b>: +2 to Backdoor</p>
+                            <p><b>Armor</b>: +2 to Resistance</p>
+                            <p><b>Decryption</b>: +1 to Eye-Dee & Pathfinder</p>
+                            <p><b>Eraser</b>: +2 to Cloak</p>
+                        `;
+                        break;
+                    case 'demons':
+                        content.innerHTML = `
+                            <p><strong>Demons & ICE</strong></p>
+                            <p><b>Hellhound</b>: Attacks Netrunner (3d6 damage)</p>
+                            <p><b>Wisp</b>: Non-lethal trap (2d6 Stun damage)</p>
+                            <p><b>Killer</b>: Lethal trap (3d6 damage)</p>
+                            <p><b>Kraken</b>: Traces Netrunner for Corp (4d6)</p>
+                            <p><b>Liche</b>: Black ICE that zombifies (5d6)</p>
+                            <p><b>Raven</b>: Finds all programs (2d6)</p>
+                        `;
+                        break;
+                }
+            });
+            
+            return panel;
+        }
+        
+        // Create a character sheet panel
+        function createCharacterPanel() {
+            const panel = createPanel('Character Sheet');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="char-name" placeholder="Character Name" style="width: 100%; padding: 5px; margin-bottom: 5px;">
+                    <input type="text" id="char-role" placeholder="Role" style="width: 100%; padding: 5px;">
+                </div>
+                <div id="stats-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; margin-bottom: 15px;">
+                    <div style="padding: 5px;">
+                        <label>INT:</label>
+                        <input type="number" class="stat-input" data-stat="INT" value="5" min="1" max="10" style="width: 40px;">
+                    </div>
+                    <div style="padding: 5px;">
+                        <label>REF:</label>
+                        <input type="number" class="stat-input" data-stat="REF" value="5" min="1" max="10" style="width: 40px;">
+                    </div>
+                    <div style="padding: 5px;">
+                        <label>DEX:</label>
+                        <input type="number" class="stat-input" data-stat="DEX" value="5" min="1" max="10" style="width: 40px;">
+                    </div>
+                    <div style="padding: 5px;">
+                        <label>TECH:</label>
+                        <input type="number" class="stat-input" data-stat="TECH" value="5" min="1" max="10" style="width: 40px;">
+                    </div>
+                    <div style="padding: 5px;">
+                        <label>COOL:</label>
+                        <input type="number" class="stat-input" data-stat="COOL" value="5" min="1" max="10" style="width: 40px;">
+                    </div>
+                    <div style="padding: 5px;">
+                        <label>WILL:</label>
+                        <input type="number" class="stat-input" data-stat="WILL" value="5" min="1" max="10" style="width: 40px;">
+                    </div>
+                    <div style="padding: 5px;">
+                        <label>MOVE:</label>
+                        <input type="number" class="stat-input" data-stat="MOVE" value="5" min="1" max="10" style="width: 40px;">
+                    </div>
+                    <div style="padding: 5px;">
+                        <label>BODY:</label>
+                        <input type="number" class="stat-input" data-stat="BODY" value="5" min="1" max="10" style="width: 40px;">
+                    </div>
+                    <div style="padding: 5px;">
+                        <label>EMP:</label>
+                        <input type="number" class="stat-input" data-stat="EMP" value="5" min="1" max="10" style="width: 40px;">
+                    </div>
+                    <div style="padding: 5px;">
+                        <label>LUCK:</label>
+                        <input type="number" class="stat-input" data-stat="LUCK" value="5" min="1" max="10" style="width: 40px;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <label>HP:</label>
+                        <div>
+                            <input type="number" id="char-hp-current" value="35" min="0" max="60" style="width: 40px;">
+                            / 
+                            <input type="number" id="char-hp-max" value="35" min="1" max="60" style="width: 40px;">
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <label>Armor SP:</label>
+                        <input type="number" id="char-armor" value="11" min="0" max="20" style="width: 40px;">
+                    </div>
+                </div>
+                <button id="save-character" style="width: 100%;">Save Character</button>
+            `;
+            
+            // Calculate HP automatically based on BODY stat
+            const bodyInput = panel.querySelector('[data-stat="BODY"]');
+            const hpMaxInput = panel.querySelector('#char-hp-max');
+            const hpCurrentInput = panel.querySelector('#char-hp-current');
+            
+            bodyInput.addEventListener('change', function() {
+                const body = parseInt(this.value) || 5;
+                const maxHP = 10 + (body * 5);
+                hpMaxInput.value = maxHP;
+                hpCurrentInput.value = maxHP;
+            });
+            
+            // Add save character functionality
+            const saveButton = panel.querySelector('#save-character');
+            
+            saveButton.addEventListener('click', function() {
+                const name = panel.querySelector('#char-name').value.trim();
+                if (!name) {
+                    alert('Please enter a character name');
+                    return;
+                }
+                
+                // Gather character data
+                const charData = {
+                    name: name,
+                    role: panel.querySelector('#char-role').value,
+                    stats: {},
+                    hp: {
+                        current: parseInt(panel.querySelector('#char-hp-current').value),
+                        max: parseInt(panel.querySelector('#char-hp-max').value)
+                    },
+                    armor: parseInt(panel.querySelector('#char-armor').value)
+                };
+                
+                // Get all stats
+                panel.querySelectorAll('.stat-input').forEach(input => {
+                    const stat = input.getAttribute('data-stat');
+                    charData.stats[stat] = parseInt(input.value);
+                });
+                
+                // Save to localStorage
+                let savedChars = JSON.parse(localStorage.getItem('cp-characters') || '{}');
+                savedChars[name] = charData;
+                localStorage.setItem('cp-characters', JSON.stringify(savedChars));
+                
+                alert(`Character "${name}" saved!`);
+            });
+            
+            return panel;
+        }
+        
+        // Create an NPC generator panel
+        function createNPCPanel() {
+            const panel = createPanel('NPC Generator');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <button id="generate-npc" style="width: 100%;">Generate Random NPC</button>
+                </div>
+                <div id="npc-result" style="border: 1px solid #00ccff; padding: 10px; margin-bottom: 15px;">
+                    <div style="text-align: center; color: #888;">Click Generate to create an NPC</div>
+                </div>
+                <button id="save-npc" style="width: 100%;">Save NPC</button>
+            `;
+            
+            // NPC generation data
+            const npcData = {
+                firstNames: ['Johnny', 'V', 'Jackie', 'Rogue', 'Panam', 'River', 'Judy', 'Kerry', 'Takemura', 'Ev', 'Dexter', 'Viktor', 'Misty', 'T-Bug', 'Adam', 'Hanako', 'Yorinobu', 'Mitch', 'Saul', 'Dakota'],
+                lastNames: ['Silverhand', 'Welles', 'Ward', 'Palmer', 'Alvarez', 'Eurodyne', 'Smasher', 'DeShawn', 'Vector', 'Arasaka', 'Blackhand', 'Thompson', 'Martinez', 'Anderson', 'Parker', 'Chen', 'Taylor', 'Jones'],
+                roles: ['Solo', 'Netrunner', 'Tech', 'Medtech', 'Media', 'Exec', 'Lawman', 'Fixer', 'Nomad', 'Rockerboy'],
+                motivations: ['Money', 'Revenge', 'Love', 'Power', 'Fame', 'Survival', 'Loyalty', 'Knowledge', 'Freedom', 'Excitement', 'Redemption', 'Escape'],
+                personalities: ['Aggressive', 'Cautious', 'Flamboyant', 'Reserved', 'Paranoid', 'Friendly', 'Cold', 'Analytical', 'Unpredictable', 'Stoic', 'Nervous', 'Confident', 'Sarcastic']
+            };
+            
+            let currentNPC = null;
+            
+            // Generate NPC function
+            function generateNPC() {
+                // Random selection from arrays
+                const firstName = npcData.firstNames[Math.floor(Math.random() * npcData.firstNames.length)];
+                const lastName = npcData.lastNames[Math.floor(Math.random() * npcData.lastNames.length)];
+                const role = npcData.roles[Math.floor(Math.random() * npcData.roles.length)];
+                const motivation = npcData.motivations[Math.floor(Math.random() * npcData.motivations.length)];
+                const personality = npcData.personalities[Math.floor(Math.random() * npcData.personalities.length)];
+                
+                // Random stats (focused on role-appropriate stats)
+                const stats = {};
+                const statNames = ['INT', 'REF', 'DEX', 'TECH', 'COOL', 'WILL', 'MOVE', 'BODY', 'EMP'];
+                
+                // Determine which stats should be higher based on role
+                let primaryStats = [];
+                if (role === 'Solo') primaryStats = ['REF', 'BODY', 'COOL'];
+                else if (role === 'Netrunner') primaryStats = ['INT', 'TECH', 'WILL'];
+                else if (role === 'Tech') primaryStats = ['TECH', 'INT', 'DEX'];
+                else if (role === 'Medtech') primaryStats = ['TECH', 'INT', 'EMP'];
+                else if (role === 'Media') primaryStats = ['INT', 'COOL', 'EMP'];
+                else if (role === 'Exec') primaryStats = ['INT', 'COOL', 'WILL'];
+                else if (role === 'Lawman') primaryStats = ['WILL', 'REF', 'COOL'];
+                else if (role === 'Fixer') primaryStats = ['COOL', 'EMP', 'INT'];
+                else if (role === 'Nomad') primaryStats = ['TECH', 'REF', 'WILL'];
+                else if (role === 'Rockerboy') primaryStats = ['EMP', 'COOL', 'DEX'];
+                
+                // Assign random stats with higher values for primary stats
+                statNames.forEach(stat => {
+                    if (primaryStats.includes(stat)) {
+                        stats[stat] = Math.floor(Math.random() * 4) + 5; // 5-8
+                    } else {
+                        stats[stat] = Math.floor(Math.random() * 3) + 3; // 3-5
+                    }
+                });
+                
+                // Calculate HP based on BODY
+                const hp = 10 + (stats.BODY * 5);
+                
+                // Choose appropriate gear
+                let weapon = 'Light Pistol (2d6)'; // Default
+                let armor = 'Light Armorjack (SP 11)'; // Default
+                
+                // Adjust based on role
+                if (role === 'Solo') {
+                    weapon = 'Assault Rifle (5d6)';
+                    armor = 'Heavy Armorjack (SP 13)';
+                } else if (role === 'Netrunner') {
+                    weapon = 'Medium Pistol (3d6)';
+                    armor = 'Light Armorjack (SP 11)';
+                } else if (['Nomad', 'Lawman'].includes(role)) {
+                    weapon = 'Shotgun (5d6)';
+                    armor = 'Medium Armorjack (SP 12)';
+                }
+                
+                // Create NPC object
+                currentNPC = {
+                    name: `${firstName} ${lastName}`,
+                    role: role,
+                    stats: stats,
+                    hp: { current: hp, max: hp },
+                    armor: parseInt(armor.match(/\d+/)[0]),
+                    weapon: weapon,
+                    motivation: motivation,
+                    personality: personality
+                };
+                
+                return currentNPC;
+            }
+            
+            // Add generate button functionality
+            const generateButton = panel.querySelector('#generate-npc');
+            const resultDiv = panel.querySelector('#npc-result');
+            const saveButton = panel.querySelector('#save-npc');
+            
+            generateButton.addEventListener('click', function() {
+                const npc = generateNPC();
+                
+                // Display NPC
+                resultDiv.innerHTML = `
+                    <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px;">${npc.name} - ${npc.role}</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px;">
+                        ${Object.entries(npc.stats).map(([stat, value]) => 
+                            `<div><strong>${stat}</strong>: ${value}</div>`
+                        ).join('')}
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong>HP</strong>: ${npc.hp.current}/${npc.hp.max} • <strong>Armor</strong>: SP ${npc.armor}
+                    </div>
+                    <div style="margin-bottom: 5px;"><strong>Weapon</strong>: ${npc.weapon}</div>
+                    <div style="margin-bottom: 5px;"><strong>Motivation</strong>: ${npc.motivation}</div>
+                    <div><strong>Personality</strong>: ${npc.personality}</div>
+                `;
+            });
+            
+            // Add save functionality
+            saveButton.addEventListener('click', function() {
+                if (!currentNPC) {
+                    alert('Generate an NPC first!');
+                    return;
+                }
+                
+                // Save to localStorage
+                let savedNPCs = JSON.parse(localStorage.getItem('cp-npcs') || '{}');
+                savedNPCs[currentNPC.name] = currentNPC;
+                localStorage.setItem('cp-npcs', JSON.stringify(savedNPCs));
+                
+                alert(`NPC "${currentNPC.name}" saved!`);
+            });
+            
+            return panel;
+        }
+        
+        // Create a generic panel
+        function createPanel(title) {
+            panelCount++;
+            
+            // Create panel
+            const panel = document.createElement('div');
+            panel.className = 'panel';
+            panel.style.left = (50 + panelCount * 30) + 'px';
+            panel.style.top = (50 + panelCount * 20) + 'px';
+            panel.style.zIndex = panelCount;
+            
+            // Add header and content
+            panel.innerHTML = `
+                <div class="panel-header">
+                    <div>${title}</div>
+                    <button class="close-button">×</button>
+                </div>
+                <div class="panel-content"></div>
+                <div class="resize-handle"></div>
+            `;
+            
+            // Add panel to document
+            document.body.appendChild(panel);
+            
+            // Make draggable
+            makeElementDraggable(panel);
+            
+            // Make resizable
+            makeElementResizable(panel);
+            
+            // Add close functionality
+            panel.querySelector('.close-button').addEventListener('click', function() {
+                panel.remove();
+            });
+            
+            return panel;
+        }
+        
+        // Make an element draggable
+        function makeElementDraggable(element) {
+            const header = element.querySelector('.panel-header');
+            
+            header.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                
+                // Bring to front
+                element.style.zIndex = ++panelCount;
+                
+                // Get initial position
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startLeft = parseInt(element.style.left) || 0;
+                const startTop = parseInt(element.style.top) || 0;
+                
+                // Define mousemove handler
+                function moveHandler(e) {
+                    // Calculate new position
+                    const newLeft = startLeft + e.clientX - startX;
+                    const newTop = startTop + e.clientY - startY;
+                    
+                    // Update position
+                    element.style.left = newLeft + 'px';
+                    element.style.top = newTop + 'px';
+                }
+                
+                // Define mouseup handler
+                function upHandler() {
+                    // Remove event listeners
+                    document.removeEventListener('mousemove', moveHandler);
+                    document.removeEventListener('mouseup', upHandler);
+                }
+                
+                // Add event listeners
+                document.addEventListener('mousemove', moveHandler);
+                document.addEventListener('mouseup', upHandler);
+            });
+        }
+        
+        // Make an element resizable
+        function makeElementResizable(element) {
+            const handle = element.querySelector('.resize-handle');
+            
+            handle.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                
+                // Get initial position and size
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startWidth = parseInt(getComputedStyle(element).width);
+                const startHeight = parseInt(getComputedStyle(element).height);
+                
+                // Define mousemove handler
+                function moveHandler(e) {
+                    // Calculate new size
+                    const newWidth = startWidth + e.clientX - startX;
+                    const newHeight = startHeight + e.clientY - startY;
+                    
+                    // Update size (with minimum dimensions)
+                    if (newWidth > 200) element.style.width = newWidth + 'px';
+                    if (newHeight > 150) element.style.height = newHeight + 'px';
+                }
+                
+                // Define mouseup handler
+                function upHandler() {
+                    // Remove event listeners
+                    document.removeEventListener('mousemove', moveHandler);
+                    document.removeEventListener('mouseup', upHandler);
+                }
+                
+                // Add event listeners
+                document.addEventListener('mousemove', moveHandler);
+                document.addEventListener('mouseup', upHandler);
+            });
+        }
+        
+        // Create loot generator panel
+        function createLootPanel() {
+            const panel = createPanel('Loot Generator');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <label>Loot Type:</label>
+                    <select id="loot-type" style="width: 100%; margin-top: 5px;">
+                        <option value="weapon">Weapons</option>
+                        <option value="armor">Armor</option>
+                        <option value="cyberware">Cyberware</option>
+                        <option value="gear">General Gear</option>
+                        <option value="drugs">Drugs & Consumables</option>
+                        <option value="junk">Street Junk</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Rarity:</label>
+                    <select id="loot-rarity" style="width: 100%; margin-top: 5px;">
+                        <option value="common">Common</option>
+                        <option value="uncommon">Uncommon</option>
+                        <option value="rare">Rare</option>
+                        <option value="legendary">Legendary</option>
+                    </select>
+                </div>
+                <button id="generate-loot" style="width: 100%; margin-bottom: 15px;">Generate Loot</button>
+                <div id="loot-result" style="border: 1px solid #00ccff; padding: 10px;">
+                    <div style="text-align: center; color: #888;">Generated loot will appear here</div>
+                </div>
+            `;
+            
+            // Loot data by category and rarity
+            const lootTables = {
+                weapon: {
+                    common: ['Light Pistol (2d6)', 'Medium Pistol (3d6)', 'Heavy Pistol (4d6)', 'SMG (2d6)', 'Shotgun (5d6)'],
+                    uncommon: ['Assault Rifle (5d6)', 'Sniper Rifle (5d6)', 'Heavy SMG (3d6)', 'Flamethrower (2d6 burn)', 'Grenade Launcher (6d6)'],
+                    rare: ['Smart Rifle (5d6)', 'Tech Shotgun (5d6 armor piercing)', 'Dual Pistols (2x3d6)', 'Railgun (8d6)'],
+                    legendary: ['Militech "Crusher" Smart-LMG (6d6)', 'Arasaka Black Unicorn (7d6)', 'Tsunami Arms Electromagnetic Hypervelocity Weapon (10d6)']
+                },
+                armor: {
+                    common: ['Leathers (SP 4)', 'Kevlar (SP 7)', 'Bulletproof Vest (SP 9)'],
+                    uncommon: ['Light Armorjack (SP 11)', 'Medium Armorjack (SP 12)', 'Kevlar Helmet (SP 7)'],
+                    rare: ['Heavy Armorjack (SP 13)', 'Flak Armor (SP 15)', 'Concealed Bulletproof Vest (SP 8)'],
+                    legendary: ['MetalGear (SP 18)', 'Full Body Armor (SP 16)', 'Militech Zero Armor (SP 15, no REF penalty)']
+                },
+                cyberware: {
+                    common: ['Basic Cybereye (Low Light)', 'Subdermal Grip (+1 Weapon Skill)', 'Audio Recorder', 'Basic Interface Plugs'],
+                    uncommon: ['Cyberarm (Standard)', 'Nasal Filters', 'Toxin Binders', 'Vampyres (Weapon)', 'Sandevistan (1 Turn)'],
+                    rare: ['Mantis Blades (4d6)', 'Cyberdeck (7 slots)', 'Neural Link (+1 Initiative)', 'Cyberleg (Jump Enhancement)'],
+                    legendary: ['Militech Sandevistan Mk. 5 (3 Turns)', 'Full Cyberskeleton (+3 BODY)', 'Arasaka Neural Co-Processor (+2 INT)', 'Mr. Studd™ Implant']
+                },
+                gear: {
+                    common: ['Agent (Smartphone)', 'Medscanner', 'Tech Tool', 'Flashlight', 'Streetmap Software', 'Kibble (Food)'],
+                    uncommon: ['RealEye Recording System', 'Basic Medkit', 'Grapple Gun', 'Tech Security Kit', 'Smart Glasses'],
+                    rare: ['Advanced Medkit', 'Cyberdeck Programming Suite', 'Techscanner', 'Homing Tracer', 'Antiborgs (Grenades)'],
+                    legendary: ['Full Medical Kit', 'Military Grade Hacking Suite', 'Active Camo System', 'Military Radio Scanner']
+                },
+                drugs: {
+                    common: ['Alcohol', 'Cigars', 'Stim (1 hour no sleep)', 'Surge (+1 REF for 1 hour)'],
+                    uncommon: ['Black Lace (+1 REF, -1 INT)', 'Synthcoke (+2 REF, +1 INT, 2d6 humanity loss)', 'Boost (+1 COOL and +1 REF for 2 hours)'],
+                    rare: ['Blue Glass (6 hour hallucinogen)', 'Dorph (Ignores wound penalties)', 'Glitter (24 hour euphoria, 1d6 EMP loss)'],
+                    legendary: ['Beast (+4 BODY, -2 INT, Berserk, 4 hour duration)', 'Soul Killer NCPD Evidence (1 dose)', 'Designer Endorphins (immune to pain)']
+                },
+                junk: {
+                    common: ['Screamsheets (newspaper)', 'Synthetic leather jacket', 'Broken electronics', 'Street food container', 'Empty hypo'],
+                    uncommon: ['Old credchip', 'Counterfeit cologne', 'Corps ID card (expired)', 'Broken cyberware', 'Maglev train tokens'],
+                    rare: ['Antique vinyl record', 'Pre-war ammunition', 'Vintage Militech propaganda', 'Arasaka employee badge', 'Scavenger gang trophy'],
+                    legendary: ['Johnny Silverhand memorabilia', 'Unmarked data shard (Corpo secrets)', 'Saburo Arasaka signed document', 'Alt Cunningham algorithm fragment']
+                }
+            };
+            
+            // Add generate button functionality
+            const generateButton = panel.querySelector('#generate-loot');
+            const resultDiv = panel.querySelector('#loot-result');
+            
+            generateButton.addEventListener('click', function() {
+                const type = panel.querySelector('#loot-type').value;
+                const rarity = panel.querySelector('#loot-rarity').value;
+                
+                const lootTable = lootTables[type][rarity];
+                const loot = lootTable[Math.floor(Math.random() * lootTable.length)];
+                
+                // Determine monetary value based on rarity
+                let valueRange;
+                switch(rarity) {
+                    case 'common':
+                        valueRange = '50-100eb';
+                        break;
+                    case 'uncommon':
+                        valueRange = '100-500eb';
+                        break;
+                    case 'rare':
+                        valueRange = '500-1,000eb';
+                        break;
+                    case 'legendary':
+                        valueRange = '1,000-5,000eb';
+                        break;
+                }
+                
+                // Display result
+                resultDiv.innerHTML = `
+                    <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px;">${loot}</div>
+                    <div><strong>Type</strong>: ${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                    <div><strong>Rarity</strong>: ${rarity.charAt(0).toUpperCase() + rarity.slice(1)}</div>
+                    <div><strong>Estimated Value</strong>: ${valueRange}</div>
+                `;
+            });
+            
+            return panel;
+        }
+        
+        // Create name generator panel
+        function createNameGeneratorPanel() {
+            const panel = createPanel('Name Generator');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <label>Culture/Style:</label>
+                    <select id="name-style" style="width: 100%; margin-top: 5px;">
+                        <option value="street">Street</option>
+                        <option value="corporate">Corporate</option>
+                        <option value="nomad">Nomad</option>
+                        <option value="asian">Asian</option>
+                        <option value="european">European</option>
+                        <option value="latino">Latino</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Gender:</label>
+                    <select id="name-gender" style="width: 100%; margin-top: 5px;">
+                        <option value="any">Any</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <button id="generate-name" style="width: 100%; margin-bottom: 15px;">Generate Name</button>
+                <div id="name-result" style="border: 1px solid #00ccff; padding: 10px; text-align: center; font-size: 18px;">
+                    Generated name will appear here
+                </div>
+            `;
+            
+            // Name data by culture and gender
+            const nameData = {
+                street: {
+                    male: ['Spike', 'Zero', 'Viper', 'Dex', 'Hack', 'Chrome', 'Gear', 'Glitch', 'Jammer', 'Twitch'],
+                    female: ['Molly', 'Mox', 'Fixer', 'Trinity', 'Neon', 'Glitch', 'Digit', 'Hex', 'Crash', 'Echo'],
+                    last: ['Quickwire', 'Blackhand', 'Steele', 'Swift', 'Killswitch', 'Shadow', 'Burn', 'Deckard', 'Wire']
+                },
+                corporate: {
+                    male: ['Richard', 'Victor', 'Edward', 'Alexander', 'William', 'Jonathan', 'Arthur', 'David', 'Robert', 'Charles'],
+                    female: ['Elizabeth', 'Victoria', 'Catherine', 'Diana', 'Sophia', 'Miranda', 'Olivia', 'Rebecca', 'Evelyn', 'Abigail'],
+                    last: ['Jenkins', 'Williams', 'Montgomery', 'Rothschild', 'Blake', 'Cunningham', 'Sterling', 'Ashcroft', 'Goldsmith', 'Farnsworth']
+                },
+                nomad: {
+                    male: ['Dusty', 'Walker', 'Storm', 'Flint', 'Hawk', 'Ridge', 'Coyote', 'Diesel', 'Road', 'Maverick'],
+                    female: ['Sierra', 'Willow', 'Sky', 'Zephyr', 'Nova', 'Phoenix', 'Sage', 'Luna', 'Canyon', 'Aurora'],
+                    last: ['Walker', 'Dustwalker', 'Roadchild', 'Sixguns', 'Wolfrider', 'Stormchaser', 'Junker', 'Sandman', 'Highwind', 'Cruiser']
+                },
+                asian: {
+                    male: ['Takemura', 'Kenji', 'Hideo', 'Hiroshi', 'Lee', 'Jin', 'Ryu', 'Chen', 'Wei', 'Tao'],
+                    female: ['Hanako', 'Yuki', 'Sakura', 'Mei', 'Ling', 'Ji-Yeon', 'Sun', 'Hana', 'Min', 'Hikari'],
+                    last: ['Arasaka', 'Tanaka', 'Kang', 'Wong', 'Zhang', 'Nakamura', 'Takashi', 'Yamato', 'Park', 'Liu']
+                },
+                european: {
+                    male: ['Klaus', 'Dmitri', 'Anders', 'Ivan', 'Pierre', 'Hans', 'Stefan', 'Gunther', 'Boris', 'Franz'],
+                    female: ['Olga', 'Natasha', 'Brigitte', 'Svetlana', 'Greta', 'Eva', 'Ingrid', 'Katarina', 'Anya', 'Sonya'],
+                    last: ['Volkov', 'Schmidt', 'Petrov', 'Mueller', 'Kowalski', 'Dubois', 'Ivanov', 'Bergmann', 'Popov', 'Novak']
+                },
+                latino: {
+                    male: ['Mateo', 'Carlos', 'Javier', 'Santiago', 'Diego', 'Roberto', 'Victor', 'Miguel', 'Alejandro', 'Manuel'],
+                    female: ['Sofia', 'Isabella', 'Valentina', 'Gabriela', 'Camila', 'Lucia', 'Julieta', 'Maria', 'Carmen', 'Adriana'],
+                    last: ['Rodriguez', 'Gonzalez', 'Welles', 'Reyes', 'Martinez', 'Vargas', 'Hernandez', 'Castillo', 'Diaz', 'Fuentes']
+                }
+            };
+            
+            // Add generate button functionality
+            const generateButton = panel.querySelector('#generate-name');
+            const resultDiv = panel.querySelector('#name-result');
+            
+            generateButton.addEventListener('click', function() {
+                const style = panel.querySelector('#name-style').value;
+                const gender = panel.querySelector('#name-gender').value;
+                
+                // Determine which gender list to use
+                let genderList;
+                if (gender === 'any') {
+                    genderList = Math.random() < 0.5 ? 'male' : 'female';
+                } else {
+                    genderList = gender;
+                }
+                
+                // Get random name components
+                const firstName = nameData[style][genderList][Math.floor(Math.random() * nameData[style][genderList].length)];
+                const lastName = nameData[style].last[Math.floor(Math.random() * nameData[style].last.length)];
+                
+                // Display result
+                resultDiv.textContent = `${firstName} ${lastName}`;
+            });
+            
+            return panel;
+        }
+        
+        // Create corporations panel
+        function createCorporationsPanel() {
+            const panel = createPanel('Corporations');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <select id="corp-select" style="width: 100%; margin-bottom: 10px;">
+                    <option value="arasaka">Arasaka</option>
+                    <option value="militech">Militech</option>
+                    <option value="biotechnica">Biotechnica</option>
+                    <option value="nightcorp">Night Corp</option>
+                    <option value="petrochem">Petrochem</option>
+                    <option value="trauma">Trauma Team</option>
+                </select>
+                <div id="corp-info" style="border: 1px solid #00ccff; padding: 10px;">
+                    <p><strong>Arasaka Corporation</strong></p>
+                    <p>Japanese multinational security corporation focused on security, banking, and manufacturing.</p>
+                    <p><strong>CEO:</strong> Hanako Arasaka (formerly Saburo)</p>
+                    <p><strong>Headquarters:</strong> Tokyo, Japan</p>
+                    <p><strong>Known For:</strong> Private military, corporate security, and financial services</p>
+                </div>
+            `;
+            
+            // Corporate data
+            const corpData = {
+                arasaka: {
+                    name: 'Arasaka Corporation',
+                    desc: 'Japanese multinational security corporation focused on security, banking, and manufacturing.',
+                    ceo: 'Hanako Arasaka (formerly Saburo)',
+                    hq: 'Tokyo, Japan',
+                    knownFor: 'Private military, corporate security, and financial services'
+                },
+                militech: {
+                    name: 'Militech International Armaments',
+                    desc: 'American weapons manufacturer and private military contractor.',
+                    ceo: 'Donald Lundee',
+                    hq: 'Night City, NUSA',
+                    knownFor: 'Military hardware, combat services, and security solutions'
+                },
+                biotechnica: {
+                    name: 'Biotechnica',
+                    desc: 'Leading biotechnology corporation specializing in agricultural and medical developments.',
+                    ceo: 'Dr. Eli Barnes',
+                    hq: 'Night City, NUSA',
+                    knownFor: 'Gene manipulation, synthetic proteins, and designer drugs'
+                },
+                nightcorp: {
+                    name: 'Night Corporation',
+                    desc: 'Infrastructure and real estate development corporation with significant influence in Night City.',
+                    ceo: 'Richard Night (Founder), Current CEO Unknown',
+                    hq: 'Night City, NUSA',
+                    knownFor: 'Urban development, AI technology, and consciousness transfer research'
+                },
+                petrochem: {
+                    name: 'Petrochem',
+                    desc: 'Oil and energy giant controlling much of the fossil fuel resources in North America.',
+                    ceo: 'Julius Robertson',
+                    hq: 'Night City, NUSA',
+                    knownFor: 'Oil refinement, synthetic fuels, and plastics manufacturing'
+                },
+                trauma: {
+                    name: 'Trauma Team International',
+                    desc: 'Subscription-based paramedical services corporation that offers rapid medical extraction and care.',
+                    ceo: 'Rachel Morrison',
+                    hq: 'Night City, NUSA',
+                    knownFor: 'Armed medical response, platinum-level health insurance, and clone organ programs'
+                }
+            };
+            
+            // Add selection functionality
+            const corpSelect = panel.querySelector('#corp-select');
+            const infoDiv = panel.querySelector('#corp-info');
+            
+            corpSelect.addEventListener('change', function() {
+                const corp = corpData[this.value];
+                
+                infoDiv.innerHTML = `
+                    <p><strong>${corp.name}</strong></p>
+                    <p>${corp.desc}</p>
+                    <p><strong>CEO:</strong> ${corp.ceo}</p>
+                    <p><strong>Headquarters:</strong> ${corp.hq}</p>
+                    <p><strong>Known For:</strong> ${corp.knownFor}</p>
+                `;
+            });
+            
+            return panel;
+        }
+        
+        // Create locations panel
+        function createLocationsPanel() {
+            const panel = createPanel('Night City Locations');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <select id="district-select" style="width: 100%; margin-bottom: 10px;">
+                    <option value="watson">Watson</option>
+                    <option value="heywood">Heywood</option>
+                    <option value="westbrook">Westbrook</option>
+                    <option value="pacifica">Pacifica</option>
+                    <option value="santo">Santo Domingo</option>
+                    <option value="city">City Center</option>
+                </select>
+                <div id="location-info" style="border: 1px solid #00ccff; padding: 10px;">
+                    <p><strong>Watson District</strong></p>
+                    <p>Industrial district turned residential area with strong Asian influences.</p>
+                    <p><strong>Notable Locations:</strong></p>
+                    <ul>
+                        <li>Kabuki - Street markets and nightlife</li>
+                        <li>Little China - Cultural enclave</li>
+                        <li>Northside - Gang territory (Maelstrom)</li>
+                        <li>Arasaka Waterfront - Corpo area</li>
+                    </ul>
+                </div>
+            `;
+            
+            // Location data
+            const locationData = {
+                watson: {
+                    name: 'Watson District',
+                    desc: 'Industrial district turned residential area with strong Asian influences.',
+                    locations: [
+                        'Kabuki - Street markets and nightlife',
+                        'Little China - Cultural enclave',
+                        'Northside - Gang territory (Maelstrom)',
+                        'Arasaka Waterfront - Corpo area'
+                    ]
+                },
+                heywood: {
+                    name: 'Heywood District',
+                    desc: 'Multicultural working-class neighborhood with Latino influences.',
+                    locations: [
+                        'Wellsprings - Middle-class residential area',
+                        'Vista Del Rey - Gang territory (Valentinos)',
+                        'Glen - Calm residential area',
+                        'The Stadium - Former sports venue'
+                    ]
+                },
+                westbrook: {
+                    name: 'Westbrook District',
+                    desc: 'Wealthy district known for entertainment and nightlife.',
+                    locations: [
+                        'Japantown - Cultural center with Asian influence',
+                        'Charter Hill - Rich residential area',
+                        'North Oak - Exclusive hilltop residences',
+                        'Lizzie's Bar - Mox-controlled club'
+                    ]
+                },
+                pacifica: {
+                    name: 'Pacifica District',
+                    desc: 'Failed luxury resort development turned dangerous, abandoned district.',
+                    locations: [
+                        'Coastview - Abandoned resort area',
+                        'West Wind Estate - Failed housing project',
+                        'Grand Imperial Mall - Voodoo Boys territory',
+                        'Batty's Hotel - Abandoned luxury resort'
+                    ]
+                },
+                santo: {
+                    name: 'Santo Domingo District',
+                    desc: 'Industrial zone filled with factories and power plants.',
+                    locations: [
+                        'Arroyo - Heavy industry and factories',
+                        'Rancho Coronado - Housing development for workers',
+                        'South Night City Power Plant - Energy production',
+                        'Oil Fields - Petrochem facilities'
+                    ]
+                },
+                city: {
+                    name: 'City Center',
+                    desc: 'Downtown area and corporate zone with skyscrapers and luxury.',
+                    locations: [
+                        'Downtown - Business district',
+                        'Corpo Plaza - Corporate headquarters',
+                        'Arasaka Tower - Iconic corporate building',
+                        'Embers - Exclusive high-end club'
+                    ]
+                }
+            };
+            
+            // Add selection functionality
+            const districtSelect = panel.querySelector('#district-select');
+            const infoDiv = panel.querySelector('#location-info');
+            
+            districtSelect.addEventListener('change', function() {
+                const district = locationData[this.value];
+                
+                infoDiv.innerHTML = `
+                    <p><strong>${district.name}</strong></p>
+                    <p>${district.desc}</p>
+                    <p><strong>Notable Locations:</strong></p>
+                    <ul>
+                        ${district.locations.map(loc => `<li>${loc}</li>`).join('')}
+                    </ul>
+                `;
+            });
+            
+            return panel;
+        }
+        
+        // Layout management functions
+        function autoArrangePanels() {
+            const panels = document.querySelectorAll('.panel');
+            if (panels.length === 0) return;
+            
+            // Calculate available space
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const toolbar = document.querySelector('.toolbar');
+            const toolbarHeight = toolbar ? toolbar.offsetHeight : 0;
+            
+            // Starting positions
+            let row = 0;
+            let col = 0;
+            const maxCols = Math.floor(screenWidth / 420); // ~400px width + margin
+            const startY = toolbarHeight + 10;
+            
+            panels.forEach((panel, index) => {
+                // Calculate position
+                const x = 10 + (col * 420);
+                const y = startY + (row * 330); // ~300px height + margin
+                
+                // Set panel position
+                panel.style.left = x + 'px';
+                panel.style.top = y + 'px';
+                panel.style.zIndex = index + 1;
+                
+                // Move to next column or row
+                col++;
+                if (col >= maxCols) {
+                    col = 0;
+                    row++;
+                }
+            });
+        }
+        
+        function saveLayout() {
+            const panels = document.querySelectorAll('.panel');
+            if (panels.length === 0) {
+                alert('No panels to save');
+                return;
+            }
+            
+            const layoutData = {
+                panels: [],
+                fontSettings: {
+                    size: currentFontSize,
+                    family: currentFontFamily
+                }
+            };
+            
+            panels.forEach(panel => {
+                const panelData = {
+                    title: panel.querySelector('.panel-header').textContent.trim(),
+                    left: panel.style.left,
+                    top: panel.style.top,
+                    width: panel.style.width || '400px',
+                    height: panel.style.height || '300px',
+                    zIndex: panel.style.zIndex,
+                    content: panel.querySelector('.panel-content').innerHTML
+                };
+                
+                layoutData.panels.push(panelData);
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('cp-panel-layout', JSON.stringify(layoutData));
+            alert('Layout saved!');
+        }
+        
+        function loadLayout() {
+            const savedLayout = localStorage.getItem('cp-panel-layout');
+            if (!savedLayout) {
+                alert('No saved layout found');
+                return;
+            }
+            
+            // Clear existing panels
+            const existingPanels = document.querySelectorAll('.panel');
+            existingPanels.forEach(panel => panel.remove());
+            
+            // Load saved layout
+            const layoutData = JSON.parse(savedLayout);
+            
+            // Restore panels
+            layoutData.panels.forEach(panelData => {
+                const panel = document.createElement('div');
+                panel.className = 'panel';
+                panel.style.left = panelData.left;
+                panel.style.top = panelData.top;
+                panel.style.width = panelData.width;
+                panel.style.height = panelData.height;
+                panel.style.zIndex = panelData.zIndex;
+                
+                panel.innerHTML = `
+                    <div class="panel-header">
+                        <div>${panelData.title}</div>
+                        <button class="close-button">×</button>
+                    </div>
+                    <div class="panel-content">${panelData.content}</div>
+                    <div class="resize-handle"></div>
+                `;
+                
+                document.body.appendChild(panel);
+                
+                // Make draggable
+                makeElementDraggable(panel);
+                
+                // Make resizable
+                makeElementResizable(panel);
+                
+                // Add close functionality
+                panel.querySelector('.close-button').addEventListener('click', function() {
+                    panel.remove();
+                });
+            });
+            
+            // Apply font settings
+            if (layoutData.fontSettings) {
+                currentFontSize = layoutData.fontSettings.size;
+                currentFontFamily = layoutData.fontSettings.family;
+                
+                document.body.style.fontSize = `${currentFontSize}px`;
+                document.body.style.fontFamily = currentFontFamily;
+                
+                // Update font control buttons
+                document.querySelectorAll('.font-size-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (parseInt(btn.getAttribute('data-size')) === currentFontSize) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                document.getElementById('font-family').value = currentFontFamily;
+            }
+            
+            alert('Layout loaded!');
+        }
+        
+        // Settings functions
+        function toggleFontControls() {
+            const controls = document.querySelector('.controls');
+            if (controls.style.display === 'none') {
+                controls.style.display = 'block';
+            } else {
+                controls.style.display = 'none';
+            }
+        }
+        
+        let currentTheme = 'dark';
+        function toggleColorTheme() {
+            if (currentTheme === 'dark') {
+                // Switch to light theme
+                document.body.style.backgroundColor = '#e0e0e0';
+                document.body.style.color = '#121212';
+                document.querySelectorAll('.panel').forEach(panel => {
+                    panel.style.backgroundColor = '#f0f0f0';
+                    panel.style.borderColor = '#0088aa';
+                });
+                document.querySelectorAll('.panel-header').forEach(header => {
+                    header.style.backgroundColor = '#0088aa';
+                    header.style.color = '#ffffff';
+                });
+                currentTheme = 'light';
+            } else {
+                // Switch to dark theme
+                document.body.style.backgroundColor = '#121212';
+                document.body.style.color = '#e0e0e0';
+                document.querySelectorAll('.panel').forEach(panel => {
+                    panel.style.backgroundColor = '#1e1e2d';
+                    panel.style.borderColor = '#00ccff';
+                });
+                document.querySelectorAll('.panel-header').forEach(header => {
+                    header.style.backgroundColor = '#254b75';
+                    header.style.color = '#ffffff';
+                });
+                currentTheme = 'dark';
+            }
+        }
+        
+        function toggleAnimations() {
+            if (document.body.classList.contains('no-animations')) {
+                document.body.classList.remove('no-animations');
+                alert('Animations enabled');
+            } else {
+                document.body.classList.add('no-animations');
+                alert('Animations disabled');
+            }
+        }
+        
+        // Create an initial notes panel
+        window.addEventListener('load', function() {
+            createNotesPanel();
+        });
+        
+        }); // End of DOMContentLoaded event listener
+    </script>
+</body>
+</html>

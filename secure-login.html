@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECURE SYSTEM ACCESS - Cyberpunk RED GM Interface</title>
+    <style>
+        /* Base styles */
+        :root {
+            --neon-pink: #ff00a5;
+            --neon-blue: #00f0ff;
+            --neon-green: #00ff66;
+            --neon-yellow: #ffcc00;
+            --dark-bg: #0d0d0f;
+            --cyber-red: #ff003c;
+            --text-color: #f0f0f0;
+            --glitch-intensity: 0.15;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @font-face {
+            font-family: 'Cyberpunk';
+            src: url('fonts/Cyberpunk.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Rajdhani', 'Share Tech Mono', monospace;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Grid background */
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,60,255,0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,60,255,0.07) 1px, transparent 1px);
+            background-size: 20px 20px;
+            perspective: 500px;
+            transform-style: preserve-3d;
+            animation: gridPulse 8s infinite linear;
+            z-index: -1;
+        }
+
+        @keyframes gridPulse {
+            0% {
+                background-size: 20px 20px;
+                opacity: 0.5;
+            }
+            50% {
+                background-size: 25px 25px;
+                opacity: 0.8;
+            }
+            100% {
+                background-size: 20px 20px;
+                opacity: 0.5;
+            }
+        }
+
+        /* Scanlines */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0),
+                rgba(0, 0, 0, 0) 1px,
+                rgba(0, 0, 0, 0.1) 1px,
+                rgba(0, 0, 0, 0.1) 2px
+            );
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Glitch effect */
+        .glitch-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(255, 0, 60, 0.1),
+                rgba(0, 240, 255, 0.1)
+            );
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            z-index: 5;
+            animation: glitchEffect 2s infinite;
+        }
+
+        @keyframes glitchEffect {
+            0% {
+                opacity: 0;
+            }
+            10% {
+                opacity: var(--glitch-intensity);
+                transform: translate(2px, 0);
+            }
+            20% {
+                opacity: 0;
+            }
+            30% {
+                opacity: 0;
+            }
+            40% {
+                opacity: var(--glitch-intensity);
+                transform: translate(-2px, 0);
+            }
+            50% {
+                opacity: 0;
+            }
+            60% {
+                opacity: 0;
+            }
+            70% {
+                opacity: var(--glitch-intensity);
+                transform: translate(0, 2px);
+            }
+            80% {
+                opacity: 0;
+            }
+            90% {
+                opacity: var(--glitch-intensity);
+                transform: translate(0, -2px);
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Login container */
+        .login-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            background: rgba(10, 10, 15, 0.8);
+            border: 1px solid var(--neon-blue);
+            border-radius: 5px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            text-align: center;
+            z-index: 2;
+            transform-style: preserve-3d;
+            animation: containerFloat 6s infinite ease-in-out;
+        }
+
+        @keyframes containerFloat {
+            0% {
+                transform: translateY(0px) rotateX(2deg);
+                box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            }
+            50% {
+                transform: translateY(-10px) rotateX(-2deg);
+                box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+            }
+            100% {
+                transform: translateY(0px) rotateX(2deg);
+                box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            }
+        }
+
+        .login-header {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Cyberpunk', 'Rajdhani', sans-serif;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: var(--neon-pink);
+            text-shadow: 
+                0 0 5px rgba(255, 0, 165, 0.5),
+                0 0 10px rgba(255, 0, 165, 0.3);
+            position: relative;
+        }
+
+        .cyber-subtitle {
+            color: var(--neon-blue);
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+            color: var(--neon-yellow);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            background: rgba(5, 5, 10, 0.6);
+            border: 1px solid var(--neon-blue);
+            border-radius: 3px;
+            color: var(--text-color);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 165, 0.4);
+        }
+
+        /* Placeholder styling */
+        ::placeholder {
+            color: rgba(240, 240, 240, 0.4);
+        }
+
+        /* Login button */
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            border: none;
+            border-radius: 3px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+        }
+
+        .login-btn:hover:before {
+            left: 100%;
+        }
+
+        /* Error message */
+        .error-msg {
+            display: none;
+            color: var(--cyber-red);
+            margin-top: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 10px;
+            border: 1px solid var(--cyber-red);
+            background: rgba(255, 0, 60, 0.1);
+            border-radius: 3px;
+            animation: glitchText 1s infinite;
+        }
+
+        @keyframes glitchText {
+            0% {
+                opacity: 1;
+                transform: none;
+                color: var(--cyber-red);
+            }
+            7% {
+                transform: skew(-0.5deg, -0.5deg);
+                color: var(--neon-blue);
+            }
+            10% {
+                transform: none;
+                color: var(--cyber-red);
+            }
+            27% {
+                transform: none;
+                color: var(--cyber-red);
+            }
+            30% {
+                transform: skew(0.5deg, -0.5deg);
+                color: var(--neon-green);
+            }
+            35% {
+                transform: none;
+                color: var(--cyber-red);
+            }
+            52% {
+                transform: none;
+                color: var(--cyber-red);
+            }
+            55% {
+                transform: skew(-1deg, 0.5deg);
+                color: var(--neon-blue);
+            }
+            50% {
+                transform: none;
+                color: var(--cyber-red);
+            }
+            72% {
+                transform: none;
+                color: var(--cyber-red);
+            }
+            75% {
+                transform: skew(1deg, -0.5deg);
+                color: var(--neon-green);
+            }
+            80% {
+                transform: none;
+                color: var(--cyber-red);
+            }
+            100% {
+                transform: none;
+                color: var(--cyber-red);
+            }
+        }
+
+        /* Loading animation */
+        .loading-animation {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(10, 10, 15, 0.9);
+            z-index: 20;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-blue);
+        }
+
+        .cyber-scanner {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .scanner-circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid var(--neon-blue);
+            animation: scannerPulse 3s infinite;
+        }
+
+        .scanner-circle:nth-child(1) {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-color: var(--neon-blue);
+            animation-delay: 0s;
+        }
+
+        .scanner-circle:nth-child(2) {
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            border-color: var(--neon-pink);
+            animation-delay: 0.3s;
+        }
+
+        .scanner-circle:nth-child(3) {
+            width: 60%;
+            height: 60%;
+            top: 20%;
+            left: 20%;
+            border-color: var(--neon-green);
+            animation-delay: 0.6s;
+        }
+
+        .scanner-circle:nth-child(4) {
+            width: 40%;
+            height: 40%;
+            top: 30%;
+            left: 30%;
+            border-color: var(--neon-yellow);
+            animation-delay: 0.9s;
+        }
+
+        @keyframes scannerPulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.4;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--neon-blue) 20%, 
+                var(--neon-blue) 80%, 
+                transparent 100%);
+            animation: scanMove 2s infinite linear;
+            top: 50%;
+            left: 0;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        @keyframes scanMove {
+            0% {
+                transform: translateY(-150px);
+            }
+            50% {
+                transform: translateY(150px);
+            }
+            100% {
+                transform: translateY(-150px);
+            }
+        }
+
+        .loading-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+            animation: textPulse 2s infinite;
+        }
+
+        @keyframes textPulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 6px;
+            background: rgba(0, 240, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            border-radius: 3px;
+            transition: width 0.1s linear;
+        }
+
+        /* Status messages during loading */
+        .status-message {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--neon-green);
+            margin-top: 15px;
+            text-align: left;
+            width: 80%;
+            max-width: 500px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .login-container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .cyber-subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.7rem;
+            }
+
+            .form-control, .login-btn {
+                padding: 12px;
+            }
+
+            .cyber-scanner {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Grid -->
+    <div class="grid-bg"></div>
+
+    <!-- Glitch Effect -->
+    <div class="glitch-effect"></div>
+
+    <!-- Scanlines -->
+    <div class="scanlines"></div>
+
+    <!-- Login Container -->
+    <div class="login-container" id="login-form">
+        <div class="login-header">
+            <h1>Netrunner Access</h1>
+            <div class="cyber-subtitle">Cyberpunk RED GM Interface</div>
+        </div>
+
+        <div class="form-group">
+            <label for="username">Identity Verification</label>
+            <div class="input-wrapper">
+                <input type="text" id="username" class="form-control" placeholder="ENTER USERNAME" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Security Protocol</label>
+            <div class="input-wrapper">
+                <input type="password" id="password" class="form-control" placeholder="ENTER PASSWORD" autocomplete="off">
+            </div>
+        </div>
+
+        <button type="button" id="login-btn" class="login-btn">NEURAL LINK</button>
+
+        <div class="error-msg" id="error-message">
+            ACCESS DENIED: Invalid credentials. Security protocol engaged.
+        </div>
+    </div>
+
+    <!-- Loading Animation -->
+    <div class="loading-animation" id="loading-animation">
+        <div class="cyber-scanner">
+            <div class="scanner-circle"></div>
+            <div class="scanner-circle"></div>
+            <div class="scanner-circle"></div>
+            <div class="scanner-circle"></div>
+            <div class="scan-line"></div>
+        </div>
+        <div class="loading-text">ESTABLISHING SECURE CONNECTION</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="status-message" id="status-message"></div>
+    </div>
+
+    <script src="js/auth-handler.js"></script>
+    <script>
+        // Check if already authenticated
+        if (authHandler.isAuthenticated()) {
+            window.location.href = "desktop.html";
+        }
+
+        // Get DOM elements
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const errorMessage = document.getElementById('error-message');
+        const loadingAnimation = document.getElementById('loading-animation');
+        const progressFill = document.getElementById('progress-fill');
+        const statusMessage = document.getElementById('status-message');
+
+        // Loading messages to display during authentication
+        const loadingMessages = [
+            "Initializing neural link...",
+            "Bypassing ICE protocols...",
+            "Scanning for black ICE...",
+            "Establishing secure datalink...",
+            "Authenticating credentials...",
+            "Decrypting database access...",
+            "Compiling netrunner toolkit...",
+            "Accessing Night City servers...",
+            "Linking to Cyberpunk RED GM Interface...",
+            "Final security verification..."
+        ];
+
+        // Function to display status messages during loading
+        function showStatusMessage(message) {
+            statusMessage.style.opacity = 0;
+            
+            setTimeout(() => {
+                statusMessage.textContent = `> ${message}`;
+                statusMessage.style.opacity = 1;
+            }, 300);
+        }
+
+        // Function to simulate loading progress
+        function simulateLoading() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                // Increment progress
+                progress += Math.random() * 10;
+                
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // Short delay before redirecting
+                    setTimeout(() => {
+                        window.location.href = "desktop.html";
+                    }, 500);
+                }
+                
+                // Update progress bar
+                progressFill.style.width = `${progress}%`;
+                
+                // Show status messages based on progress
+                const messageIndex = Math.floor((progress / 100) * loadingMessages.length);
+                if (messageIndex < loadingMessages.length) {
+                    showStatusMessage(loadingMessages[messageIndex]);
+                }
+            }, 400);
+        }
+
+        // Function to authenticate user
+        function authenticateUser(username, password) {
+            // Hide login form
+            loginForm.style.display = 'none';
+            
+            // Show loading animation
+            loadingAnimation.style.display = 'flex';
+            
+            // Simulate authentication delay
+            setTimeout(() => {
+                // Use auth handler to authenticate
+                if (authHandler.authenticate(username, password)) {
+                    // Start loading simulation
+                    simulateLoading();
+                } else {
+                    // Show error and return to login
+                    loginForm.style.display = 'block';
+                    loadingAnimation.style.display = 'none';
+                    errorMessage.style.display = 'block';
+                    
+                    // Clear password field
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }, 1500);
+        }
+
+        // Event listener for login button
+        loginBtn.addEventListener('click', () => {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            // Simple validation
+            if (username === '' || password === '') {
+                errorMessage.textContent = 'ERROR: All fields are required for neural link.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Hide error message if visible
+            errorMessage.style.display = 'none';
+            
+            // Authenticate user
+            authenticateUser(username, password);
+        });
+
+        // Also trigger login on Enter key
+        passwordInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                loginBtn.click();
+            }
+        });
+
+        // Focus username input on page load
+        window.addEventListener('load', () => {
+            usernameInput.focus();
+        });
+    </script>
+</body>
+</html>

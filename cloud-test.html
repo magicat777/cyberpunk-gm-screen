@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Storage Test</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .online {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .offline {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0055aa;
+        }
+        pre {
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cloud Storage API Test</h1>
+    
+    <div class="status" id="status">Checking cloud storage status...</div>
+    
+    <div>
+        <button id="pingBtn">Test Ping</button>
+        <button id="saveBtn">Test Save</button>
+        <button id="loadBtn">Test Load</button>
+        <button id="deleteBtn">Test Delete</button>
+    </div>
+    
+    <h2>Results:</h2>
+    <pre id="results">No results yet</pre>
+    
+    <script>
+        // Configuration
+        const API_BASE = '/api/storage';
+        const TEST_KEY = 'test-key-' + Date.now();
+        const TEST_DATA = { message: 'This is test data', timestamp: Date.now() };
+        
+        // Elements
+        const statusEl = document.getElementById('status');
+        const resultsEl = document.getElementById('results');
+        const pingBtn = document.getElementById('pingBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const loadBtn = document.getElementById('loadBtn');
+        const deleteBtn = document.getElementById('deleteBtn');
+        
+        // Update status
+        function updateStatus(status, message) {
+            statusEl.className = 'status ' + status;
+            statusEl.textContent = message;
+        }
+        
+        // Log results
+        function logResult(operation, result) {
+            resultsEl.textContent = `Operation: ${operation}\nResult: ${JSON.stringify(result, null, 2)}`;
+        }
+        
+        // Test ping
+        async function testPing() {
+            try {
+                updateStatus('offline', 'Testing connection...');
+                
+                const response = await fetch(`${API_BASE}/ping`, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.status === 'ok' || result.status === 'online') {
+                    updateStatus('online', 'Cloud storage is available!');
+                } else {
+                    updateStatus('offline', 'Cloud storage is offline.');
+                }
+                
+                logResult('ping', result);
+                return result;
+            } catch (error) {
+                updateStatus('error', `Connection error: ${error.message}`);
+                logResult('ping', { error: error.message });
+                return { error: error.message };
+            }
+        }
+        
+        // Test save
+        async function testSave() {
+            try {
+                updateStatus('offline', 'Testing save operation...');
+                
+                const response = await fetch(`${API_BASE}/save`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        key: TEST_KEY,
+                        data: TEST_DATA
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                updateStatus('online', 'Save operation completed!');
+                logResult('save', result);
+                return result;
+            } catch (error) {
+                updateStatus('error', `Save error: ${error.message}`);
+                logResult('save', { error: error.message });
+                return { error: error.message };
+            }
+        }
+        
+        // Test load
+        async function testLoad() {
+            try {
+                updateStatus('offline', 'Testing load operation...');
+                
+                const response = await fetch(`${API_BASE}/load?key=${encodeURIComponent(TEST_KEY)}`, {
+                    method: 'GET',
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                updateStatus('online', 'Load operation completed!');
+                logResult('load', result);
+                return result;
+            } catch (error) {
+                updateStatus('error', `Load error: ${error.message}`);
+                logResult('load', { error: error.message });
+                return { error: error.message };
+            }
+        }
+        
+        // Test delete
+        async function testDelete() {
+            try {
+                updateStatus('offline', 'Testing delete operation...');
+                
+                const response = await fetch(`${API_BASE}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        key: TEST_KEY
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                updateStatus('online', 'Delete operation completed!');
+                logResult('delete', result);
+                return result;
+            } catch (error) {
+                updateStatus('error', `Delete error: ${error.message}`);
+                logResult('delete', { error: error.message });
+                return { error: error.message };
+            }
+        }
+        
+        // Event listeners
+        pingBtn.addEventListener('click', testPing);
+        saveBtn.addEventListener('click', testSave);
+        loadBtn.addEventListener('click', testLoad);
+        deleteBtn.addEventListener('click', testDelete);
+        
+        // Initial ping
+        document.addEventListener('DOMContentLoaded', testPing);
+    </script>
+</body>
+</html>

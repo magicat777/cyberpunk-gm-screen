@@ -1,0 +1,224 @@
+/**
+ * Cyberpunk RED GM Screen - Modern Grid System
+ * A responsive grid system using CSS Grid and Flexbox
+ */
+
+/* Container - Main wrapper with max width */
+.cp-container {
+  width: 100%;
+  max-width: var(--max-width-container);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--responsive-padding);
+  padding-right: var(--responsive-padding);
+}
+
+.cp-container-fluid {
+  width: 100%;
+  padding-left: var(--responsive-padding);
+  padding-right: var(--responsive-padding);
+}
+
+/* Grid - Modern CSS Grid implementation */
+.cp-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--spacing-small);
+}
+
+/* Grid gaps */
+.cp-grid-gap-none { gap: 0; }
+.cp-grid-gap-xs { gap: var(--spacing-micro); }
+.cp-grid-gap-sm { gap: var(--spacing-tiny); }
+.cp-grid-gap-md { gap: var(--spacing-small); }
+.cp-grid-gap-lg { gap: var(--spacing-medium); }
+.cp-grid-gap-xl { gap: var(--spacing-large); }
+
+/* Grid items - Standard sizes for desktop */
+.cp-col-1 { grid-column: span 1; }
+.cp-col-2 { grid-column: span 2; }
+.cp-col-3 { grid-column: span 3; }
+.cp-col-4 { grid-column: span 4; }
+.cp-col-5 { grid-column: span 5; }
+.cp-col-6 { grid-column: span 6; }
+.cp-col-7 { grid-column: span 7; }
+.cp-col-8 { grid-column: span 8; }
+.cp-col-9 { grid-column: span 9; }
+.cp-col-10 { grid-column: span 10; }
+.cp-col-11 { grid-column: span 11; }
+.cp-col-12 { grid-column: span 12; }
+
+/* Grid items - Large desktops and up (≥1440px) */
+@media (min-width: 1440px) {
+  .cp-col-xl-1 { grid-column: span 1; }
+  .cp-col-xl-2 { grid-column: span 2; }
+  .cp-col-xl-3 { grid-column: span 3; }
+  .cp-col-xl-4 { grid-column: span 4; }
+  .cp-col-xl-5 { grid-column: span 5; }
+  .cp-col-xl-6 { grid-column: span 6; }
+  .cp-col-xl-7 { grid-column: span 7; }
+  .cp-col-xl-8 { grid-column: span 8; }
+  .cp-col-xl-9 { grid-column: span 9; }
+  .cp-col-xl-10 { grid-column: span 10; }
+  .cp-col-xl-11 { grid-column: span 11; }
+  .cp-col-xl-12 { grid-column: span 12; }
+}
+
+/* Grid items - Medium desktops and laptops (≥1024px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .cp-col-lg-1 { grid-column: span 1; }
+  .cp-col-lg-2 { grid-column: span 2; }
+  .cp-col-lg-3 { grid-column: span 3; }
+  .cp-col-lg-4 { grid-column: span 4; }
+  .cp-col-lg-5 { grid-column: span 5; }
+  .cp-col-lg-6 { grid-column: span 6; }
+  .cp-col-lg-7 { grid-column: span 7; }
+  .cp-col-lg-8 { grid-column: span 8; }
+  .cp-col-lg-9 { grid-column: span 9; }
+  .cp-col-lg-10 { grid-column: span 10; }
+  .cp-col-lg-11 { grid-column: span 11; }
+  .cp-col-lg-12 { grid-column: span 12; }
+}
+
+/* Grid items - Tablets and small laptops (≥768px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cp-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .cp-col-md-1 { grid-column: span 1; }
+  .cp-col-md-2 { grid-column: span 2; }
+  .cp-col-md-3 { grid-column: span 3; }
+  .cp-col-md-4 { grid-column: span 4; }
+  .cp-col-md-5 { grid-column: span 5; }
+  .cp-col-md-6 { grid-column: span 6; }
+  
+  /* Handle larger spans to fit the 6-column grid */
+  .cp-col-md-7, 
+  .cp-col-md-8, 
+  .cp-col-md-9, 
+  .cp-col-md-10, 
+  .cp-col-md-11, 
+  .cp-col-md-12 { 
+    grid-column: span 6;
+  }
+}
+
+/* Grid items - Mobile devices (≤767px) */
+@media (max-width: 767px) {
+  .cp-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .cp-col-sm-1 { grid-column: span 1; }
+  .cp-col-sm-2 { grid-column: span 2; }
+  .cp-col-sm-3 { grid-column: span 3; }
+  .cp-col-sm-4 { grid-column: span 4; }
+  
+  /* Handle larger spans to fit the 4-column grid */
+  .cp-col-sm-5, 
+  .cp-col-sm-6, 
+  .cp-col-sm-7, 
+  .cp-col-sm-8, 
+  .cp-col-sm-9, 
+  .cp-col-sm-10, 
+  .cp-col-sm-11, 
+  .cp-col-sm-12 { 
+    grid-column: span 4;
+  }
+}
+
+/* Flexbox layouts */
+.cp-flex {
+  display: flex;
+}
+
+.cp-flex-inline {
+  display: inline-flex;
+}
+
+/* Flex direction */
+.cp-flex-row { flex-direction: row; }
+.cp-flex-row-reverse { flex-direction: row-reverse; }
+.cp-flex-column { flex-direction: column; }
+.cp-flex-column-reverse { flex-direction: column-reverse; }
+
+/* Flex wrap */
+.cp-flex-nowrap { flex-wrap: nowrap; }
+.cp-flex-wrap { flex-wrap: wrap; }
+.cp-flex-wrap-reverse { flex-wrap: wrap-reverse; }
+
+/* Justify content */
+.cp-justify-start { justify-content: flex-start; }
+.cp-justify-end { justify-content: flex-end; }
+.cp-justify-center { justify-content: center; }
+.cp-justify-between { justify-content: space-between; }
+.cp-justify-around { justify-content: space-around; }
+.cp-justify-evenly { justify-content: space-evenly; }
+
+/* Align items */
+.cp-items-start { align-items: flex-start; }
+.cp-items-end { align-items: flex-end; }
+.cp-items-center { align-items: center; }
+.cp-items-baseline { align-items: baseline; }
+.cp-items-stretch { align-items: stretch; }
+
+/* Align content */
+.cp-content-start { align-content: flex-start; }
+.cp-content-end { align-content: flex-end; }
+.cp-content-center { align-content: center; }
+.cp-content-between { align-content: space-between; }
+.cp-content-around { align-content: space-around; }
+.cp-content-stretch { align-content: stretch; }
+
+/* Flex grow/shrink for individual items */
+.cp-flex-grow-0 { flex-grow: 0; }
+.cp-flex-grow-1 { flex-grow: 1; }
+.cp-flex-shrink-0 { flex-shrink: 0; }
+.cp-flex-shrink-1 { flex-shrink: 1; }
+
+/* Gap utilities */
+.cp-gap-none { gap: 0; }
+.cp-gap-xs { gap: var(--spacing-micro); }
+.cp-gap-sm { gap: var(--spacing-tiny); }
+.cp-gap-md { gap: var(--spacing-small); }
+.cp-gap-lg { gap: var(--spacing-medium); }
+.cp-gap-xl { gap: var(--spacing-large); }
+
+/* Two-dimensional panel grid specifically for CP GM Screen */
+.cp-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-medium);
+  padding: var(--spacing-medium);
+}
+
+/* Responsive panel grid adjustments */
+@media (max-width: 768px) {
+  .cp-panel-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-small);
+    padding: var(--spacing-small);
+  }
+}
+
+@media (max-width: 480px) {
+  .cp-panel-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-tiny);
+    padding: var(--spacing-tiny);
+  }
+}
+
+/* Auto-grid for equal width items */
+.cp-auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--auto-grid-min, 200px), 1fr));
+  grid-gap: var(--spacing-small);
+}
+
+/* Layout utility classes */
+.cp-w-full { width: 100%; }
+.cp-h-full { height: 100%; }
+.cp-h-screen { height: 100vh; }
+.cp-min-h-screen { min-height: 100vh; }

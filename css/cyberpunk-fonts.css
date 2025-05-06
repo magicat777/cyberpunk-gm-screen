@@ -1,0 +1,68 @@
+/**
+ * Cyberpunk RED GM Screen - Font Declarations
+ * Defines custom font faces for the application
+ */
+
+/* Google Fonts are loaded in cyberpunk-ui.css */
+
+/* Cyberpunk font - main display font for headers and logos */
+@font-face {
+  font-family: 'Cyberpunk';
+  src: url('../fonts/Cyberpunk.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Acquire font - for technical, data-oriented displays */
+@font-face {
+  font-family: 'Acquire';
+  src: url('../fonts/Acquire.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Venite Adoremus font - for stylized headings */
+@font-face {
+  font-family: 'Venite Adoremus';
+  src: url('../fonts/VeniteAdoremus.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Angora font - for specialized UI elements */
+@font-face {
+  font-family: 'Angora';
+  src: url('../fonts/Angora.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Fallback strategy:
+ * 1. If custom fonts fail to load, the application will fall back to:
+ *    - Cyberpunk -> Orbitron -> sans-serif
+ *    - Acquire -> Share Tech Mono -> monospace
+ *    - Venite Adoremus -> Rajdhani -> sans-serif
+ *    - Angora -> Arial -> sans-serif
+ * 
+ * 2. Using font-display: swap ensures text remains visible during font loading
+ */
+
+/* Font loading notification for developers (appears in console) */
+@keyframes fontLoadCheck {
+  from { opacity: 0; }
+  to { opacity: 0; }
+}
+
+.font-load-check {
+  font-family: 'Cyberpunk', serif;
+  animation: fontLoadCheck 1ms;
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Add this to cyberpunk-ui.css import list */

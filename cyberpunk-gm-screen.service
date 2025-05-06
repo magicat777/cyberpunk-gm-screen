@@ -1,0 +1,15 @@
+[Unit]
+Description=Cyberpunk GM Screen Web Server
+After=network.target
+
+[Service]
+Type=simple
+User=magic
+WorkingDirectory=/mnt/c/Users/magic/cyberpunk-gm-screen
+ExecStartPre=/bin/bash -c "ss -tuln | grep -q ':8888' && pkill -f 'python.*http.server.*8888' || true"
+ExecStart=/mnt/c/Users/magic/cyberpunk-gm-screen/start-server.sh --force
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

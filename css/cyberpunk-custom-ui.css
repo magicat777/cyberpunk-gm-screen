@@ -1,0 +1,265 @@
+/**
+ * Cyberpunk RED GM Screen - Custom UI Elements
+ * Special UI components for customization features
+ */
+
+/* SLIDER CONTROLS */
+.cp-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.cp-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    rgba(var(--neon-blue-rgb), 0.3) 0%, 
+    rgba(var(--neon-pink-rgb), 0.3) 100%);
+  outline: none;
+  border-radius: 3px;
+}
+
+.cp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--neon-blue);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(var(--neon-blue-rgb), 0.6);
+  transition: all 0.2s ease;
+}
+
+.cp-slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--neon-blue);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(var(--neon-blue-rgb), 0.6);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.cp-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 12px rgba(var(--neon-blue-rgb), 0.7);
+}
+
+.cp-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 12px rgba(var(--neon-blue-rgb), 0.7);
+}
+
+#cp-ui-scale-value,
+#cp-font-size-value {
+  min-width: 40px;
+  text-align: right;
+  font-family: var(--font-mono);
+  color: var(--neon-blue);
+}
+
+/* PREVIEW BOX */
+.cp-preview-box {
+  margin-top: 20px;
+  padding: 15px;
+  background: linear-gradient(135deg, 
+    rgba(var(--bg-secondary-rgb), 0.5) 0%, 
+    rgba(var(--bg-primary-rgb), 0.7) 100%);
+  border: 1px solid rgba(var(--neon-blue-rgb), 0.3);
+  border-radius: 5px;
+}
+
+.cp-preview-box h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--neon-pink);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+#cp-preview-text {
+  margin: 0;
+  transition: all 0.2s ease;
+}
+
+/* COLOR PRESETS */
+.cp-color-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.cp-color-preset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 85px;
+  background: rgba(var(--bg-primary-rgb), 0.4);
+  border: 1px solid rgba(var(--accent-primary-rgb), 0.2);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  padding: 5px;
+}
+
+.cp-color-preset span:not(:last-child) {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin: 2px;
+}
+
+.cp-color-preset span:last-child {
+  font-size: 0.8rem;
+  margin-top: 5px;
+  color: var(--text-color);
+}
+
+.cp-color-preset:hover {
+  background: rgba(var(--bg-primary-rgb), 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.cp-color-preset.active {
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 10px rgba(var(--neon-blue-rgb), 0.3);
+}
+
+/* COLOR PICKER */
+.cp-color-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cp-color-picker input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cp-color-picker input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.cp-color-picker input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+
+.cp-color-picker input[type="text"] {
+  width: 80px;
+  text-align: center;
+  font-family: var(--font-mono);
+}
+
+/* COLOR PREVIEW */
+.cp-color-preview {
+  display: flex;
+  margin-top: 15px;
+  height: 100px;
+  gap: 10px;
+}
+
+.cp-preview-panel {
+  flex: 2;
+  border: 1px solid rgba(var(--neon-blue-rgb), 0.3);
+  border-radius: 5px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cp-preview-header {
+  height: 25px;
+  background: var(--neon-blue);
+  transition: background 0.2s ease;
+}
+
+.cp-preview-body {
+  flex: 1;
+  background: linear-gradient(135deg, 
+    rgba(var(--bg-secondary-rgb), 0.4) 0%, 
+    rgba(var(--bg-primary-rgb), 0.7) 100%);
+}
+
+.cp-preview-sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cp-preview-item {
+  flex: 1;
+  border: 1px solid rgba(var(--neon-pink-rgb), 0.3);
+  background: rgba(var(--bg-primary-rgb), 0.4);
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.cp-preview-item:first-child {
+  border-left-color: var(--neon-pink);
+}
+
+.cp-preview-item:last-child {
+  border-left-color: var(--neon-green);
+}
+
+/* IMPORT PREVIEW */
+.cp-import-preview {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(var(--bg-primary-rgb), 0.4);
+  border: 1px solid rgba(var(--neon-blue-rgb), 0.3);
+  border-radius: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+/* Override for file input which can't be easily styled */
+input[type="file"].cp-form-control {
+  border: 1px dashed rgba(var(--neon-blue-rgb), 0.5);
+  padding: 15px;
+  background: rgba(var(--bg-primary-rgb), 0.2);
+  text-align: center;
+  cursor: pointer;
+}
+
+input[type="file"].cp-form-control:hover {
+  border-color: var(--neon-blue);
+  background: rgba(var(--neon-blue-rgb), 0.05);
+}
+
+/* RESOLUTION TEST GRID STYLING */
+.cp-resolution-test {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+  backdrop-filter: blur(1px);
+}

@@ -1,0 +1,131 @@
+/**
+ * DIRECT FONT OVERRIDE
+ * This CSS file applies aggressive styling to force font sizes across all elements
+ */
+
+/* Extremely high specificity selector for the html element */
+html[lang="en"],
+html:root,
+html:root:root,
+html#html#html,
+html:not(#nonexistent),
+html:nth-child(n),
+html:not(.nonexistent),
+html[lang]:not([hidden]) {
+  --cp-ui-scale: var(--cp-ui-scale, 1) !important;
+  --cp-content-scale: var(--cp-content-scale, 1) !important;
+  --cp-base-font-size: var(--cp-base-font-size, 16px) !important;
+  --cp-font-family: var(--cp-font-family, 'Share Tech Mono', monospace) !important;
+}
+
+/* Force all elements to use the correct font size and family */
+html[lang="en"] body,
+html[lang="en"] *,
+html:root .cp-app,
+html:root .cp-panel,
+html:root .cp-panel__content,
+html:root .cp-sidebar,
+html:root .cp-text,
+html:root .cp-button,
+html:root .cp-form-control,
+html:root .cp-dropdown,
+html:root .cp-modal,
+html:root button,
+html:root input,
+html:root select,
+html:root textarea,
+html:root p,
+html:root div,
+html:root span,
+html:root a,
+html:root h1, 
+html:root h2, 
+html:root h3, 
+html:root h4, 
+html:root h5, 
+html:root h6,
+html:root .cp-panel__title,
+html:root .cp-sidebar-toggle,
+html:root .cp-accordion-item,
+html:root .cp-accordion-title,
+html:root .cp-modal-content,
+html:root .cp-modal-header,
+html:root .cp-modal-body,
+html:root .cp-modal-footer,
+html:root .cp-character-list-item,
+html:root .cp-component-name,
+html:root .cp-tool-name,
+html:root .cp-btn {
+  /* These !important rules ensure our styles take precedence */
+  font-family: var(--cp-font-family) !important;
+}
+
+/* Apply font size to key elements */
+body {
+  font-size: var(--cp-base-font-size) !important;
+}
+
+/* Force all elements to use the base font size */
+html[lang="en"] * {
+  font-size: var(--cp-base-font-size) !important;
+}
+
+/* Universal selector with !important to make absolutely sure */
+* {
+  font-size: var(--cp-base-font-size) !important;
+}
+
+/* Force scaling of specific UI elements */
+.cp-panel__title,
+.cp-text-h1,
+.cp-text-h2,
+.cp-text-h3,
+.cp-text-h4 {
+  font-size: calc(var(--cp-base-font-size) * 1.2) !important;
+}
+
+.cp-panel__content {
+  font-size: var(--cp-base-font-size) !important;
+}
+
+.cp-btn,
+.cp-dropdown-button,
+button {
+  font-size: var(--cp-base-font-size) !important;
+}
+
+.cp-form-control,
+input,
+select,
+textarea {
+  font-size: var(--cp-base-font-size) !important;
+}
+
+.cp-sidebar-item,
+.cp-accordion-item,
+.cp-accordion-title,
+.cp-dropdown-content a {
+  font-size: var(--cp-base-font-size) !important;
+}
+
+.cp-character-list-item,
+.cp-component-name,
+.cp-tool-name {
+  font-size: var(--cp-base-font-size) !important;
+}
+
+/* Scaling applied with transform */
+.cp-app {
+  transform: scale(var(--cp-ui-scale)) !important;
+  transform-origin: top left !important;
+}
+
+/* Force some minimum sizes for readability */
+.cp-panel__content {
+  min-height: 100px !important;
+}
+
+/* Force sidebar width */
+.cp-sidebar {
+  width: calc(var(--cyber-sidebar-width) * var(--cp-ui-scale)) !important;
+}

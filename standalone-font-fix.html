@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk GM Screen - Font Fixer</title>
+    <style>
+        /* Base styling */
+        body {
+            background-color: #050709;
+            color: #f0f0f0;
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        
+        .container {
+            background-color: rgba(20, 40, 60, 0.8);
+            border: 1px solid #00f0ff;
+            border-radius: 5px;
+            width: 400px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+        
+        h1 {
+            color: #00f0ff;
+            font-size: 24px;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        
+        select, input[type="range"] {
+            width: 100%;
+            background-color: #0f1925;
+            color: white;
+            border: 1px solid #336;
+            padding: 8px;
+            border-radius: 3px;
+        }
+        
+        .range-value {
+            display: block;
+            text-align: center;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #00f0ff;
+        }
+        
+        button {
+            background-color: #00f0ff;
+            color: #000;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        button:hover {
+            background-color: #33f3ff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+        }
+        
+        .preview {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        
+        .preview-title {
+            color: #ccc;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 240, 255, 0.2);
+            color: #00f0ff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid #00f0ff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .button-group button {
+            flex: 1;
+        }
+        
+        .button-secondary {
+            background-color: transparent;
+            border: 1px solid #00f0ff;
+            color: #00f0ff;
+        }
+        
+        .button-secondary:hover {
+            background-color: rgba(0, 240, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cyberpunk GM Screen Font Fixer</h1>
+        
+        <div class="form-group">
+            <label for="fontSize">Font Size:</label>
+            <input type="range" id="fontSize" min="10" max="24" value="16" step="1">
+            <span class="range-value" id="fontSizeValue">16px</span>
+        </div>
+        
+        <div class="form-group">
+            <label for="fontFamily">Font Family:</label>
+            <select id="fontFamily">
+                <option value="Share Tech Mono">Share Tech Mono</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Exo 2">Exo 2</option>
+                <option value="Rajdhani">Rajdhani</option>
+                <option value="monospace">Monospace</option>
+            </select>
+        </div>
+        
+        <div class="preview">
+            <div class="preview-title">Preview:</div>
+            <div id="previewText">
+                The quick brown fox jumps over the lazy dog.<br>
+                Damage: 3d6+2<br>
+                INT: 10 REF: 8 DEX: 9
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="stubborn">Target Specific Panels:</label>
+            <select id="stubborn" multiple size="3">
+                <option value="character-states" selected>Character States</option>
+                <option value="standard-dv" selected>Standard DV Table</option>
+                <option value="all-panels" selected>All Panels</option>
+            </select>
+        </div>
+        
+        <div class="button-group">
+            <button id="applyButton">Apply Font Settings</button>
+            <button id="closeButton" class="button-secondary">Close</button>
+        </div>
+    </div>
+    
+    <script>
+        // Update preview as values change
+        const fontSizeSlider = document.getElementById('fontSize');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+        const fontFamilySelect = document.getElementById('fontFamily');
+        const previewText = document.getElementById('previewText');
+        const applyButton = document.getElementById('applyButton');
+        const closeButton = document.getElementById('closeButton');
+        
+        // Update preview as values change
+        fontSizeSlider.addEventListener('input', updatePreview);
+        fontFamilySelect.addEventListener('change', updatePreview);
+        
+        function updatePreview() {
+            const fontSize = fontSizeSlider.value;
+            const fontFamily = fontFamilySelect.value;
+            
+            fontSizeValue.textContent = `${fontSize}px`;
+            previewText.style.fontSize = `${fontSize}px`;
+            previewText.style.fontFamily = fontFamily;
+        }
+        
+        // Initialize preview
+        updatePreview();
+        
+        // Apply button handler
+        applyButton.addEventListener('click', () => {
+            const fontSize = fontSizeSlider.value;
+            const fontFamily = fontFamilySelect.value;
+            const selectedPanels = Array.from(document.getElementById('stubborn').selectedOptions).map(option => option.value);
+            
+            // Create the CSS to inject into the parent window
+            let cssRules = '';
+            
+            // Add rules for specific panels if selected
+            if (selectedPanels.includes('character-states')) {
+                cssRules += `
+                    [data-component="character-states"] .cp-panel__content,
+                    [data-component="character-states"] .cp-panel__content *,
+                    [data-component="character-states"] table,
+                    [data-component="character-states"] th,
+                    [data-component="character-states"] td {
+                        font-size: ${fontSize}px !important;
+                        font-family: ${fontFamily}, monospace !important;
+                    }
+                `;
+            }
+            
+            if (selectedPanels.includes('standard-dv')) {
+                cssRules += `
+                    [data-component="standard-dv"] .cp-panel__content,
+                    [data-component="standard-dv"] .cp-panel__content *,
+                    [data-component="standard-dv"] table,
+                    [data-component="standard-dv"] th,
+                    [data-component="standard-dv"] td {
+                        font-size: ${fontSize}px !important;
+                        font-family: ${fontFamily}, monospace !important;
+                    }
+                `;
+            }
+            
+            if (selectedPanels.includes('all-panels')) {
+                cssRules += `
+                    .cp-panel__content,
+                    .cp-panel__content table,
+                    .cp-panel__content th,
+                    .cp-panel__content td,
+                    [data-component] .cp-panel__content,
+                    .cp-text-mono,
+                    .cp-sidebar-content,
+                    .cp-accordion-item,
+                    table.cp-data-table,
+                    table.cp-data-table th,
+                    table.cp-data-table td,
+                    .cp-stat-block,
+                    .cp-stat-block * {
+                        font-size: ${fontSize}px !important;
+                        font-family: ${fontFamily}, monospace !important;
+                    }
+                `;
+            }
+            
+            // Find target window - if opened as standalone, try to use opener
+            const targetWindow = window.opener || window.parent || window;
+            
+            try {
+                // Create or update style element in the target document
+                let styleEl = targetWindow.document.getElementById('standalone-font-fix');
+                if (!styleEl) {
+                    styleEl = targetWindow.document.createElement('style');
+                    styleEl.id = 'standalone-font-fix';
+                    targetWindow.document.head.appendChild(styleEl);
+                }
+                
+                // Set the content
+                styleEl.textContent = cssRules;
+                
+                // Set CSS variables in target document
+                targetWindow.document.documentElement.style.setProperty('--cp-base-font-size', `${fontSize}px`);
+                targetWindow.document.documentElement.style.setProperty('--cp-font-family', fontFamily);
+                
+                // Also try to update any existing panels directly
+                const panels = targetWindow.document.querySelectorAll('.cp-panel__content');
+                panels.forEach(panel => {
+                    panel.style.fontSize = `${fontSize}px`;
+                    panel.style.fontFamily = `${fontFamily}, monospace`;
+                    
+                    // Update all children too
+                    Array.from(panel.querySelectorAll('*')).forEach(el => {
+                        el.style.fontSize = `${fontSize}px`;
+                        el.style.fontFamily = `${fontFamily}, monospace`;
+                    });
+                });
+                
+                // Show success notification
+                showNotification(`Font settings applied: ${fontSize}px ${fontFamily}`);
+                
+                // If there's a refreshPanelFonts function in the target window, call it
+                if (typeof targetWindow.refreshPanelFonts === 'function') {
+                    targetWindow.refreshPanelFonts();
+                }
+                
+                // Try to update layout manager if it exists
+                if (targetWindow.layoutManager && 
+                    targetWindow.layoutManager.settings && 
+                    targetWindow.layoutManager.settings.scaling) {
+                    
+                    targetWindow.layoutManager.settings.scaling.fontSize = parseInt(fontSize, 10);
+                    targetWindow.layoutManager.settings.scaling.fontFamily = fontFamily;
+                    
+                    if (typeof targetWindow.layoutManager.saveSettings === 'function') {
+                        targetWindow.layoutManager.saveSettings();
+                    }
+                    
+                    if (typeof targetWindow.layoutManager.applyScalingSettings === 'function') {
+                        targetWindow.layoutManager.applyScalingSettings();
+                    }
+                }
+            } catch (error) {
+                // If cross-origin issues, show instructions
+                alert(`Please copy this code and paste it into the console of your Cyberpunk GM Screen:
+
+                // Apply font settings
+                const style = document.createElement('style');
+                style.id = 'standalone-font-fix';
+                style.textContent = \`${cssRules}\`;
+                document.head.appendChild(style);
+                
+                // Also set CSS variables
+                document.documentElement.style.setProperty('--cp-base-font-size', '${fontSize}px');
+                document.documentElement.style.setProperty('--cp-font-family', '${fontFamily}');
+                
+                // Show success
+                alert('Font settings applied: ${fontSize}px ${fontFamily}');`);
+            }
+        });
+        
+        // Show notification
+        function showNotification(message) {
+            // Remove any existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Fade in
+            setTimeout(() => {
+                notification.style.opacity = '1';
+            }, 10);
+            
+            // Fade out and remove
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+        
+        // Close button
+        closeButton.addEventListener('click', () => {
+            // If opened in a new window, close it
+            if (window.opener) {
+                window.close();
+            } else {
+                // Otherwise, create a "go back" link
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 50px; color: #00f0ff;">
+                        <h2>Font settings have been applied.</h2>
+                        <p>You can now close this window.</p>
+                        <a href="minimal-local.html" style="color: #00f0ff; text-decoration: underline;">
+                            Return to Cyberpunk GM Screen
+                        </a>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

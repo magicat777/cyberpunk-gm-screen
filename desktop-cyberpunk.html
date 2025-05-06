@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+    <title>Cyberpunk RED GM Screen | Modern Interface</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta name="keywords" content="cyberpunk red, game master screen, rpg tools, tabletop rpg, gm screen, cyberpunk, role-playing game, dice roller, character management">
+    <meta name="author" content="Cyberpunk RED GM Screen Project">
+    <meta name="robots" content="index, follow">
+    <meta name="application-name" content="Cyberpunk RED GM Screen">
+    <meta name="theme-color" content="#050709">
+    
+    <!-- FINAL Font Fix Script - Maximum Visibility and Coverage -->
+    <script src="final-font-fix.js"></script>
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    
+    <!-- Open Graph / Facebook Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/index.html">
+    <meta property="og:title" content="Cyberpunk RED GM Screen | Modern Interface">
+    <meta property="og:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta property="og:image" content="https://yourdomain.com/images/og-image.jpg">
+    
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yourdomain.com/index.html">
+    <meta name="twitter:title" content="Cyberpunk RED GM Screen | Modern Interface">
+    <meta name="twitter:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta name="twitter:image" content="https://yourdomain.com/images/twitter-image.jpg">
+    
+    <!-- Cyberpunk UI Stylesheet -->
+    <link rel="stylesheet" href="css/cyberpunk-ui.css">
+    <!-- Initiative Tracker Stylesheet -->
+    <link rel="stylesheet" href="css/initiative-tracker.css">
+    <!-- Cloud Status Stylesheet -->
+    <link rel="stylesheet" href="css/cloud-status.css?v=1.0">
+    <!-- Anti-Flash Fix -->
+    <link rel="stylesheet" href="css/no-flash-fix.css?v=1.0">
+    
+    <!-- Authentication Check -->
+    <script src="js/auth-handler.js"></script>
+    <script>
+        // Redirect to login if not authenticated
+        if (typeof authHandler !== 'undefined' && !authHandler.isAuthenticated()) {
+            window.location.href = 'secure-login.html';
+        }
+    </script>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="cp-grid-bg"></div>
+    <div class="cp-noise"></div>
+    <div class="cp-scanlines"></div>
+    <div class="cp-glitch-effect"></div>
+    
+    <!-- Main Application Container -->
+    <div class="cp-app">
+        <!-- Admin Bar -->
+        <div class="cp-admin-bar">
+            <div class="cp-logo">CYBERPUNK RED <span>GM INTERFACE v2.0.77</span></div>
+            <div class="cp-admin-controls">
+                <!-- UI Customization Dropdown -->
+                <div class="cp-dropdown">
+                    <button class="cp-dropdown-button">UI Customization</button>
+                    <div class="cp-dropdown-content">
+                        <a href="#" id="cp-toggle-theme">Toggle Dark/Light Theme</a>
+                        <a href="#" id="cp-toggle-animations">Toggle Animations</a>
+                        <a href="#" id="cp-ui-scaling">Scaling & Font Options...</a>
+                        <a href="#" id="cp-change-colors">Color Scheme</a>
+                        <hr>
+                        <a href="#" id="cp-toggle-grid">Toggle Grid Display</a>
+                        <a href="#" id="cp-toggle-snap">Toggle Grid Snapping</a>
+                        <a href="#" id="cp-auto-arrange">Auto-arrange Desktop</a>
+                        <a href="#" id="cp-resolution-test">Resolution Testing</a>
+                        <hr>
+                        <a href="#" id="cp-export-settings">Export Settings</a>
+                        <a href="#" id="cp-import-settings">Import Settings</a>
+                    </div>
+                </div>
+                
+                <!-- Profile Dropdown -->
+                <div class="cp-dropdown">
+                    <button class="cp-dropdown-button">Profile: <span id="cp-current-profile">Default</span></button>
+                    <div class="cp-dropdown-content">
+                        <a href="#" data-profile="default">Default</a>
+                        <a href="#" data-profile="combat">Combat Focused</a>
+                        <a href="#" data-profile="netrunner">Netrunner</a>
+                        <a href="#" data-profile="custom">Custom</a>
+                        <hr>
+                        <a href="#" id="cp-save-profile">Save Current as New...</a>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <button id="cp-save-state" class="cp-btn cp-btn--primary">Save Current State</button>
+                <button id="cp-logout" class="cp-btn cp-btn--danger">Logout</button>
+            </div>
+        </div>
+        
+        <!-- Main Content Container -->
+        <div class="cp-content-container">
+            <!-- Sidebar -->
+            <div class="cp-sidebar">
+                <button class="cp-sidebar-toggle"><span class="toggle-icon">◀</span></button>
+                
+                <!-- Sidebar Content -->
+                <div class="cp-sidebar-content">
+                    <!-- Components Section -->
+                    <div class="cp-accordion open" data-category="components">
+                        <div class="cp-accordion-header">
+                            <span class="cp-accordion-title">Components</span>
+                            <span class="cp-accordion-icon">-</span>
+                        </div>
+                        <div class="cp-accordion-content" style="max-height: 500px;">
+                            <div class="cp-component-list">
+                                <!-- Game Data Components -->
+                                <div class="cp-component-category">
+                                    <h3>Core Rules</h3>
+                                    <div class="cp-component-item" data-component="stats">
+                                        <span class="cp-component-name">Character Stats</span>
+                                        <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-add-component">+</button>
+                                    </div>
+                                    <div class="cp-component-item" data-component="skills">
+                                        <span class="cp-component-name">Skills List</span>
+                                        <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-add-component">+</button>
+                                    </div>
+                                    <!-- More components would go here -->
+                                </div>
+                                
+                                <div class="cp-component-category">
+                                    <h3>Combat</h3>
+                                    <div class="cp-component-item" data-component="combat-basics">
+                                        <span class="cp-component-name">Combat Basics</span>
+                                        <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-add-component">+</button>
+                                    </div>
+                                    <div class="cp-component-item" data-component="combat-actions">
+                                        <span class="cp-component-name">Combat Actions</span>
+                                        <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-add-component">+</button>
+                                    </div>
+                                    <!-- More components would go here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Characters Section -->
+                    <div class="cp-accordion" data-category="characters">
+                        <div class="cp-accordion-header">
+                            <span class="cp-accordion-title">Characters</span>
+                            <span class="cp-accordion-icon">+</span>
+                        </div>
+                        <div class="cp-accordion-content">
+                            <div class="cp-character-lists">
+                                <!-- Player Characters -->
+                                <div class="cp-character-section">
+                                    <div class="cp-section-header">
+                                        <h3>Player Characters</h3>
+                                        <button id="cp-add-pc" class="cp-btn cp-btn--sm">Add PC</button>
+                                    </div>
+                                    <div id="cp-pc-list" class="cp-character-list">
+                                        <!-- PC list will be populated by JavaScript -->
+                                        <div class="cp-empty-list">No player characters added</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- NPCs -->
+                                <div class="cp-character-section">
+                                    <div class="cp-section-header">
+                                        <h3>NPCs</h3>
+                                        <button id="cp-add-npc" class="cp-btn cp-btn--sm">Add NPC</button>
+                                    </div>
+                                    <div id="cp-npc-list" class="cp-character-list">
+                                        <!-- NPC list will be populated by JavaScript -->
+                                        <div class="cp-empty-list">No NPCs added</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tools Section -->
+                    <div class="cp-accordion" data-category="tools">
+                        <div class="cp-accordion-header">
+                            <span class="cp-accordion-title">GM Tools</span>
+                            <span class="cp-accordion-icon">+</span>
+                        </div>
+                        <div class="cp-accordion-content">
+                            <div class="cp-tool-list">
+                                <div class="cp-tool-item" data-tool="dice-roller">
+                                    <span class="cp-tool-name">Dice Roller</span>
+                                    <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-run-tool">▶</button>
+                                </div>
+                                <div class="cp-tool-item" data-tool="initiative-tracker">
+                                    <span class="cp-tool-name">Initiative Tracker</span>
+                                    <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-run-tool">▶</button>
+                                </div>
+                                <div class="cp-tool-item" data-tool="name-generator">
+                                    <span class="cp-tool-name">Name Generator</span>
+                                    <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-run-tool">▶</button>
+                                </div>
+                                <div class="cp-tool-item" data-tool="encounter-builder">
+                                    <span class="cp-tool-name">Encounter Builder</span>
+                                    <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-run-tool">▶</button>
+                                </div>
+                                <!-- More tools would go here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="cp-main-content" id="cp-main-content">
+                <!-- Panels will be added here -->
+                
+                <!-- Example Panel -->
+                <div class="cp-panel" data-component="example" style="left: 50px; top: 50px; width: 400px;">
+                    <div class="cp-panel__header">
+                        <h4 class="cp-panel__title">Example Panel</h4>
+                        <div class="cp-panel__controls">
+                            <button class="cp-btn cp-btn--icon cp-btn--ghost">
+                                <span class="cp-icon cp-icon--minimize">_</span>
+                            </button>
+                            <button class="cp-btn cp-btn--icon cp-btn--ghost">
+                                <span class="cp-icon cp-icon--close">×</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="cp-panel__content">
+                        <p>This is an example panel with cyberpunk styling.</p>
+                        <p>Panels can be dragged, resized, and contain any content.</p>
+                        <div class="cp-form-group">
+                            <label>Example Input</label>
+                            <input type="text" class="cp-form-control" placeholder="Enter text...">
+                        </div>
+                        <button class="cp-btn cp-btn--primary">Primary Button</button>
+                        <button class="cp-btn">Default Button</button>
+                    </div>
+                    <div class="cp-panel__resize-handle cp-panel__resize-handle--se"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Character Form Modal -->
+    <div class="cp-modal" id="cp-character-form-modal">
+        <div class="cp-modal-content">
+            <div class="cp-modal-header">
+                <h2 id="cp-character-form-title">Add Character</h2>
+                <button class="cp-modal-close">&times;</button>
+            </div>
+            <div class="cp-modal-body">
+                <form id="cp-character-form" class="cp-form">
+                    <div class="cp-form-group">
+                        <label for="cp-character-name">Name</label>
+                        <input type="text" id="cp-character-name" class="cp-form-control" placeholder="Character name">
+                    </div>
+                    <div class="cp-form-group">
+                        <label for="cp-character-role">Role</label>
+                        <div class="cp-select-wrapper">
+                            <select id="cp-character-role" class="cp-form-control cp-select">
+                                <option value="">Select role</option>
+                                <option value="Solo">Solo</option>
+                                <option value="Netrunner">Netrunner</option>
+                                <option value="Tech">Tech</option>
+                                <option value="Medtech">Medtech</option>
+                                <option value="Media">Media</option>
+                                <option value="Exec">Exec</option>
+                                <option value="Lawman">Lawman</option>
+                                <option value="Fixer">Fixer</option>
+                                <option value="Nomad">Nomad</option>
+                                <option value="Rockerboy">Rockerboy</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="cp-form-row cp-flex cp-gap-md">
+                        <div class="cp-form-group">
+                            <label for="cp-character-hp">Hit Points</label>
+                            <input type="number" id="cp-character-hp" class="cp-form-control" min="1" value="25">
+                        </div>
+                        <div class="cp-form-group">
+                            <label for="cp-character-armor">Armor SP</label>
+                            <input type="number" id="cp-character-armor" class="cp-form-control" min="0" value="11">
+                        </div>
+                    </div>
+                    <!-- More form fields would go here -->
+                </form>
+            </div>
+            <div class="cp-modal-footer">
+                <button class="cp-btn cp-btn--ghost" id="cp-character-form-cancel">Cancel</button>
+                <button class="cp-btn cp-btn--primary" id="cp-character-form-save">Save Character</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- UI Scaling Modal -->
+    <div class="cp-modal" id="cp-scaling-modal">
+        <div class="cp-modal-content">
+            <div class="cp-modal-header">
+                <h2>UI Scaling & Font Options</h2>
+                <button class="cp-modal-close">&times;</button>
+            </div>
+            <div class="cp-modal-body">
+                <div class="cp-form-group">
+                    <label for="cp-ui-scale-slider">UI Scale (Affects Overall Size)</label>
+                    <div class="cp-slider-container">
+                        <input type="range" id="cp-ui-scale-slider" class="cp-slider" min="70" max="130" value="100" step="5">
+                        <span id="cp-ui-scale-value">100%</span>
+                    </div>
+                </div>
+                
+                <div class="cp-form-group">
+                    <label for="cp-font-size-slider">Font Size</label>
+                    <div class="cp-slider-container">
+                        <input type="range" id="cp-font-size-slider" class="cp-slider" min="12" max="20" value="16" step="1">
+                        <span id="cp-font-size-value">16px</span>
+                    </div>
+                </div>
+                
+                <div class="cp-form-group">
+                    <label for="cp-font-family">Font Family</label>
+                    <div class="cp-select-wrapper">
+                        <select id="cp-font-family" class="cp-form-control cp-select">
+                            <option value="Share Tech Mono">Share Tech Mono (Default)</option>
+                            <option value="Rajdhani">Rajdhani (Heading)</option>
+                            <option value="Exo 2">Exo 2 (Body)</option>
+                            <option value="monospace">System Monospace</option>
+                            <option value="sans-serif">System Sans-serif</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="cp-form-group">
+                    <div class="cp-checkbox-wrapper">
+                        <input type="checkbox" id="cp-auto-adjust" class="cp-checkbox" checked>
+                        <span class="cp-checkbox-indicator"></span>
+                        <label for="cp-auto-adjust">Auto-adjust for screen size</label>
+                    </div>
+                </div>
+                
+                <div class="cp-preview-box">
+                    <h3>Preview Text</h3>
+                    <p id="cp-preview-text">This is how text will appear in the interface.</p>
+                </div>
+            </div>
+            <div class="cp-modal-footer">
+                <button class="cp-btn cp-btn--ghost" id="cp-scaling-reset">Reset to Default</button>
+                <button class="cp-btn cp-btn--primary" id="cp-scaling-save">Apply Changes</button>
+                <script>
+                    // Connect modal to layout manager
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const uiScaleSlider = document.getElementById('cp-ui-scale-slider');
+                        const uiScaleValue = document.getElementById('cp-ui-scale-value');
+                        const fontSizeSlider = document.getElementById('cp-font-size-slider');
+                        const fontSizeValue = document.getElementById('cp-font-size-value');
+                        const fontFamilySelect = document.getElementById('cp-font-family');
+                        const autoAdjustCheckbox = document.getElementById('cp-auto-adjust');
+                        const previewText = document.getElementById('cp-preview-text');
+                        const resetButton = document.getElementById('cp-scaling-reset');
+                        const saveButton = document.getElementById('cp-scaling-save');
+                        
+                        // Initialize values from layout manager if available
+                        if (window.layoutManager && window.layoutManager.settings && window.layoutManager.settings.scaling) {
+                            const { uiScale, fontSize, fontFamily, autoAdjust } = window.layoutManager.settings.scaling;
+                            uiScaleSlider.value = uiScale;
+                            uiScaleValue.textContent = `${uiScale}%`;
+                            fontSizeSlider.value = fontSize;
+                            fontSizeValue.textContent = `${fontSize}px`;
+                            fontFamilySelect.value = fontFamily;
+                            autoAdjustCheckbox.checked = autoAdjust;
+                            
+                            // Apply to preview
+                            previewText.style.fontFamily = fontFamily;
+                            previewText.style.fontSize = `${fontSize}px`;
+                        }
+                        
+                        // Update preview on slider change
+                        uiScaleSlider.addEventListener('input', () => {
+                            uiScaleValue.textContent = `${uiScaleSlider.value}%`;
+                        });
+                        
+                        fontSizeSlider.addEventListener('input', () => {
+                            fontSizeValue.textContent = `${fontSizeSlider.value}px`;
+                            previewText.style.fontSize = `${fontSizeSlider.value}px`;
+                        });
+                        
+                        fontFamilySelect.addEventListener('change', () => {
+                            previewText.style.fontFamily = fontFamilySelect.value;
+                        });
+                        
+                        // Reset to default
+                        resetButton.addEventListener('click', () => {
+                            if (window.layoutManager && typeof window.layoutManager.resetUIScale === 'function') {
+                                window.layoutManager.resetUIScale();
+                                window.layoutManager.resetFontSize();
+                                
+                                // Update controls
+                                uiScaleSlider.value = 100;
+                                uiScaleValue.textContent = '100%';
+                                fontSizeSlider.value = 16;
+                                fontSizeValue.textContent = '16px';
+                                fontFamilySelect.value = 'Share Tech Mono';
+                                autoAdjustCheckbox.checked = true;
+                                
+                                // Update preview
+                                previewText.style.fontFamily = 'Share Tech Mono';
+                                previewText.style.fontSize = '16px';
+                            }
+                        });
+                        
+                        // Save changes
+                        saveButton.addEventListener('click', () => {
+                            if (window.layoutManager && window.layoutManager.settings) {
+                                // Get values
+                                const uiScale = parseInt(uiScaleSlider.value);
+                                const fontSize = parseInt(fontSizeSlider.value);
+                                const fontFamily = fontFamilySelect.value;
+                                const autoAdjust = autoAdjustCheckbox.checked;
+                                
+                                // Update settings
+                                if (window.layoutManager.settings.scaling) {
+                                    window.layoutManager.settings.scaling.uiScale = uiScale;
+                                    window.layoutManager.settings.scaling.fontSize = fontSize;
+                                    window.layoutManager.settings.scaling.fontFamily = fontFamily;
+                                    window.layoutManager.settings.scaling.autoAdjust = autoAdjust;
+                                }
+                                
+                                // Apply settings
+                                if (typeof window.layoutManager.applyScalingSettings === 'function') {
+                                    window.layoutManager.applyScalingSettings();
+                                    window.layoutManager.saveSettings();
+                                }
+                                
+                                // Close modal
+                                document.getElementById('cp-scaling-modal').classList.remove('visible');
+                                
+                                // Show notification
+                                if (window.cyberpunkUI && window.cyberpunkUI.showNotification) {
+                                    window.cyberpunkUI.showNotification('Scaling settings applied successfully!', 'success');
+                                }
+                            }
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Color Scheme Modal -->
+    <div class="cp-modal" id="cp-colors-modal">
+        <div class="cp-modal-content">
+            <div class="cp-modal-header">
+                <h2>Color Scheme Customization</h2>
+                <button class="cp-modal-close">&times;</button>
+            </div>
+            <div class="cp-modal-body">
+                <div class="cp-preset-schemes">
+                    <h3>Preset Color Schemes</h3>
+                    <div class="cp-color-presets">
+                        <button class="cp-color-preset active" data-scheme="default">
+                            <span style="background-color: #00f0ff;"></span>
+                            <span style="background-color: #ff2a6d;"></span>
+                            <span style="background-color: #05ffa1;"></span>
+                            <span>Default</span>
+                        </button>
+                        <button class="cp-color-preset" data-scheme="purple-haze">
+                            <span style="background-color: #bb46ff;"></span>
+                            <span style="background-color: #ff003c;"></span>
+                            <span style="background-color: #02d8b9;"></span>
+                            <span>Purple Haze</span>
+                        </button>
+                        <button class="cp-color-preset" data-scheme="yellow-fever">
+                            <span style="background-color: #ffcc00;"></span>
+                            <span style="background-color: #ff2a6d;"></span>
+                            <span style="background-color: #0df5e3;"></span>
+                            <span>Yellow Fever</span>
+                        </button>
+                        <button class="cp-color-preset" data-scheme="tech-noir">
+                            <span style="background-color: #0df5e3;"></span>
+                            <span style="background-color: #bb46ff;"></span>
+                            <span style="background-color: #ff9e4f;"></span>
+                            <span>Tech Noir</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="cp-custom-colors">
+                    <h3>Custom Colors</h3>
+                    
+                    <div class="cp-form-group">
+                        <label for="cp-primary-color">Primary Color</label>
+                        <div class="cp-color-picker">
+                            <input type="color" id="cp-primary-color" value="#00f0ff">
+                            <input type="text" id="cp-primary-color-text" class="cp-form-control" value="#00f0ff">
+                        </div>
+                    </div>
+                    
+                    <div class="cp-form-group">
+                        <label for="cp-secondary-color">Secondary Color</label>
+                        <div class="cp-color-picker">
+                            <input type="color" id="cp-secondary-color" value="#ff2a6d">
+                            <input type="text" id="cp-secondary-color-text" class="cp-form-control" value="#ff2a6d">
+                        </div>
+                    </div>
+                    
+                    <div class="cp-form-group">
+                        <label for="cp-tertiary-color">Tertiary Color</label>
+                        <div class="cp-color-picker">
+                            <input type="color" id="cp-tertiary-color" value="#05ffa1">
+                            <input type="text" id="cp-tertiary-color-text" class="cp-form-control" value="#05ffa1">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="cp-preview-box">
+                    <div class="cp-color-preview">
+                        <div class="cp-preview-panel">
+                            <div class="cp-preview-header"></div>
+                            <div class="cp-preview-body"></div>
+                        </div>
+                        <div class="cp-preview-sidebar">
+                            <div class="cp-preview-item"></div>
+                            <div class="cp-preview-item"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="cp-modal-footer">
+                <button class="cp-btn cp-btn--ghost" id="cp-colors-reset">Reset to Default</button>
+                <button class="cp-btn cp-btn--primary" id="cp-colors-save">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import Settings Modal -->
+    <div class="cp-modal" id="cp-import-modal">
+        <div class="cp-modal-content">
+            <div class="cp-modal-header">
+                <h2>Import Settings</h2>
+                <button class="cp-modal-close">&times;</button>
+            </div>
+            <div class="cp-modal-body">
+                <div class="cp-form-group">
+                    <label for="cp-import-file">Upload Settings File</label>
+                    <input type="file" id="cp-import-file" class="cp-form-control" accept=".json">
+                </div>
+                <div class="cp-import-preview" id="cp-import-preview">
+                    <p>Upload a settings file to preview its contents.</p>
+                </div>
+            </div>
+            <div class="cp-modal-footer">
+                <button class="cp-btn cp-btn--ghost" id="cp-import-cancel">Cancel</button>
+                <button class="cp-btn cp-btn--primary" id="cp-import-confirm">Import Settings</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="js/cloud-storage-adapter.js?v=1.0" defer></script>
+    <script src="js/cloud-status-ui.js?v=1.0" defer></script>
+    <script src="js/data-handler.js" defer></script>
+    <script src="js/game-data.js" defer></script>
+    <script src="js/drag-handler.js" defer></script>
+    <script src="js/character-manager.js" defer></script>
+    <script src="js/layout-manager.js" defer></script>
+    <!-- Direct patch to layout-manager initialization -->
+    <script src="patch-init-settings.js" defer></script>
+    <script src="js/gm-tools.js" defer></script>
+    <script src="js/initiative-tracker.js" defer></script>
+    <script src="js/cyberpunk-ui.js?v=1.1" defer></script>
+    <script src="js/cyberpunk-sidebar.js" defer></script>
+    <script src="js/ui-adapter.js" defer></script>
+    <!-- Fix for UI Scaling and Font options -->
+    <script src="js/fix-scaling.js" defer></script>
+    <!-- Targeted fix for stubborn panels that don't respond to font scaling -->
+    <script src="js/panel-font-fix.js" defer></script>
+    <!-- UI Diagnostics Tool - helps identify and fix UI issues -->
+    <script src="js/ui-diagnostics.js" defer></script>
+    
+    <!-- Initialize Application -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log("DOM fully loaded, initializing application...");
+            
+            try {
+                // Initialize cloud storage first, if available
+                if (typeof window.cloudStorage !== 'undefined' && 
+                    typeof window.cloudStorage.init === 'function') {
+                    await window.cloudStorage.init();
+                    console.log("Cloud Storage initialized");
+                }
+                
+                // Initialize cloud status UI
+                if (typeof window.cloudStatusUI !== 'undefined' && 
+                    typeof window.cloudStatusUI.init === 'function') {
+                    await window.cloudStatusUI.init();
+                    console.log("Cloud Status UI initialized");
+                }
+                
+                // Initialize character manager - now async
+                if (typeof window.characterManager !== 'undefined') {
+                    await window.characterManager.init();
+                    console.log("Character Manager initialized");
+                } else {
+                    console.error("Character Manager not found on window!");
+                }
+                
+                // Initialize layout manager
+                if (typeof LayoutManager !== 'undefined') {
+                    window.layoutManager = new LayoutManager();
+                    window.layoutManager.init();
+                    console.log("Layout Manager initialized");
+                }
+                
+                // Initialize GM tools
+                if (typeof gmTools !== 'undefined') {
+                    window.gmTools = gmTools;
+                    window.gmTools.init();
+                    console.log("GM Tools initialized");
+                }
+                
+                // Initialize Initiative Tracker - now async
+                if (typeof initiativeTracker !== 'undefined') {
+                    window.initiativeTracker = initiativeTracker;
+                    await window.initiativeTracker.init();
+                    console.log("Initiative Tracker initialized");
+                }
+                
+                // Ensure UI adapter doesn't auto-initialize to avoid conflicts
+                window.uiAdapterAutoInit = false;
+                
+                // Now init cyberpunk UI last since it depends on other components
+                if (typeof window.cyberpunkUI !== 'undefined' && 
+                    typeof window.cyberpunkUI.init === 'function') {
+                    window.cyberpunkUI.init();
+                }
+                
+                // Show cloud status notification after everything is initialized
+                if (typeof window.cloudStatusUI !== 'undefined' && 
+                    typeof window.cloudStatusUI.showStatus === 'function') {
+                    window.cloudStatusUI.showStatus();
+                    window.cloudStatusUI.autoHideAfterDelay(5000); // Hide after 5 seconds
+                }
+                
+                console.log("Application initialization complete!");
+            } catch (error) {
+                console.error("Error during application initialization:", error);
+            }
+        });
+    </script>
+</body>
+</html>

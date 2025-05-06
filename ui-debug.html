@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+    <title>Cyberpunk UI Debug</title>
+    
+    <!-- Cyberpunk UI Stylesheet -->
+    <link rel="stylesheet" href="css/cyberpunk-ui.css">
+    
+    <style>
+        .debug-section {
+            margin: 20px;
+            padding: 15px;
+            border: 1px solid var(--cp-color-accent-primary);
+            border-radius: 3px;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        .debug-log {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            font-family: 'Courier New', monospace;
+            color: var(--cp-color-text-primary);
+            margin-top: 10px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+        
+        .log-error {
+            color: var(--cp-color-danger);
+        }
+        
+        .log-success {
+            color: var(--cp-color-success);
+        }
+        
+        .log-info {
+            color: var(--cp-color-info);
+        }
+        
+        .debug-controls button {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="cp-grid-bg"></div>
+    <div class="cp-noise"></div>
+    <div class="cp-scanlines"></div>
+    <div class="cp-glitch-effect"></div>
+    
+    <!-- Main Container -->
+    <div class="cp-app">
+        <!-- Admin Bar -->
+        <div class="cp-admin-bar">
+            <div class="cp-logo">CYBERPUNK UI <span>DEBUG CONSOLE</span></div>
+            <div class="cp-admin-controls">
+                <button id="refresh-debug" class="cp-btn cp-btn--primary">Refresh</button>
+                <button id="clear-log" class="cp-btn cp-btn--ghost">Clear Log</button>
+            </div>
+        </div>
+        
+        <!-- Main Content Container -->
+        <div class="cp-content-container">
+            <!-- Debug Sections -->
+            <div class="debug-section">
+                <h2>UI Adapter Tests</h2>
+                <div class="debug-controls">
+                    <button id="test-sidebar-population" class="cp-btn cp-btn--primary">Test Sidebar Population</button>
+                    <button id="test-add-component" class="cp-btn">Test Add Component</button>
+                    <button id="test-event-handlers" class="cp-btn">Test Event Handlers</button>
+                </div>
+                <div class="debug-log" id="ui-adapter-log">
+                    <div class="log-entry log-info">UI Adapter debug log initialized</div>
+                </div>
+            </div>
+            
+            <div class="debug-section">
+                <h2>Layout Manager Tests</h2>
+                <div class="debug-controls">
+                    <button id="test-create-panel" class="cp-btn cp-btn--primary">Test Create Panel</button>
+                    <button id="test-save-layout" class="cp-btn">Test Save Layout</button>
+                    <button id="test-load-layout" class="cp-btn">Test Load Layout</button>
+                </div>
+                <div class="debug-log" id="layout-manager-log">
+                    <div class="log-entry log-info">Layout Manager debug log initialized</div>
+                </div>
+            </div>
+            
+            <div class="debug-section">
+                <h2>Cyberpunk UI Tests</h2>
+                <div class="debug-controls">
+                    <button id="test-notifications" class="cp-btn cp-btn--primary">Test Notifications</button>
+                    <button id="test-modal" class="cp-btn">Test Modal</button>
+                    <button id="test-panel-drag" class="cp-btn">Test Panel Dragging</button>
+                </div>
+                <div class="debug-log" id="ui-log">
+                    <div class="log-entry log-info">UI debug log initialized</div>
+                </div>
+            </div>
+            
+            <!-- Test Layout Area -->
+            <div class="debug-section">
+                <h2>Test Layout</h2>
+                <div id="test-container" style="position: relative; height: 300px; border: 1px dashed var(--cp-color-accent-secondary);">
+                    <!-- Panels will be placed here during tests -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mock Components Modal -->
+    <div class="cp-modal" id="test-modal">
+        <div class="cp-modal-content">
+            <div class="cp-modal-header">
+                <h2>Test Modal</h2>
+                <button class="cp-modal-close">&times;</button>
+            </div>
+            <div class="cp-modal-body">
+                <p>This is a test modal window to verify the modal system works correctly.</p>
+                <div class="cp-form-group">
+                    <label for="test-input">Test Input</label>
+                    <input type="text" id="test-input" class="cp-form-control" placeholder="Test input">
+                </div>
+            </div>
+            <div class="cp-modal-footer">
+                <button class="cp-btn cp-btn--ghost" id="test-modal-cancel">Cancel</button>
+                <button class="cp-btn cp-btn--primary" id="test-modal-ok">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script>
+        // Mock gameData for testing
+        const gameData = {
+            'test-component-1': {
+                title: 'Test Component 1',
+                category: 'overview',
+                content: '<p>This is test component 1 content.</p>'
+            },
+            'test-component-2': {
+                title: 'Test Component 2',
+                category: 'combat',
+                content: '<p>This is test component 2 content.</p>'
+            },
+            'test-component-3': {
+                title: 'Test Component 3',
+                category: 'netrunning',
+                content: '<p>This is test component 3 content.</p>'
+            }
+        };
+        
+        // Mock LayoutManager for testing
+        class LayoutManager {
+            constructor() {
+                this.activePanels = [];
+                this.LAYOUT_KEY = 'test-layout-key';
+            }
+            
+            init() {
+                logMessage('layout-manager-log', 'LayoutManager initialized', 'info');
+            }
+            
+            addComponentToDesktop(componentId) {
+                logMessage('layout-manager-log', `Adding component: ${componentId}`, 'info');
+                // Actual implementation is in ui-adapter.js
+                return null;
+            }
+            
+            saveState() {
+                logMessage('layout-manager-log', 'Layout state saved', 'success');
+                return true;
+            }
+        }
+        
+        // Mock gmTools for testing
+        const gmTools = {
+            init() {
+                logMessage('ui-log', 'GM Tools initialized', 'info');
+            },
+            
+            runTool(toolId) {
+                logMessage('ui-log', `Running tool: ${toolId}`, 'info');
+            }
+        };
+        
+        // Debug utility functions
+        function logMessage(logId, message, type = 'info') {
+            const log = document.getElementById(logId);
+            if (!log) return;
+            
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = message;
+            
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        // Setup test functions
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create global instances
+            window.layoutManager = new LayoutManager();
+            window.layoutManager.init();
+            
+            window.gmTools = gmTools;
+            window.gmTools.init();
+            
+            // UI Adapter tests
+            document.getElementById('test-sidebar-population').addEventListener('click', () => {
+                logMessage('ui-adapter-log', 'Testing sidebar population...', 'info');
+                
+                try {
+                    // Create mock sidebar structure
+                    const testContainer = document.getElementById('test-container');
+                    testContainer.innerHTML = `
+                        <div class="cp-accordion open" data-category="components">
+                            <div class="cp-accordion-header">
+                                <span class="cp-accordion-title">Components</span>
+                                <span class="cp-accordion-icon">-</span>
+                            </div>
+                            <div class="cp-accordion-content" style="max-height: 500px;">
+                                <div class="cp-component-list">
+                                    <!-- Components will be added here by populateSidebar -->
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    if (window.uiAdapter && typeof window.uiAdapter.populateSidebar === 'function') {
+                        window.uiAdapter.populateSidebar();
+                        logMessage('ui-adapter-log', 'Sidebar population successful', 'success');
+                    } else {
+                        logMessage('ui-adapter-log', 'uiAdapter.populateSidebar not found', 'error');
+                    }
+                } catch (error) {
+                    logMessage('ui-adapter-log', `Error: ${error.message}`, 'error');
+                }
+            });
+            
+            document.getElementById('test-add-component').addEventListener('click', () => {
+                logMessage('ui-adapter-log', 'Testing component addition...', 'info');
+                
+                try {
+                    if (window.layoutManager && typeof window.layoutManager.addComponentToDesktop === 'function') {
+                        window.layoutManager.addComponentToDesktop('test-component-1');
+                        logMessage('ui-adapter-log', 'Component addition triggered', 'success');
+                    } else {
+                        logMessage('ui-adapter-log', 'layoutManager.addComponentToDesktop not found', 'error');
+                    }
+                } catch (error) {
+                    logMessage('ui-adapter-log', `Error: ${error.message}`, 'error');
+                }
+            });
+            
+            // Layout Manager tests
+            document.getElementById('test-create-panel').addEventListener('click', () => {
+                logMessage('layout-manager-log', 'Testing panel creation...', 'info');
+                
+                try {
+                    // Add a panel to the test container
+                    const testContainer = document.getElementById('test-container');
+                    
+                    if (window.layoutManager && typeof window.layoutManager.createCyberpunkPanel === 'function') {
+                        const panel = window.layoutManager.createCyberpunkPanel(
+                            'test-panel',
+                            'Test Panel',
+                            '<p>This is a test panel content.</p>'
+                        );
+                        
+                        panel.style.position = 'absolute';
+                        panel.style.left = '50px';
+                        panel.style.top = '50px';
+                        
+                        testContainer.appendChild(panel);
+                        logMessage('layout-manager-log', 'Panel created and added to container', 'success');
+                        
+                        // Initialize panel using cyberpunkUI if available
+                        if (window.cyberpunkUI && typeof window.cyberpunkUI.initPanels === 'function') {
+                            window.cyberpunkUI.initPanels([panel]);
+                            logMessage('layout-manager-log', 'Panel initialized with cyberpunkUI', 'success');
+                        }
+                    } else {
+                        logMessage('layout-manager-log', 'layoutManager.createCyberpunkPanel not found', 'error');
+                    }
+                } catch (error) {
+                    logMessage('layout-manager-log', `Error: ${error.message}`, 'error');
+                }
+            });
+            
+            // Cyberpunk UI tests
+            document.getElementById('test-notifications').addEventListener('click', () => {
+                logMessage('ui-log', 'Testing notifications...', 'info');
+                
+                try {
+                    if (window.cyberpunkUI && typeof window.cyberpunkUI.showNotification === 'function') {
+                        window.cyberpunkUI.showNotification('Test success notification', 'success', 3000);
+                        setTimeout(() => {
+                            window.cyberpunkUI.showNotification('Test error notification', 'error', 3000);
+                        }, 1000);
+                        setTimeout(() => {
+                            window.cyberpunkUI.showNotification('Test info notification', 'info', 3000);
+                        }, 2000);
+                        
+                        logMessage('ui-log', 'Notifications triggered', 'success');
+                    } else {
+                        logMessage('ui-log', 'cyberpunkUI.showNotification not found', 'error');
+                    }
+                } catch (error) {
+                    logMessage('ui-log', `Error: ${error.message}`, 'error');
+                }
+            });
+            
+            document.getElementById('test-modal').addEventListener('click', () => {
+                logMessage('ui-log', 'Testing modal...', 'info');
+                
+                try {
+                    if (window.cyberpunkUI && typeof window.cyberpunkUI.showModal === 'function') {
+                        window.cyberpunkUI.showModal('test-modal');
+                        logMessage('ui-log', 'Modal triggered', 'success');
+                    } else {
+                        logMessage('ui-log', 'cyberpunkUI.showModal not found', 'error');
+                    }
+                } catch (error) {
+                    logMessage('ui-log', `Error: ${error.message}`, 'error');
+                }
+            });
+            
+            // Utility buttons
+            document.getElementById('refresh-debug').addEventListener('click', () => {
+                window.location.reload();
+            });
+            
+            document.getElementById('clear-log').addEventListener('click', () => {
+                document.querySelectorAll('.debug-log').forEach(log => {
+                    const firstEntry = log.querySelector('.log-entry');
+                    log.innerHTML = '';
+                    if (firstEntry) {
+                        log.appendChild(firstEntry);
+                    }
+                });
+            });
+            
+            // Initialize debugging
+            logMessage('ui-adapter-log', 'Debug page loaded successfully', 'success');
+            logMessage('layout-manager-log', 'Debug page loaded successfully', 'success');
+            logMessage('ui-log', 'Debug page loaded successfully', 'success');
+        });
+    </script>
+    
+    <!-- Load the actual scripts for testing -->
+    <script src="js/cyberpunk-ui.js" defer></script>
+    <script src="js/ui-adapter.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk RED GM Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Color scheme */
+            --cyber-red: #ff003c;
+            --cyber-blue: #00b3e6;
+            --cyber-yellow: #ffff00;
+            --cyber-purple: #9b30ff;
+            --cyber-green: #00ff66;
+            --cyber-bg-dark: #0a0a0a;
+            --cyber-bg: #111;
+            --cyber-bg-light: #222;
+            --cyber-text: #eee;
+            
+            /* UI Scaling */
+            --base-font-size: 14px;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 60px;
+            --header-height: 60px;
+            --footer-height: 30px;
+            --panel-border-radius: 3px;
+            --panel-padding: 15px;
+            --transition-speed: 0.3s;
+        }
+        
+        /* Optional user scaling */
+        .scale-small {
+            --base-font-size: 12px;
+        }
+        
+        .scale-large {
+            --base-font-size: 16px;
+        }
+        
+        .scale-xl {
+            --base-font-size: 18px;
+        }
+        
+        /* Base Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--base-font-size);
+            line-height: 1.5;
+            background-color: var(--cyber-bg);
+            color: var(--cyber-text);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+        }
+        
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            margin: 0 0 1rem 0;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            color: var(--cyber-red);
+            text-shadow: 0 0 10px rgba(255, 0, 60, 0.5);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            color: var(--cyber-blue);
+        }
+        
+        h3 {
+            font-size: 1.4rem;
+            color: var(--cyber-yellow);
+        }
+        
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            color: var(--cyber-blue);
+            animation: glitch-animation 3s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            color: var(--cyber-yellow);
+            animation: glitch-animation 2s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-animation {
+            0% {
+                clip-path: inset(80% 0 0 0);
+            }
+            5% {
+                clip-path: inset(20% 0 60% 0);
+            }
+            10% {
+                clip-path: inset(40% 0 40% 0);
+            }
+            15% {
+                clip-path: inset(60% 0 20% 0);
+            }
+            20% {
+                clip-path: inset(10% 0 70% 0);
+            }
+            25% {
+                clip-path: inset(30% 0 50% 0);
+            }
+            100% {
+                clip-path: inset(0 0 0 0);
+            }
+        }
+        
+        /* Main Layout Structure */
+        .app-container {
+            display: grid;
+            grid-template-rows: var(--header-height) 1fr var(--footer-height);
+            grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-areas: 
+                "header header"
+                "sidebar content"
+                "footer footer";
+            height: 100vh;
+            width: 100vw;
+            transition: grid-template-columns var(--transition-speed);
+        }
+        
+        .app-container.sidebar-collapsed {
+            grid-template-columns: var(--sidebar-collapsed-width) 1fr;
+        }
+        
+        /* Header */
+        .header {
+            grid-area: header;
+            background-color: var(--cyber-bg-dark);
+            border-bottom: 1px solid var(--cyber-red);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+        }
+        
+        .header-title {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .header-title .logo {
+            margin-right: 15px;
+            height: 40px;
+        }
+        
+        .header-menu {
+            display: flex;
+            gap: 15px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            grid-area: sidebar;
+            background-color: var(--cyber-bg-dark);
+            border-right: 1px solid var(--cyber-blue);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: width var(--transition-speed);
+            width: var(--sidebar-width);
+        }
+        
+        .sidebar-collapsed .sidebar {
+            width: var(--sidebar-collapsed-width);
+        }
+        
+        .sidebar-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            color: var(--cyber-blue);
+            cursor: pointer;
+            align-self: flex-end;
+        }
+        
+        .sidebar-toggle:hover {
+            color: var(--cyber-yellow);
+        }
+        
+        .sidebar-toggle svg {
+            width: 24px;
+            height: 24px;
+            transition: transform var(--transition-speed);
+        }
+        
+        .sidebar-collapsed .sidebar-toggle svg {
+            transform: rotate(180deg);
+        }
+        
+        .sidebar-content {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        /* Accordion Navigation */
+        .nav-accordion {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-section {
+            border-bottom: 1px solid rgba(0, 179, 230, 0.3);
+        }
+        
+        .nav-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--cyber-blue);
+            cursor: pointer;
+            transition: background var(--transition-speed);
+        }
+        
+        .sidebar-collapsed .nav-header-text {
+            display: none;
+        }
+        
+        .nav-header:hover {
+            background: rgba(0, 179, 230, 0.1);
+        }
+        
+        .nav-header-icon {
+            margin-right: 10px;
+        }
+        
+        .nav-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height var(--transition-speed);
+        }
+        
+        .nav-section.active .nav-content {
+            max-height: 500px; /* Adjust as needed */
+        }
+        
+        .sidebar-collapsed .nav-content {
+            display: none;
+        }
+        
+        .nav-item {
+            padding: 8px 15px 8px 35px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-item:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-item-checkbox {
+            margin-right: 10px;
+        }
+        
+        /* Main Content Area */
+        .content {
+            grid-area: content;
+            overflow: hidden;
+            position: relative;
+            background: radial-gradient(circle at center, var(--cyber-bg-light) 0%, var(--cyber-bg) 70%);
+        }
+        
+        .desktop {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            position: relative;
+            padding: 20px;
+        }
+        
+        /* Desktop tabs */
+        .desktop-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--cyber-blue);
+            margin-bottom: 10px;
+        }
+        
+        .desktop-tab {
+            padding: 8px 15px;
+            background: transparent;
+            border: 1px solid var(--cyber-blue);
+            border-bottom: none;
+            color: var(--cyber-blue);
+            margin-right: 5px;
+            cursor: pointer;
+            position: relative;
+            top: 1px;
+        }
+        
+        .desktop-tab.active {
+            background: var(--cyber-blue);
+            color: black;
+        }
+        
+        .desktop-add-tab {
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px dashed var(--cyber-blue);
+            border-bottom: none;
+            color: var(--cyber-blue);
+            cursor: pointer;
+            position: relative;
+            top: 1px;
+        }
+        
+        /* Footer */
+        .footer {
+            grid-area: footer;
+            background-color: var(--cyber-bg-dark);
+            border-top: 1px solid var(--cyber-red);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 0.8rem;
+        }
+        
+        /* Module Panels */
+        .module-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--cyber-blue);
+            box-shadow: 0 0 10px rgba(0, 179, 230, 0.3);
+            position: absolute;
+            min-width: 250px;
+            min-height: 150px;
+            border-radius: var(--panel-border-radius);
+            overflow: hidden;
+            resize: both;
+            backdrop-filter: blur(5px);
+        }
+        
+        .panel-header {
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 179, 230, 0.2), rgba(0, 0, 0, 0.5));
+            padding: 8px 10px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-title {
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .panel-controls {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .panel-control {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-blue);
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        
+        .panel-control:hover {
+            background: var(--cyber-blue);
+            color: black;
+        }
+        
+        .panel-content {
+            padding: var(--panel-padding);
+            height: calc(100% - 35px);
+            overflow: auto;
+        }
+        
+        /* Buttons and controls */
+        .cyber-button {
+            background: linear-gradient(to bottom, var(--cyber-bg-light), var(--cyber-bg-dark));
+            color: var(--cyber-blue);
+            border: 1px solid var(--cyber-blue);
+            padding: 8px 15px;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-speed);
+        }
+        
+        .cyber-button:hover {
+            color: var(--cyber-yellow);
+            border-color: var(--cyber-yellow);
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+        }
+        
+        .cyber-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 179, 230, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: button-shine 3s infinite linear;
+            opacity: 0;
+        }
+        
+        .cyber-button:hover::after {
+            opacity: 1;
+        }
+        
+        @keyframes button-shine {
+            0% {
+                left: -50%;
+            }
+            100% {
+                left: 150%;
+            }
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            border: 1px solid rgba(0, 179, 230, 0.3);
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background: rgba(0, 179, 230, 0.2);
+            color: var(--cyber-blue);
+            text-transform: uppercase;
+        }
+        
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Profile Management Dialog */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--cyber-bg);
+            border: 1px solid var(--cyber-blue);
+            box-shadow: 0 0 20px rgba(0, 179, 230, 0.5);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--cyber-blue);
+            padding-bottom: 10px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--cyber-red);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .profile-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+        
+        .profile-item {
+            padding: 10px;
+            border: 1px solid var(--cyber-blue);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .profile-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .profile-form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .cyber-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-text);
+            padding: 8px;
+            font-family: 'Share Tech Mono', monospace;
+            flex-grow: 1;
+        }
+        
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+        
+        .text-red {
+            color: var(--cyber-red);
+        }
+        
+        .text-blue {
+            color: var(--cyber-blue);
+        }
+        
+        .text-yellow {
+            color: var(--cyber-yellow);
+        }
+        
+        .text-green {
+            color: var(--cyber-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen for First Time Users or Reset -->
+    <div id="splash-screen" class="hidden">
+        <div class="glitch-wrapper">
+            <h1 class="glitch" data-text="CYBERPUNK RED">CYBERPUNK RED</h1>
+            <h2>GM INTERFACE v3.0.77</h2>
+        </div>
+        <p>Welcome to the Cyberpunk RED GM Interface. Configure your experience below.</p>
+        <button id="start-session" class="cyber-button">INITIALIZE INTERFACE</button>
+    </div>
+
+    <!-- Main Application Layout -->
+    <div class="app-container" id="app-container">
+        <!-- Top Header Bar -->
+        <header class="header">
+            <div class="header-title">
+                <span class="glitch" data-text="CYBERPUNK RED">CYBERPUNK RED</span>
+                <span>GM INTERFACE</span>
+            </div>
+            <div class="header-menu">
+                <button class="cyber-button" id="new-profile-btn">NEW PROFILE</button>
+                <button class="cyber-button" id="load-profile-btn">LOAD PROFILE</button>
+                <button class="cyber-button" id="save-profile-btn">SAVE PROFILE</button>
+                <button class="cyber-button" id="settings-btn">SETTINGS</button>
+            </div>
+        </header>
+
+        <!-- Left Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+            
+            <div class="sidebar-content">
+                <ul class="nav-accordion">
+                    <!-- Overview Section -->
+                    <li class="nav-section active" data-category="overview">
+                        <div class="nav-header">
+                            <div>
+                                <span class="nav-header-icon">📊</span>
+                                <span class="nav-header-text">Overview</span>
+                            </div>
+                            <span class="accordion-toggle">▼</span>
+                        </div>
+                        <div class="nav-content">
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="stats" checked>
+                                <span>Stats</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="skills" checked>
+                                <span>Skills</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="skill-resolution" checked>
+                                <span>Skill Resolution</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="exploding-dice" checked>
+                                <span>Exploding Dice</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="rule-of-cool" checked>
+                                <span>Rule of Cool</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="standard-dv" checked>
+                                <span>Standard DV Table</span>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Combat Section -->
+                    <li class="nav-section" data-category="combat">
+                        <div class="nav-header">
+                            <div>
+                                <span class="nav-header-icon">💥</span>
+                                <span class="nav-header-text">Combat</span>
+                            </div>
+                            <span class="accordion-toggle">▶</span>
+                        </div>
+                        <div class="nav-content">
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="combat-basics" checked>
+                                <span>Combat Basics</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="initiative" checked>
+                                <span>Initiative</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="actions" checked>
+                                <span>Actions</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="movement" checked>
+                                <span>Movement</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="ranged-combat" checked>
+                                <span>Ranged Combat</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="ranged-dv" checked>
+                                <span>Ranged DV Table</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="autofire-dv" checked>
+                                <span>Autofire DV Table</span>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Melee & Defense Section -->
+                    <li class="nav-section" data-category="melee-defense">
+                        <div class="nav-header">
+                            <div>
+                                <span class="nav-header-icon">🗡️</span>
+                                <span class="nav-header-text">Melee & Defense</span>
+                            </div>
+                            <span class="accordion-toggle">▶</span>
+                        </div>
+                        <div class="nav-content">
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="brawling" checked>
+                                <span>Brawling Combat</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="martial-arts" checked>
+                                <span>Martial Arts</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="thrown-weapons" checked>
+                                <span>Thrown Weapons</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="thrown-dv" checked>
+                                <span>Thrown Weapons DV</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="surprise" checked>
+                                <span>Surprise Attacks</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="cover" checked>
+                                <span>Cover</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="armor" checked>
+                                <span>Armor</span>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Damage & Health Section -->
+                    <li class="nav-section" data-category="damage-health">
+                        <div class="nav-header">
+                            <div>
+                                <span class="nav-header-icon">❤️</span>
+                                <span class="nav-header-text">Damage & Health</span>
+                            </div>
+                            <span class="accordion-toggle">▶</span>
+                        </div>
+                        <div class="nav-content">
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="damage" checked>
+                                <span>Damage System</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="critical-injury" checked>
+                                <span>Critical Injury Chart</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="wounds" checked>
+                                <span>Wounds</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="death" checked>
+                                <span>Death Rules</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="stabilization" checked>
+                                <span>Stabilization</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="healing" checked>
+                                <span>Healing</span>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Netrunning Section -->
+                    <li class="nav-section" data-category="netrunning">
+                        <div class="nav-header">
+                            <div>
+                                <span class="nav-header-icon">🌐</span>
+                                <span class="nav-header-text">Netrunning</span>
+                            </div>
+                            <span class="accordion-toggle">▶</span>
+                        </div>
+                        <div class="nav-content">
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="netrunning" checked>
+                                <span>Netrunning Basics</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="quickhacking" checked>
+                                <span>Quickhacking</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="net-actions" checked>
+                                <span>Net Actions Table</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="programs" checked>
+                                <span>Programs</span>
+                            </div>
+                            <div class="nav-item">
+                                <input type="checkbox" class="nav-item-checkbox" data-component="net-architecture" checked>
+                                <span>NET Architecture</span>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Additional Sections Can Be Added Here -->
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <!-- Desktop Tabs -->
+            <div class="desktop-tabs">
+                <button class="desktop-tab active" data-desktop="desktop-1">Desktop 1</button>
+                <button class="desktop-add-tab" id="add-desktop">+</button>
+            </div>
+            
+            <!-- Desktop Workspaces -->
+            <div class="desktops">
+                <div class="desktop active" id="desktop-1">
+                    <!-- Panels will be added here dynamically -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div>Cyberpunk RED GM Interface v3.0.77</div>
+            <div>© 2023-2025 Night City Solutions</div>
+        </footer>
+    </div>
+
+    <!-- Profile Management Modal -->
+    <div class="modal" id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Profile Management</h3>
+                <button class="modal-close" id="profile-modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <h4>Load Profile</h4>
+                <ul class="profile-list" id="profile-list">
+                    <!-- Profiles will be listed here -->
+                </ul>
+                
+                <h4>Save Current Layout</h4>
+                <div class="profile-form">
+                    <input type="text" class="cyber-input" id="profile-name" placeholder="Profile Name">
+                    <button class="cyber-button" id="save-profile-confirm">SAVE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="modal-close" id="settings-modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <h4>Interface Scaling</h4>
+                <div class="settings-option">
+                    <label>
+                        <input type="radio" name="scale" value="scale-small"> Small
+                    </label>
+                    <label>
+                        <input type="radio" name="scale" value="default" checked> Default
+                    </label>
+                    <label>
+                        <input type="radio" name="scale" value="scale-large"> Large
+                    </label>
+                    <label>
+                        <input type="radio" name="scale" value="scale-xl"> Extra Large
+                    </label>
+                </div>
+                
+                <h4>Theme</h4>
+                <div class="settings-option">
+                    <button class="cyber-button theme-button" data-theme="default">Default</button>
+                    <button class="cyber-button theme-button" data-theme="neon-blue">Neon Blue</button>
+                    <button class="cyber-button theme-button" data-theme="cyber-red">Cyber Red</button>
+                    <button class="cyber-button theme-button" data-theme="ghost-green">Ghost Green</button>
+                </div>
+                
+                <h4>Reset</h4>
+                <div class="settings-option">
+                    <button class="cyber-button" id="reset-layout">Reset Current Layout</button>
+                    <button class="cyber-button" id="reset-all">Reset Everything</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const appContainer = document.getElementById('app-container');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const navSections = document.querySelectorAll('.nav-section');
+            const navCheckboxes = document.querySelectorAll('.nav-item-checkbox');
+            const desktopTabs = document.querySelector('.desktop-tabs');
+            const desktops = document.querySelector('.desktops');
+            const addDesktopBtn = document.getElementById('add-desktop');
+            
+            // Modal elements
+            const profileBtn = document.getElementById('load-profile-btn');
+            const saveProfileBtn = document.getElementById('save-profile-btn');
+            const settingsBtn = document.getElementById('settings-btn');
+            const profileModal = document.getElementById('profile-modal');
+            const settingsModal = document.getElementById('settings-modal');
+            const profileModalClose = document.getElementById('profile-modal-close');
+            const settingsModalClose = document.getElementById('settings-modal-close');
+            const profileList = document.getElementById('profile-list');
+            const profileNameInput = document.getElementById('profile-name');
+            const saveProfileConfirm = document.getElementById('save-profile-confirm');
+            
+            // State
+            let activeDesktop = 'desktop-1';
+            let desktopCount = 1;
+            let isDragging = false;
+            let currentZIndex = 10;
+            
+            // Toggle sidebar
+            sidebarToggle.addEventListener('click', function() {
+                appContainer.classList.toggle('sidebar-collapsed');
+            });
+            
+            // Initialize accordion sections
+            navSections.forEach(section => {
+                const header = section.querySelector('.nav-header');
+                header.addEventListener('click', function() {
+                    // If sidebar is collapsed, expand it first
+                    if (appContainer.classList.contains('sidebar-collapsed')) {
+                        appContainer.classList.remove('sidebar-collapsed');
+                        // Then activate the clicked section after a short delay
+                        setTimeout(() => {
+                            toggleAccordion(section);
+                        }, 300);
+                    } else {
+                        toggleAccordion(section);
+                    }
+                });
+            });
+            
+            function toggleAccordion(section) {
+                const isActive = section.classList.contains('active');
+                
+                // Close all sections
+                navSections.forEach(sec => {
+                    sec.classList.remove('active');
+                    sec.querySelector('.accordion-toggle').textContent = '▶';
+                });
+                
+                // If the clicked section wasn't active, open it
+                if (!isActive) {
+                    section.classList.add('active');
+                    section.querySelector('.accordion-toggle').textContent = '▼';
+                }
+            }
+            
+            // Handle module checkboxes
+            navCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const componentId = this.getAttribute('data-component');
+                    if (this.checked) {
+                        addModuleToDesktop(componentId, activeDesktop);
+                    } else {
+                        removeModuleFromDesktop(componentId, activeDesktop);
+                    }
+                });
+            });
+            
+            // Add desktop tab
+            addDesktopBtn.addEventListener('click', function() {
+                desktopCount++;
+                const newDesktopId = `desktop-${desktopCount}`;
+                
+                // Create new tab
+                const newTab = document.createElement('button');
+                newTab.className = 'desktop-tab';
+                newTab.setAttribute('data-desktop', newDesktopId);
+                newTab.textContent = `Desktop ${desktopCount}`;
+                desktopTabs.insertBefore(newTab, addDesktopBtn);
+                
+                // Create new desktop
+                const newDesktop = document.createElement('div');
+                newDesktop.className = 'desktop';
+                newDesktop.id = newDesktopId;
+                desktops.appendChild(newDesktop);
+                
+                // Activate the new desktop
+                setActiveDesktop(newDesktopId);
+                
+                // Add click handler to the tab
+                newTab.addEventListener('click', function() {
+                    setActiveDesktop(newDesktopId);
+                });
+            });
+            
+            // Handle existing desktop tabs
+            document.querySelectorAll('.desktop-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const desktopId = this.getAttribute('data-desktop');
+                    setActiveDesktop(desktopId);
+                });
+            });
+            
+            function setActiveDesktop(desktopId) {
+                // Update activeDesktop state
+                activeDesktop = desktopId;
+                
+                // Update tabs
+                document.querySelectorAll('.desktop-tab').forEach(tab => {
+                    if (tab.getAttribute('data-desktop') === desktopId) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+                
+                // Update desktops
+                document.querySelectorAll('.desktop').forEach(desktop => {
+                    if (desktop.id === desktopId) {
+                        desktop.classList.add('active');
+                    } else {
+                        desktop.classList.remove('active');
+                    }
+                });
+                
+                // Update checkboxes to reflect modules on this desktop
+                updateCheckboxesForDesktop(desktopId);
+            }
+            
+            function updateCheckboxesForDesktop(desktopId) {
+                // Reset all checkboxes
+                navCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Check boxes for modules present on this desktop
+                const desktop = document.getElementById(desktopId);
+                if (desktop) {
+                    const modules = desktop.querySelectorAll('.module-panel');
+                    modules.forEach(module => {
+                        const componentId = module.getAttribute('data-component');
+                        const checkbox = document.querySelector(`.nav-item-checkbox[data-component="${componentId}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
+                }
+            }
+            
+            // Module data (example, would be expanded with all module content)
+            const moduleData = {
+                'stats': {
+                    title: 'Character Stats',
+                    content: `
+                        <table>
+                            <tr>
+                                <th>STAT</th>
+                                <th>DESCRIPTION</th>
+                                <th>TYPICAL</th>
+                            </tr>
+                            <tr>
+                                <td>INT</td>
+                                <td>Intelligence, knowledge, memory</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>REF</td>
+                                <td>Reflexes, coordination, physical reaction</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>DEX</td>
+                                <td>Dexterity, agility, fine motor control</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>TECH</td>
+                                <td>Technical aptitude</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>COOL</td>
+                                <td>Willpower, composure, stress tolerance</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>WILL</td>
+                                <td>Determination, mental fortitude</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>LUCK</td>
+                                <td>Fortune, player pool, replenishes session start</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>MOVE</td>
+                                <td>Movement capability (meters per Turn)</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>BODY</td>
+                                <td>Strength, endurance, constitution</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>EMP</td>
+                                <td>Empathy, interpersonal intelligence</td>
+                                <td>5</td>
+                            </tr>
+                        </table>
+                    `
+                },
+                'skills': {
+                    title: 'Skills List',
+                    content: `
+                        <div style="column-count: 2; column-gap: 20px;">
+                            <p><strong>INTELLIGENCE</strong></p>
+                            <ul>
+                                <li>Accounting</li>
+                                <li>Animal Handling</li>
+                                <li>Concentration</li>
+                                <li>Education & Gen. Knowledge</li>
+                                <li>Gambling</li>
+                                <li>Language (Various)</li>
+                                <li>Tactics</li>
+                                <li>Wilderness Survival</li>
+                            </ul>
+                            
+                            <p><strong>REFLEXES</strong></p>
+                            <ul>
+                                <li>Brawling</li>
+                                <li>Evasion</li>
+                                <li>Martial Arts (Various)</li>
+                                <li>Melee Weapon</li>
+                                <li>Driving</li>
+                            </ul>
+                            
+                            <p><strong>DEXTERITY</strong></p>
+                            <ul>
+                                <li>Archery</li>
+                                <li>Athletics</li>
+                                <li>Autofire</li>
+                                <li>Handgun</li>
+                                <li>Heavy Weapons</li>
+                                <li>Shoulder Arms</li>
+                                <li>Stealth</li>
+                            </ul>
+                            
+                            <p><strong>TECHNIQUE</strong></p>
+                            <ul>
+                                <li>Basic Tech</li>
+                                <li>Cybertech</li>
+                                <li>First Aid</li>
+                                <li>Forgery</li>
+                                <li>Paramedic</li>
+                                <li>Photography/Film</li>
+                                <li>Pick Lock</li>
+                            </ul>
+                            
+                            <p><strong>COOL</strong></p>
+                            <ul>
+                                <li>Acting</li>
+                                <li>Interrogation</li>
+                                <li>Intimidation</li>
+                                <li>Perception</li>
+                                <li>Persuasion</li>
+                                <li>Resist Torture/Drugs</li>
+                            </ul>
+                            
+                            <p><strong>WILL</strong></p>
+                            <ul>
+                                <li>Concentration</li>
+                                <li>Resist Torture/Drugs</li>
+                            </ul>
+                            
+                            <p><strong>EMPATHY</strong></p>
+                            <ul>
+                                <li>Human Perception</li>
+                                <li>Conversation</li>
+                                <li>Trading</li>
+                                <li>Social</li>
+                                <li>Persuasion</li>
+                                <li>Performance</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                'skill-resolution': {
+                    title: 'Skill Resolution',
+                    content: `
+                        <p>To perform an action, player rolls:</p>
+                        <p><strong>STAT + SKILL + 1d10 vs DV</strong></p>
+                        <p>A result equal to or higher than the DV means success.</p>
+                        <p><strong>Critical Success:</strong> If a natural 10 is rolled on the d10, roll again and add (exploding dice).</p>
+                        <p><strong>Critical Failure:</strong> If a natural 1 is rolled on the d10, roll again and subtract (imploding dice).</p>
+                    `
+                },
+                'standard-dv': {
+                    title: 'Standard DV Table',
+                    content: `
+                        <table>
+                            <tr>
+                                <th>DV</th>
+                                <th>DIFFICULTY</th>
+                                <th>DESCRIPTION</th>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td>Everyday</td>
+                                <td>Simple task that most people could do</td>
+                            </tr>
+                            <tr>
+                                <td>13</td>
+                                <td>Average</td>
+                                <td>Task requiring some competence</td>
+                            </tr>
+                            <tr>
+                                <td>15</td>
+                                <td>Difficult</td>
+                                <td>Task requiring significant skill</td>
+                            </tr>
+                            <tr>
+                                <td>17</td>
+                                <td>Very Difficult</td>
+                                <td>Task requiring expertise</td>
+                            </tr>
+                            <tr>
+                                <td>21</td>
+                                <td>Hard</td>
+                                <td>Task requiring significant expertise</td>
+                            </tr>
+                            <tr>
+                                <td>24</td>
+                                <td>Very Hard</td>
+                                <td>Task requiring mastery</td>
+                            </tr>
+                            <tr>
+                                <td>29</td>
+                                <td>Near Impossible</td>
+                                <td>Task at the edge of human capability</td>
+                            </tr>
+                        </table>
+                    `
+                }
+                // Additional modules would be defined here
+            };
+            
+            // Add module to desktop
+            function addModuleToDesktop(componentId, desktopId) {
+                // Check if this module is already on the desktop
+                const desktop = document.getElementById(desktopId);
+                const existingModule = desktop.querySelector(`.module-panel[data-component="${componentId}"]`);
+                if (existingModule) return;
+                
+                // Get module data
+                const module = moduleData[componentId];
+                if (!module) {
+                    console.error(`No data for module: ${componentId}`);
+                    return;
+                }
+                
+                // Create panel
+                const panel = document.createElement('div');
+                panel.className = 'module-panel';
+                panel.setAttribute('data-component', componentId);
+                
+                // Set initial position
+                const panelsCount = desktop.querySelectorAll('.module-panel').length;
+                const xOffset = 20 + (panelsCount % 3) * 40;
+                const yOffset = 20 + Math.floor(panelsCount / 3) * 40;
+                panel.style.left = `${xOffset}px`;
+                panel.style.top = `${yOffset}px`;
+                panel.style.width = '350px';
+                panel.style.height = '300px';
+                panel.style.zIndex = currentZIndex++;
+                
+                // Set content
+                panel.innerHTML = `
+                    <div class="panel-header">
+                        <div class="panel-title">${module.title}</div>
+                        <div class="panel-controls">
+                            <button class="panel-control panel-minimize">_</button>
+                            <button class="panel-control panel-close">×</button>
+                        </div>
+                    </div>
+                    <div class="panel-content">
+                        ${module.content}
+                    </div>
+                `;
+                
+                // Add to desktop
+                desktop.appendChild(panel);
+                
+                // Add event listeners
+                initializePanelControls(panel);
+                makeElementDraggable(panel);
+            }
+            
+            // Remove module from desktop
+            function removeModuleFromDesktop(componentId, desktopId) {
+                const desktop = document.getElementById(desktopId);
+                const panel = desktop.querySelector(`.module-panel[data-component="${componentId}"]`);
+                if (panel) {
+                    panel.remove();
+                }
+            }
+            
+            // Initialize panel control buttons
+            function initializePanelControls(panel) {
+                const closeBtn = panel.querySelector('.panel-close');
+                const minimizeBtn = panel.querySelector('.panel-minimize');
+                const panelContent = panel.querySelector('.panel-content');
+                
+                closeBtn.addEventListener('click', function() {
+                    // Update checkbox state
+                    const componentId = panel.getAttribute('data-component');
+                    const checkbox = document.querySelector(`.nav-item-checkbox[data-component="${componentId}"]`);
+                    if (checkbox) {
+                        checkbox.checked = false;
+                    }
+                    
+                    // Remove panel
+                    panel.remove();
+                });
+                
+                minimizeBtn.addEventListener('click', function() {
+                    if (panelContent.style.display === 'none') {
+                        panelContent.style.display = 'block';
+                        panel.style.height = '300px';
+                        minimizeBtn.textContent = '_';
+                    } else {
+                        panelContent.style.display = 'none';
+                        panel.style.height = 'auto';
+                        minimizeBtn.textContent = '□';
+                    }
+                });
+            }
+            
+            // Make an element draggable
+            function makeElementDraggable(element) {
+                const header = element.querySelector('.panel-header');
+                
+                header.addEventListener('mousedown', function(e) {
+                    // Prevent default behavior
+                    e.preventDefault();
+                    
+                    // Bring to front
+                    element.style.zIndex = currentZIndex++;
+                    
+                    // Get initial positions
+                    const rect = element.getBoundingClientRect();
+                    const offsetX = e.clientX - rect.left;
+                    const offsetY = e.clientY - rect.top;
+                    
+                    // Start dragging
+                    isDragging = true;
+                    
+                    // Create move function
+                    function onMouseMove(e) {
+                        if (isDragging) {
+                            const desktop = element.closest('.desktop');
+                            const desktopRect = desktop.getBoundingClientRect();
+                            
+                            let x = e.clientX - offsetX - desktopRect.left;
+                            let y = e.clientY - offsetY - desktopRect.top;
+                            
+                            // Constrain to desktop
+                            x = Math.max(0, Math.min(x, desktopRect.width - 100));
+                            y = Math.max(0, Math.min(y, desktopRect.height - 50));
+                            
+                            element.style.left = `${x}px`;
+                            element.style.top = `${y}px`;
+                        }
+                    }
+                    
+                    // Create stop function
+                    function onMouseUp() {
+                        isDragging = false;
+                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener('mouseup', onMouseUp);
+                    }
+                    
+                    // Add event listeners
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                });
+            }
+            
+            // Profile Management
+            profileBtn.addEventListener('click', function() {
+                loadProfiles();
+                profileModal.classList.add('active');
+            });
+            
+            saveProfileBtn.addEventListener('click', function() {
+                profileModal.classList.add('active');
+                profileNameInput.focus();
+            });
+            
+            profileModalClose.addEventListener('click', function() {
+                profileModal.classList.remove('active');
+            });
+            
+            saveProfileConfirm.addEventListener('click', function() {
+                const profileName = profileNameInput.value.trim();
+                if (profileName) {
+                    saveProfile(profileName);
+                    profileModal.classList.remove('active');
+                    profileNameInput.value = '';
+                }
+            });
+            
+            function loadProfiles() {
+                // Clear the profile list
+                profileList.innerHTML = '';
+                
+                // Get profiles from local storage
+                const profiles = JSON.parse(localStorage.getItem('cyberpunk-gm-profiles') || '{}');
+                
+                // Add each profile to the list
+                for (const [name, _] of Object.entries(profiles)) {
+                    const li = document.createElement('li');
+                    li.className = 'profile-item';
+                    li.innerHTML = `
+                        <span>${name}</span>
+                        <div class="profile-actions">
+                            <button class="cyber-button profile-load" data-profile="${name}">Load</button>
+                            <button class="cyber-button profile-delete" data-profile="${name}">Delete</button>
+                        </div>
+                    `;
+                    profileList.appendChild(li);
+                }
+                
+                // Add event listeners
+                document.querySelectorAll('.profile-load').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const profileName = this.getAttribute('data-profile');
+                        loadProfile(profileName);
+                        profileModal.classList.remove('active');
+                    });
+                });
+                
+                document.querySelectorAll('.profile-delete').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const profileName = this.getAttribute('data-profile');
+                        deleteProfile(profileName);
+                        loadProfiles(); // Refresh the list
+                    });
+                });
+            }
+            
+            function saveProfile(name) {
+                // Get all desktops
+                const desktopData = {};
+                document.querySelectorAll('.desktop').forEach(desktop => {
+                    const desktopId = desktop.id;
+                    const modules = [];
+                    
+                    desktop.querySelectorAll('.module-panel').forEach(panel => {
+                        modules.push({
+                            component: panel.getAttribute('data-component'),
+                            left: panel.style.left,
+                            top: panel.style.top,
+                            width: panel.style.width,
+                            height: panel.style.height,
+                            minimized: panel.querySelector('.panel-content').style.display === 'none'
+                        });
+                    });
+                    
+                    desktopData[desktopId] = {
+                        modules: modules
+                    };
+                });
+                
+                // Save overall UI state
+                const uiState = {
+                    desktops: desktopData,
+                    activeDesktop: activeDesktop,
+                    desktopCount: desktopCount,
+                    sidebarCollapsed: appContainer.classList.contains('sidebar-collapsed'),
+                };
+                
+                // Get existing profiles
+                const profiles = JSON.parse(localStorage.getItem('cyberpunk-gm-profiles') || '{}');
+                
+                // Add or update this profile
+                profiles[name] = uiState;
+                
+                // Save back to localStorage
+                localStorage.setItem('cyberpunk-gm-profiles', JSON.stringify(profiles));
+                
+                alert(`Profile "${name}" saved successfully!`);
+            }
+            
+            function loadProfile(name) {
+                // Get profiles from storage
+                const profiles = JSON.parse(localStorage.getItem('cyberpunk-gm-profiles') || '{}');
+                const profile = profiles[name];
+                
+                if (!profile) {
+                    alert(`Profile "${name}" not found.`);
+                    return;
+                }
+                
+                // Update UI state
+                activeDesktop = profile.activeDesktop;
+                desktopCount = profile.desktopCount;
+                
+                if (profile.sidebarCollapsed) {
+                    appContainer.classList.add('sidebar-collapsed');
+                } else {
+                    appContainer.classList.remove('sidebar-collapsed');
+                }
+                
+                // Clear all desktops
+                desktopTabs.innerHTML = '';
+                desktopTabs.appendChild(addDesktopBtn);
+                desktops.innerHTML = '';
+                
+                // Recreate desktops
+                for (let i = 1; i <= desktopCount; i++) {
+                    const desktopId = `desktop-${i}`;
+                    
+                    // Create tab
+                    const tab = document.createElement('button');
+                    tab.className = 'desktop-tab';
+                    tab.setAttribute('data-desktop', desktopId);
+                    tab.textContent = `Desktop ${i}`;
+                    
+                    if (desktopId === activeDesktop) {
+                        tab.classList.add('active');
+                    }
+                    
+                    desktopTabs.insertBefore(tab, addDesktopBtn);
+                    
+                    // Create desktop
+                    const desktop = document.createElement('div');
+                    desktop.className = 'desktop';
+                    desktop.id = desktopId;
+                    
+                    if (desktopId === activeDesktop) {
+                        desktop.classList.add('active');
+                    }
+                    
+                    desktops.appendChild(desktop);
+                    
+                    // Add event listener to tab
+                    tab.addEventListener('click', function() {
+                        setActiveDesktop(desktopId);
+                    });
+                }
+                
+                // Add modules to each desktop
+                for (const [desktopId, desktopInfo] of Object.entries(profile.desktops)) {
+                    const desktop = document.getElementById(desktopId);
+                    if (!desktop) continue;
+                    
+                    desktopInfo.modules.forEach(moduleInfo => {
+                        const componentId = moduleInfo.component;
+                        const module = moduleData[componentId];
+                        if (!module) return;
+                        
+                        // Create panel
+                        const panel = document.createElement('div');
+                        panel.className = 'module-panel';
+                        panel.setAttribute('data-component', componentId);
+                        panel.style.left = moduleInfo.left;
+                        panel.style.top = moduleInfo.top;
+                        panel.style.width = moduleInfo.width;
+                        panel.style.height = moduleInfo.height;
+                        panel.style.zIndex = currentZIndex++;
+                        
+                        // Set content
+                        panel.innerHTML = `
+                            <div class="panel-header">
+                                <div class="panel-title">${module.title}</div>
+                                <div class="panel-controls">
+                                    <button class="panel-control panel-minimize">${moduleInfo.minimized ? '□' : '_'}</button>
+                                    <button class="panel-control panel-close">×</button>
+                                </div>
+                            </div>
+                            <div class="panel-content" ${moduleInfo.minimized ? 'style="display: none;"' : ''}>
+                                ${module.content}
+                            </div>
+                        `;
+                        
+                        // Add to desktop
+                        desktop.appendChild(panel);
+                        
+                        // Add event listeners
+                        initializePanelControls(panel);
+                        makeElementDraggable(panel);
+                    });
+                }
+                
+                // Update checkboxes
+                updateCheckboxesForDesktop(activeDesktop);
+                
+                alert(`Profile "${name}" loaded successfully!`);
+            }
+            
+            function deleteProfile(name) {
+                // Get profiles from storage
+                const profiles = JSON.parse(localStorage.getItem('cyberpunk-gm-profiles') || '{}');
+                
+                // Delete this profile
+                if (profiles[name]) {
+                    delete profiles[name];
+                    localStorage.setItem('cyberpunk-gm-profiles', JSON.stringify(profiles));
+                    alert(`Profile "${name}" deleted.`);
+                }
+            }
+            
+            // Settings
+            settingsBtn.addEventListener('click', function() {
+                settingsModal.classList.add('active');
+            });
+            
+            settingsModalClose.addEventListener('click', function() {
+                settingsModal.classList.remove('active');
+            });
+            
+            // Initialize interface - add default modules to first desktop
+            document.querySelectorAll('.nav-item-checkbox[data-component="stats"], .nav-item-checkbox[data-component="skills"], .nav-item-checkbox[data-component="skill-resolution"], .nav-item-checkbox[data-component="standard-dv"]').forEach(checkbox => {
+                addModuleToDesktop(checkbox.getAttribute('data-component'), 'desktop-1');
+            });
+            
+            // Save initial state to localStorage for persistence
+            window.addEventListener('beforeunload', function() {
+                saveProfile('_autosave_');
+            });
+            
+            // On first load, try to load autosave profile
+            const profiles = JSON.parse(localStorage.getItem('cyberpunk-gm-profiles') || '{}');
+            if (profiles['_autosave_']) {
+                loadProfile('_autosave_');
+            }
+        });
+    </script>
+</body>
+</html>

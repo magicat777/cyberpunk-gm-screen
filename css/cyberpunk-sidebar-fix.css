@@ -1,0 +1,350 @@
+/**
+ * Cyberpunk RED GM Screen - Fixed Sidebar Styling
+ * Clean implementation to fix sidebar issues
+ */
+
+/* BASE SIDEBAR STRUCTURE */
+.cp-sidebar {
+  background: rgba(5, 7, 9, 0.95);
+  border-right: 1px solid rgba(0, 240, 255, 0.3);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 10;
+  width: 240px;
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.cp-sidebar.collapsed {
+  transform: translateX(calc(-100% + 24px));
+}
+
+.cp-sidebar-toggle {
+  position: absolute;
+  right: -24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 60px;
+  background: rgba(5, 7, 9, 0.95);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-left: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  color: rgba(0, 240, 255, 0.8);
+}
+
+.cp-sidebar-toggle:hover {
+  color: rgb(0, 240, 255);
+  background: rgba(19, 22, 37, 0.95);
+}
+
+.cp-sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 240, 255, 0.5) rgba(0, 0, 0, 0.2);
+}
+
+.cp-sidebar-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.cp-sidebar-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.cp-sidebar-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 240, 255, 0.3);
+  border-radius: 3px;
+}
+
+.cp-sidebar-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 240, 255, 0.5);
+}
+
+/* ACCORDION SECTIONS */
+.cp-accordion {
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  overflow: hidden;
+}
+
+.cp-accordion-header {
+  padding: 10px 15px;
+  background: rgba(19, 22, 37, 0.6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-left: 3px solid rgba(0, 240, 255, 0.3);
+}
+
+.cp-accordion.open .cp-accordion-header {
+  border-left-color: rgb(0, 240, 255);
+  background: rgba(19, 22, 37, 0.8);
+}
+
+.cp-accordion-header:hover {
+  background: rgba(19, 22, 37, 0.7);
+}
+
+.cp-accordion-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(0, 240, 255, 0.8);
+}
+
+.cp-accordion.open .cp-accordion-title {
+  color: rgb(0, 240, 255);
+  text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+}
+
+.cp-accordion-icon {
+  font-size: 16px;
+  color: rgba(0, 240, 255, 0.8);
+}
+
+.cp-accordion.open .cp-accordion-icon {
+  color: rgb(0, 240, 255);
+}
+
+.cp-accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: rgba(5, 7, 9, 0.5);
+}
+
+.cp-accordion.open .cp-accordion-content {
+  max-height: 1000px; /* This will be overridden by JS */
+  transition: max-height 0.4s ease;
+}
+
+/* COMPONENT CATEGORIES AND ITEMS */
+.cp-component-list {
+  padding: 5px 10px 15px 10px;
+}
+
+.cp-component-category {
+  margin-bottom: 15px;
+}
+
+.cp-component-category h3 {
+  font-size: 0.85rem;
+  padding: 8px 10px;
+  margin: 5px 0;
+  color: rgb(255, 42, 109);
+  text-shadow: 0 0 5px rgba(255, 42, 109, 0.5);
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 42, 109, 0.2);
+}
+
+/* Use different colors for different categories */
+.cp-component-category:nth-child(1) h3 {
+  color: rgb(0, 240, 255);
+  text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+  border-bottom-color: rgba(0, 240, 255, 0.2);
+}
+
+.cp-component-category:nth-child(2) h3 {
+  color: rgb(255, 42, 109);
+  text-shadow: 0 0 5px rgba(255, 42, 109, 0.5);
+  border-bottom-color: rgba(255, 42, 109, 0.2);
+}
+
+.cp-component-category:nth-child(3) h3 {
+  color: rgb(255, 0, 60);
+  text-shadow: 0 0 5px rgba(255, 0, 60, 0.5);
+  border-bottom-color: rgba(255, 0, 60, 0.2);
+}
+
+.cp-component-category:nth-child(4) h3 {
+  color: rgb(5, 255, 161);
+  text-shadow: 0 0 5px rgba(5, 255, 161, 0.5);
+  border-bottom-color: rgba(5, 255, 161, 0.2);
+}
+
+.cp-component-item {
+  padding: 7px 10px;
+  margin: 2px 0;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.cp-component-item:hover {
+  background: rgba(19, 22, 37, 0.5);
+  border-left-color: rgba(0, 240, 255, 0.5);
+}
+
+.cp-component-item:active,
+.cp-component-item.active {
+  background: rgba(0, 240, 255, 0.1);
+  border-left-color: rgb(0, 240, 255);
+}
+
+.cp-component-name {
+  font-size: 0.85rem;
+  color: rgb(240, 240, 240);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cp-component-item:hover .cp-component-name {
+  color: white;
+}
+
+.cp-add-component {
+  border-radius: 3px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  background: transparent !important;
+  border: none !important;
+  color: rgb(240, 240, 240);
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.cp-component-item:hover .cp-add-component {
+  opacity: 1;
+  color: rgb(0, 240, 255);
+}
+
+.cp-add-component:hover {
+  background: rgba(0, 240, 255, 0.15) !important;
+  transform: scale(1.1);
+}
+
+.cp-add-component:active,
+.cp-add-component.clicked {
+  transform: scale(0.9);
+  background: rgba(0, 240, 255, 0.3) !important;
+}
+
+/* TOOLS SECTION */
+.cp-tool-list {
+  padding: 5px 10px 15px 10px;
+}
+
+.cp-tool-item {
+  padding: 8px 10px;
+  margin: 3px 0;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  background: rgba(19, 22, 37, 0.3);
+  transition: all 0.2s ease;
+}
+
+.cp-tool-item:hover {
+  background: rgba(19, 22, 37, 0.5);
+  border-left-color: rgba(187, 70, 255, 0.5);
+}
+
+.cp-tool-item:active,
+.cp-tool-item.active {
+  background: rgba(187, 70, 255, 0.1);
+  border-left-color: rgb(187, 70, 255);
+}
+
+.cp-tool-name {
+  font-size: 0.85rem;
+  color: rgb(240, 240, 240);
+  flex: 1;
+}
+
+.cp-tool-item:hover .cp-tool-name {
+  color: white;
+}
+
+.cp-run-tool {
+  border-radius: 3px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  background: transparent !important;
+  border: none !important;
+  color: rgb(240, 240, 240);
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.cp-tool-item:hover .cp-run-tool {
+  opacity: 1;
+  color: rgb(187, 70, 255);
+}
+
+.cp-run-tool:hover {
+  background: rgba(187, 70, 255, 0.15) !important;
+  transform: scale(1.1);
+}
+
+.cp-run-tool:active,
+.cp-run-tool.clicked {
+  transform: scale(0.9);
+  background: rgba(187, 70, 255, 0.3) !important;
+}
+
+/* CHARACTER LISTS */
+.cp-character-section {
+  margin-bottom: 15px;
+}
+
+.cp-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+}
+
+.cp-section-header h3 {
+  font-size: 0.85rem;
+  margin: 0;
+  color: rgb(0, 240, 255);
+  text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.cp-character-list {
+  padding: 5px 10px;
+}
+
+.cp-empty-list {
+  padding: 10px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(240, 240, 240, 0.5);
+  font-style: italic;
+}

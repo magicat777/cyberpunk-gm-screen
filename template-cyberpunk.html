@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+    <title>Cyberpunk RED GM Screen | Modern Interface</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta name="keywords" content="cyberpunk red, game master screen, rpg tools, tabletop rpg, gm screen, cyberpunk, role-playing game, dice roller, character management">
+    <meta name="author" content="Cyberpunk RED GM Screen Project">
+    <meta name="robots" content="index, follow">
+    <meta name="application-name" content="Cyberpunk RED GM Screen">
+    <meta name="theme-color" content="#050709">
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    
+    <!-- Open Graph / Facebook Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/index.html">
+    <meta property="og:title" content="Cyberpunk RED GM Screen | Modern Interface">
+    <meta property="og:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta property="og:image" content="https://yourdomain.com/images/og-image.jpg">
+    
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yourdomain.com/index.html">
+    <meta name="twitter:title" content="Cyberpunk RED GM Screen | Modern Interface">
+    <meta name="twitter:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta name="twitter:image" content="https://yourdomain.com/images/twitter-image.jpg">
+    
+    <!-- Cyberpunk UI Stylesheet -->
+    <link rel="stylesheet" href="css/cyberpunk-ui.css">
+    
+    <!-- Authentication Check -->
+    <script src="js/auth-handler.js"></script>
+    <script>
+        // Redirect to login if not authenticated
+        if (typeof authHandler !== 'undefined' && !authHandler.isAuthenticated()) {
+            window.location.href = 'secure-login.html';
+        }
+    </script>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="cp-grid-bg"></div>
+    <div class="cp-noise"></div>
+    <div class="cp-scanlines"></div>
+    <div class="cp-glitch-effect"></div>
+    
+    <!-- Main Application Container -->
+    <div class="cp-app">
+        <!-- Admin Bar -->
+        <div class="cp-admin-bar">
+            <div class="cp-logo">CYBERPUNK RED <span>GM INTERFACE v2.0.77</span></div>
+            <div class="cp-admin-controls">
+                <!-- UI Customization Dropdown -->
+                <div class="cp-dropdown">
+                    <button class="cp-dropdown-button">UI Customization</button>
+                    <div class="cp-dropdown-content">
+                        <a href="#" id="cp-toggle-theme">Toggle Dark/Light Theme</a>
+                        <a href="#" id="cp-toggle-animations">Toggle Animations</a>
+                        <a href="#" id="cp-ui-scaling">Scaling & Font Options...</a>
+                        <a href="#" id="cp-change-colors">Color Scheme</a>
+                        <hr>
+                        <a href="#" id="cp-auto-arrange">Auto-arrange Desktop</a>
+                        <a href="#" id="cp-resolution-test">Resolution Testing</a>
+                        <hr>
+                        <a href="#" id="cp-export-settings">Export Settings</a>
+                        <a href="#" id="cp-import-settings">Import Settings</a>
+                    </div>
+                </div>
+                
+                <!-- Profile Dropdown -->
+                <div class="cp-dropdown">
+                    <button class="cp-dropdown-button">Profile: <span id="cp-current-profile">Default</span></button>
+                    <div class="cp-dropdown-content">
+                        <a href="#" data-profile="default">Default</a>
+                        <a href="#" data-profile="combat">Combat Focused</a>
+                        <a href="#" data-profile="netrunner">Netrunner</a>
+                        <a href="#" data-profile="custom">Custom</a>
+                        <hr>
+                        <a href="#" id="cp-save-profile">Save Current as New...</a>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <button id="cp-save-state" class="cp-btn cp-btn--primary">Save Current State</button>
+                <button id="cp-logout" class="cp-btn cp-btn--danger">Logout</button>
+            </div>
+        </div>
+        
+        <!-- Main Content Container -->
+        <div class="cp-content-container">
+            <!-- Sidebar -->
+            <div class="cp-sidebar">
+                <button class="cp-sidebar-toggle"><span class="toggle-icon">◀</span></button>
+                
+                <!-- Sidebar Content -->
+                <div class="cp-sidebar-content">
+                    <!-- Components Section -->
+                    <div class="cp-accordion open" data-category="components">
+                        <div class="cp-accordion-header">
+                            <span class="cp-accordion-title">Components</span>
+                            <span class="cp-accordion-icon">-</span>
+                        </div>
+                        <div class="cp-accordion-content" style="max-height: 500px;">
+                            <div class="cp-component-list">
+                                <!-- Game Data Components -->
+                                <div class="cp-component-category">
+                                    <h3>Core Rules</h3>
+                                    <div class="cp-component-item" data-component="stats">
+                                        <span class="cp-component-name">Character Stats</span>
+                                        <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-add-component">+</button>
+                                    </div>
+                                    <div class="cp-component-item" data-component="skills">
+                                        <span class="cp-component-name">Skills List</span>
+                                        <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-add-component">+</button>
+                                    </div>
+                                    <!-- More components would go here -->
+                                </div>
+                                
+                                <div class="cp-component-category">
+                                    <h3>Combat</h3>
+                                    <div class="cp-component-item" data-component="combat-basics">
+                                        <span class="cp-component-name">Combat Basics</span>
+                                        <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-add-component">+</button>
+                                    </div>
+                                    <div class="cp-component-item" data-component="combat-actions">
+                                        <span class="cp-component-name">Combat Actions</span>
+                                        <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-add-component">+</button>
+                                    </div>
+                                    <!-- More components would go here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Characters Section -->
+                    <div class="cp-accordion" data-category="characters">
+                        <div class="cp-accordion-header">
+                            <span class="cp-accordion-title">Characters</span>
+                            <span class="cp-accordion-icon">+</span>
+                        </div>
+                        <div class="cp-accordion-content">
+                            <div class="cp-character-lists">
+                                <!-- Player Characters -->
+                                <div class="cp-character-section">
+                                    <div class="cp-section-header">
+                                        <h3>Player Characters</h3>
+                                        <button id="cp-add-pc" class="cp-btn cp-btn--sm">Add PC</button>
+                                    </div>
+                                    <div id="cp-pc-list" class="cp-character-list">
+                                        <!-- PC list will be populated by JavaScript -->
+                                        <div class="cp-empty-list">No player characters added</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- NPCs -->
+                                <div class="cp-character-section">
+                                    <div class="cp-section-header">
+                                        <h3>NPCs</h3>
+                                        <button id="cp-add-npc" class="cp-btn cp-btn--sm">Add NPC</button>
+                                    </div>
+                                    <div id="cp-npc-list" class="cp-character-list">
+                                        <!-- NPC list will be populated by JavaScript -->
+                                        <div class="cp-empty-list">No NPCs added</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tools Section -->
+                    <div class="cp-accordion" data-category="tools">
+                        <div class="cp-accordion-header">
+                            <span class="cp-accordion-title">GM Tools</span>
+                            <span class="cp-accordion-icon">+</span>
+                        </div>
+                        <div class="cp-accordion-content">
+                            <div class="cp-tool-list">
+                                <div class="cp-tool-item" data-tool="dice-roller">
+                                    <span class="cp-tool-name">Dice Roller</span>
+                                    <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-run-tool">▶</button>
+                                </div>
+                                <div class="cp-tool-item" data-tool="name-generator">
+                                    <span class="cp-tool-name">Name Generator</span>
+                                    <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-run-tool">▶</button>
+                                </div>
+                                <div class="cp-tool-item" data-tool="encounter-builder">
+                                    <span class="cp-tool-name">Encounter Builder</span>
+                                    <button class="cp-btn cp-btn--icon cp-btn--sm cp-btn--ghost cp-run-tool">▶</button>
+                                </div>
+                                <!-- More tools would go here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="cp-main-content" id="cp-main-content">
+                <!-- Panels will be added here -->
+                
+                <!-- Example Panel -->
+                <div class="cp-panel" data-component="example" style="left: 50px; top: 50px; width: 400px;">
+                    <div class="cp-panel__header">
+                        <h4 class="cp-panel__title">Example Panel</h4>
+                        <div class="cp-panel__controls">
+                            <button class="cp-btn cp-btn--icon cp-btn--ghost">
+                                <span class="cp-icon cp-icon--minimize">_</span>
+                            </button>
+                            <button class="cp-btn cp-btn--icon cp-btn--ghost">
+                                <span class="cp-icon cp-icon--close">×</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="cp-panel__content">
+                        <p>This is an example panel with cyberpunk styling.</p>
+                        <p>Panels can be dragged, resized, and contain any content.</p>
+                        <div class="cp-form-group">
+                            <label>Example Input</label>
+                            <input type="text" class="cp-form-control" placeholder="Enter text...">
+                        </div>
+                        <button class="cp-btn cp-btn--primary">Primary Button</button>
+                        <button class="cp-btn">Default Button</button>
+                    </div>
+                    <div class="cp-panel__resize-handle cp-panel__resize-handle--se"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Character Form Modal -->
+    <div class="cp-modal" id="cp-character-form-modal">
+        <div class="cp-modal-content">
+            <div class="cp-modal-header">
+                <h2 id="cp-character-form-title">Add Character</h2>
+                <button class="cp-modal-close">&times;</button>
+            </div>
+            <div class="cp-modal-body">
+                <form id="cp-character-form" class="cp-form">
+                    <div class="cp-form-group">
+                        <label for="cp-character-name">Name</label>
+                        <input type="text" id="cp-character-name" class="cp-form-control" placeholder="Character name">
+                    </div>
+                    <div class="cp-form-group">
+                        <label for="cp-character-role">Role</label>
+                        <div class="cp-select-wrapper">
+                            <select id="cp-character-role" class="cp-form-control cp-select">
+                                <option value="">Select role</option>
+                                <option value="Solo">Solo</option>
+                                <option value="Netrunner">Netrunner</option>
+                                <option value="Tech">Tech</option>
+                                <option value="Medtech">Medtech</option>
+                                <option value="Media">Media</option>
+                                <option value="Exec">Exec</option>
+                                <option value="Lawman">Lawman</option>
+                                <option value="Fixer">Fixer</option>
+                                <option value="Nomad">Nomad</option>
+                                <option value="Rockerboy">Rockerboy</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="cp-form-row cp-flex cp-gap-md">
+                        <div class="cp-form-group">
+                            <label for="cp-character-hp">Hit Points</label>
+                            <input type="number" id="cp-character-hp" class="cp-form-control" min="1" value="25">
+                        </div>
+                        <div class="cp-form-group">
+                            <label for="cp-character-armor">Armor SP</label>
+                            <input type="number" id="cp-character-armor" class="cp-form-control" min="0" value="11">
+                        </div>
+                    </div>
+                    <!-- More form fields would go here -->
+                </form>
+            </div>
+            <div class="cp-modal-footer">
+                <button class="cp-btn cp-btn--ghost" id="cp-character-form-cancel">Cancel</button>
+                <button class="cp-btn cp-btn--primary" id="cp-character-form-save">Save Character</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="js/data-handler.js" defer></script>
+    <script src="js/game-data.js" defer></script>
+    <script src="js/drag-handler.js" defer></script>
+    <script src="js/character-manager.js" defer></script>
+    <script src="js/layout-manager.js" defer></script>
+    <script src="js/gm-tools.js" defer></script>
+    <script src="js/cyberpunk-ui.js" defer></script>
+    
+    <!-- Initialize Application -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded, initializing application...");
+            
+            // Initialize character manager
+            if (typeof characterManager !== 'undefined') {
+                characterManager.init();
+                console.log("Character Manager initialized");
+            }
+            
+            // Initialize layout manager
+            if (typeof LayoutManager !== 'undefined') {
+                window.layoutManager = new LayoutManager();
+                window.layoutManager.init();
+                console.log("Layout Manager initialized");
+            }
+            
+            // Initialize GM tools
+            if (typeof gmTools !== 'undefined') {
+                window.gmTools = gmTools;
+                window.gmTools.init();
+                console.log("GM Tools initialized");
+            }
+            
+            console.log("Application initialization complete");
+        });
+    </script>
+</body>
+</html>

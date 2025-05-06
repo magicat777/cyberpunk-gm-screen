@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+    <title>Cyberpunk RED GM Screen | Bare Minimum</title>
+    
+    <!-- Essential styling only -->
+    <style>
+        /* Reset and dark background */
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: #050709;
+            color: #f0f0f0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Ensure dark background at all times */
+        body {
+            background-color: #050709 !important;
+        }
+        
+        /* Main container */
+        .cp-app {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Sidebar */
+        .cp-sidebar {
+            width: 250px;
+            background-color: #0a1520;
+            border-right: 1px solid #00f0ff;
+            overflow-y: auto;
+            height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        /* Main content */
+        .cp-main-content {
+            flex: 1;
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+        }
+        
+        /* Panel styling */
+        .draggable-panel {
+            position: absolute;
+            min-width: 300px;
+            min-height: 200px;
+            background-color: #0a1520;
+            border: 1px solid #00f0ff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* Panel header */
+        .panel-header {
+            background-color: #041020;
+            padding: 8px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #00f0ff;
+            cursor: move;
+        }
+        
+        .panel-title {
+            font-weight: bold;
+            color: #00f0ff;
+        }
+        
+        .panel-controls {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .panel-button {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .panel-button:hover {
+            color: #00f0ff;
+        }
+        
+        /* Panel content */
+        .panel-content {
+            flex: 1;
+            overflow: auto;
+            padding: 10px;
+        }
+        
+        /* Resize handle */
+        .resize-handle {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            right: 0;
+            bottom: 0;
+            cursor: nwse-resize;
+            z-index: 10;
+        }
+        
+        /* Toolbar */
+        .cp-toolbar {
+            width: 100%;
+            height: 40px;
+            background-color: #041020;
+            border-bottom: 1px solid #00f0ff;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+        
+        .cp-toolbar-title {
+            color: #00f0ff;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 20px;
+        }
+        
+        .cp-toolbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .cp-button {
+            padding: 5px 10px;
+            background-color: #00526e;
+            color: #00f0ff;
+            border: 1px solid #00f0ff;
+            cursor: pointer;
+        }
+        
+        .cp-button:hover {
+            background-color: #006a8e;
+        }
+        
+        /* Control panel */
+        #font-control-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(4, 16, 32, 0.9);
+            border: 1px solid #00f0ff;
+            padding: 15px;
+            z-index: 9999;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            width: 250px;
+        }
+        
+        #font-control-panel h3 {
+            margin-top: 0;
+            color: #00f0ff;
+            border-bottom: 1px solid #00f0ff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .font-section {
+            margin-bottom: 15px;
+        }
+        
+        .font-section label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ddd;
+        }
+        
+        .font-size-buttons {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .font-size-btn {
+            padding: 5px 0;
+            background-color: #00526e;
+            color: #fff;
+            border: 1px solid #00f0ff;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .font-size-btn:hover {
+            background-color: #006a8e;
+        }
+        
+        .font-size-btn.active {
+            background-color: #00f0ff;
+            color: #000;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 5px;
+            background-color: #041020;
+            color: #fff;
+            border: 1px solid #00f0ff;
+        }
+        
+        .panel-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cp-app">
+        <!-- Toolbar -->
+        <div class="cp-toolbar">
+            <div class="cp-toolbar-title">Cyberpunk RED GM Screen</div>
+            <div class="cp-toolbar-actions">
+                <button class="cp-button" onclick="createPanel('Notes')">Add Notes</button>
+                <button class="cp-button" onclick="createPanel('Dice Roller')">Add Dice Roller</button>
+                <button class="cp-button" onclick="createPanel('Rules Reference')">Add Rules</button>
+            </div>
+        </div>
+        
+        <!-- Main content area where panels will be added -->
+        <div class="cp-main-content" id="panel-container">
+            <!-- Panels will be added here dynamically -->
+        </div>
+        
+        <!-- Font control panel - always visible -->
+        <div id="font-control-panel">
+            <h3>Font Controls</h3>
+            <div class="font-section">
+                <label>Font Size:</label>
+                <div class="font-size-buttons">
+                    <button class="font-size-btn" data-size="12">12px</button>
+                    <button class="font-size-btn" data-size="14">14px</button>
+                    <button class="font-size-btn active" data-size="16">16px</button>
+                    <button class="font-size-btn" data-size="18">18px</button>
+                </div>
+            </div>
+            <div class="font-section">
+                <label>Font Family:</label>
+                <select id="font-family-select">
+                    <option value="'Share Tech Mono', monospace" selected>Share Tech Mono</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="monospace">Monospace</option>
+                </select>
+            </div>
+            <div class="panel-buttons">
+                <button class="cp-button" id="toggle-controls-btn">Hide</button>
+                <button class="cp-button" id="apply-font-btn">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Minimal JavaScript for core functionality -->
+    <script>
+        // Current settings
+        let currentFontSize = 16;
+        let currentFontFamily = "'Share Tech Mono', monospace";
+        let nextPanelId = 1;
+
+        // Define createPanel as a global function so it can be accessed from HTML buttons
+        function createPanel(title) {
+            const panelId = nextPanelId++;
+            const panel = document.createElement('div');
+            panel.className = 'draggable-panel';
+            panel.id = `panel-${panelId}`;
+            panel.style.left = `${50 + (panelId * 20)}px`;
+            panel.style.top = `${50 + (panelId * 20)}px`;
+            panel.style.width = '400px';
+            panel.style.height = '300px';
+            panel.style.zIndex = panelId;
+            
+            panel.innerHTML = `
+                <div class="panel-header">
+                    <div class="panel-title">${title}</div>
+                    <div class="panel-controls">
+                        <button class="panel-button close">×</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <p>This is a ${title} panel.</p>
+                    <p>You can drag it by the header and resize it using the bottom-right corner.</p>
+                    ${getPanelContent(title)}
+                </div>
+                <div class="resize-handle"></div>
+            `;
+            
+            document.getElementById('panel-container').appendChild(panel);
+            
+            // Apply current font settings
+            const content = panel.querySelector('.panel-content');
+            content.style.fontSize = `${currentFontSize}px`;
+            content.style.fontFamily = currentFontFamily;
+            
+            // Add event listeners
+            setupDraggable(panel);
+            setupResizable(panel);
+            
+            // Close button
+            panel.querySelector('.close').addEventListener('click', function() {
+                panel.remove();
+            });
+            
+            // Bring to front when clicked
+            panel.addEventListener('mousedown', function() {
+                bringToFront(panel);
+            });
+            
+            return panel;
+        }
+        
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply initial font settings
+            document.body.style.fontSize = `${currentFontSize}px`;
+            document.body.style.fontFamily = currentFontFamily;
+            
+            // Font control buttons
+            const fontSizeButtons = document.querySelectorAll('.font-size-btn');
+            fontSizeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Update active button
+                    fontSizeButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update current font size
+                    currentFontSize = parseInt(this.getAttribute('data-size'));
+                });
+            });
+            
+            const fontFamilySelect = document.getElementById('font-family-select');
+            fontFamilySelect.addEventListener('change', function() {
+                currentFontFamily = this.value;
+            });
+            
+            // Apply button
+            document.getElementById('apply-font-btn').addEventListener('click', function() {
+                applyFontSettings();
+            });
+            
+            // Toggle controls
+            document.getElementById('toggle-controls-btn').addEventListener('click', function() {
+                const panel = document.getElementById('font-control-panel');
+                
+                if (this.textContent === 'Hide') {
+                    panel.style.height = '20px';
+                    panel.style.overflow = 'hidden';
+                    this.textContent = 'Show';
+                } else {
+                    panel.style.height = 'auto';
+                    panel.style.overflow = 'visible';
+                    this.textContent = 'Hide';
+                }
+            });
+            
+        // Apply font settings to all panels
+        function applyFontSettings() {
+                // Apply to body (global)
+                document.body.style.fontSize = `${currentFontSize}px`;
+                document.body.style.fontFamily = currentFontFamily;
+                
+                // Apply to all panel content
+                const panelContents = document.querySelectorAll('.panel-content');
+                panelContents.forEach(content => {
+                    content.style.fontSize = `${currentFontSize}px`;
+                    content.style.fontFamily = currentFontFamily;
+                });
+                
+                // Show notification
+                showNotification(`Font applied: ${currentFontSize}px ${currentFontFamily.split(',')[0].replace(/['\"]/g, '')}`);
+            }
+            
+            // This function was moved to global scope
+            
+        // Helper function to get specific panel content
+        function getPanelContent(title) {
+                switch(title) {
+                    case 'Notes':
+                        return `
+                            <textarea style="width: 100%; height: 200px; background-color: #041020; color: #fff; border: 1px solid #00f0ff; padding: 5px; margin-top: 10px; resize: none;"></textarea>
+                            <div style="display: flex; gap: 5px; margin-top: 10px;">
+                                <button class="cp-button">Save</button>
+                                <button class="cp-button">Download</button>
+                            </div>
+                        `;
+                    case 'Dice Roller':
+                        return `
+                            <div style="margin-top: 10px;">
+                                <select style="width: 60px; margin-right: 5px; background-color: #041020; color: #fff; border: 1px solid #00f0ff;">
+                                    ${[1,2,3,4,5,6,8,10].map(n => `<option>${n}</option>`).join('')}
+                                </select>
+                                <span>d</span>
+                                <select style="width: 60px; margin-left: 5px; margin-right: 10px; background-color: #041020; color: #fff; border: 1px solid #00f0ff;">
+                                    ${[4,6,8,10,12,20,100].map(n => `<option>${n}</option>`).join('')}
+                                </select>
+                                <button class="cp-button">Roll</button>
+                            </div>
+                            <div style="margin-top: 15px; border: 1px solid #00f0ff; padding: 10px; text-align: center; background-color: rgba(0,0,0,0.3);">
+                                <div>Result:</div>
+                                <div style="font-size: 24px; color: #00f0ff; margin-top: 5px;">-</div>
+                            </div>
+                        `;
+                    case 'Rules Reference':
+                        return `
+                            <div style="margin-top: 10px;">
+                                <select style="width: 100%; background-color: #041020; color: #fff; border: 1px solid #00f0ff;">
+                                    <option>Combat Basics</option>
+                                    <option>Actions</option>
+                                    <option>Movement</option>
+                                    <option>Ranged Combat</option>
+                                    <option>Melee Combat</option>
+                                </select>
+                            </div>
+                            <div style="margin-top: 10px; border: 1px solid #00f0ff; padding: 10px; background-color: rgba(0,0,0,0.3);">
+                                <p>Combat in Cyberpunk RED is handled in rounds, with each participant taking turns based on their initiative roll.</p>
+                                <p>Each round, a character can take one move action and one other action (attack, use item, etc.).</p>
+                            </div>
+                        `;
+                    default:
+                        return '';
+                }
+            }
+            
+        // Make a panel draggable
+        function setupDraggable(panel) {
+                const header = panel.querySelector('.panel-header');
+                let isDragging = false;
+                let offsetX, offsetY;
+                
+                header.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    offsetX = e.clientX - panel.getBoundingClientRect().left;
+                    offsetY = e.clientY - panel.getBoundingClientRect().top;
+                    bringToFront(panel);
+                    
+                    // Add cursor style to show dragging
+                    document.body.style.cursor = 'move';
+                });
+                
+                document.addEventListener('mousemove', function(e) {
+                    if (!isDragging) return;
+                    
+                    const x = e.clientX - offsetX;
+                    const y = e.clientY - offsetY;
+                    
+                    // Keep panel within the viewport
+                    const container = document.getElementById('panel-container');
+                    const maxX = container.clientWidth - panel.clientWidth;
+                    const maxY = container.clientHeight - panel.clientHeight;
+                    
+                    panel.style.left = `${Math.max(0, Math.min(maxX, x))}px`;
+                    panel.style.top = `${Math.max(0, Math.min(maxY, y))}px`;
+                });
+                
+                document.addEventListener('mouseup', function() {
+                    isDragging = false;
+                    document.body.style.cursor = 'default';
+                });
+            }
+            
+        // Make a panel resizable
+        function setupResizable(panel) {
+                const resizeHandle = panel.querySelector('.resize-handle');
+                let isResizing = false;
+                let startWidth, startHeight, startX, startY;
+                
+                resizeHandle.addEventListener('mousedown', function(e) {
+                    isResizing = true;
+                    startWidth = panel.clientWidth;
+                    startHeight = panel.clientHeight;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    bringToFront(panel);
+                    
+                    // Add cursor style to show resizing
+                    document.body.style.cursor = 'nwse-resize';
+                    e.preventDefault(); // Prevent text selection
+                });
+                
+                document.addEventListener('mousemove', function(e) {
+                    if (!isResizing) return;
+                    
+                    const width = startWidth + (e.clientX - startX);
+                    const height = startHeight + (e.clientY - startY);
+                    
+                    // Enforce minimum size
+                    if (width >= 200) panel.style.width = `${width}px`;
+                    if (height >= 150) panel.style.height = `${height}px`;
+                });
+                
+                document.addEventListener('mouseup', function() {
+                    isResizing = false;
+                    document.body.style.cursor = 'default';
+                });
+            }
+            
+        // Bring a panel to the front
+        function bringToFront(panel) {
+                const panels = document.querySelectorAll('.draggable-panel');
+                let maxZ = 0;
+                
+                panels.forEach(p => {
+                    const zIndex = parseInt(p.style.zIndex || 0);
+                    maxZ = Math.max(maxZ, zIndex);
+                });
+                
+                panel.style.zIndex = maxZ + 1;
+            }
+            
+        // Show notification
+        function showNotification(message, isError = false) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background-color: ${isError ? 'rgba(255, 50, 50, 0.2)' : 'rgba(0, 240, 255, 0.2)'};
+                    color: ${isError ? '#ff5050' : '#00f0ff'};
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    border: 1px solid ${isError ? '#ff5050' : '#00f0ff'};
+                    font-family: monospace;
+                    z-index: 10000;
+                    transition: opacity 0.3s ease;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+            
+            // Create initial panels
+            createPanel('Notes');
+            
+            // Load any saved settings
+            try {
+                const savedSettings = localStorage.getItem('cp-bare-minimum-settings');
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+                    
+                    // Apply saved font size
+                    if (settings.fontSize) {
+                        currentFontSize = settings.fontSize;
+                        document.body.style.fontSize = `${currentFontSize}px`;
+                        
+                        // Update active button
+                        fontSizeButtons.forEach(btn => {
+                            btn.classList.remove('active');
+                            if (parseInt(btn.getAttribute('data-size')) === currentFontSize) {
+                                btn.classList.add('active');
+                            }
+                        });
+                    }
+                    
+                    // Apply saved font family
+                    if (settings.fontFamily) {
+                        currentFontFamily = settings.fontFamily;
+                        document.body.style.fontFamily = currentFontFamily;
+                        fontFamilySelect.value = settings.fontFamily;
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading settings:', e);
+            }
+        });
+    </script>
+</body>
+</html>

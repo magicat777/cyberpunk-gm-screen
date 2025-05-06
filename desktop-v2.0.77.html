@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+    <title>Cyberpunk RED GM Screen v2.0.77 | Digital Game Master Tools</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta name="keywords" content="cyberpunk red, game master screen, rpg tools, tabletop rpg, gm screen, cyberpunk, role-playing game, dice roller, character management">
+    <meta name="author" content="Cyberpunk RED GM Screen Project">
+    <meta name="robots" content="index, follow">
+    <meta name="application-name" content="Cyberpunk RED GM Screen">
+    <meta name="theme-color" content="#121212">
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    
+    <!-- Open Graph / Facebook Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/desktop.html">
+    <meta property="og:title" content="Cyberpunk RED GM Screen v2.0.77 | Digital Game Master Tools">
+    <meta property="og:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta property="og:image" content="https://yourdomain.com/images/og-image.jpg">
+    
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yourdomain.com/desktop.html">
+    <meta name="twitter:title" content="Cyberpunk RED GM Screen v2.0.77 | Digital Game Master Tools">
+    <meta name="twitter:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta name="twitter:image" content="https://yourdomain.com/images/twitter-image.jpg">
+    
+    <!-- Stylesheet Links -->
+    <link rel="stylesheet" href="css/desktop-layout.css">
+    <link rel="stylesheet" href="css/gm-tools.css?v=1.3">
+    <link rel="stylesheet" href="css/initiative-tracker.css?v=1.0">
+    <link rel="stylesheet" href="css/cloud-status.css?v=1.0">
+    <link rel="stylesheet" href="css/no-flash-fix.css?v=1.0">
+    
+    <!-- Authentication Check -->
+    <script src="js/auth-handler.js"></script>
+    <script>
+        // Redirect to login if not authenticated
+        if (!authHandler.isAuthenticated()) {
+            window.location.href = 'secure-login.html';
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- We'll use the new layout system instead of the old CSS -->
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    
+    <!-- Canonical URL - Helps prevent duplicate content issues -->
+    <link rel="canonical" href="https://yourdomain.com/desktop.html">
+    
+    <!-- Structured Data - For better search engine understanding -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Cyberpunk RED GM Screen",
+      "description": "A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "url": "https://yourdomain.com/desktop.html",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      },
+      "genre": "Tabletop RPG Tool",
+      "softwareVersion": "2.0.77",
+      "author": {
+        "@type": "Organization",
+        "name": "Cyberpunk RED GM Screen Project"
+      },
+      "featureList": "Rule references, character management, GM notes, dice roller, custom layouts",
+      "copyrightYear": "2023",
+      "keywords": "cyberpunk red, game master screen, rpg tools, tabletop rpg, gm screen"
+    }
+    </script>
+    
+    <style>
+        /* Additional styles to improve panel visibility and performance */
+        .draggable-panel {
+            will-change: transform;
+            transform: translate3d(0, 0, 0);
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        /* Optimize box-shadow for better performance */
+        .draggable-panel {
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+        
+        .panel-header {
+            cursor: move !important;
+        }
+        
+        /* Add a visible resize handle */
+        .resize-handle {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 15px !important;
+            height: 15px !important;
+            cursor: nwse-resize !important;
+            background-image: linear-gradient(135deg, transparent 50%, rgba(0, 255, 255, 0.5) 50%);
+            z-index: 10;
+        }
+        
+        /* Improve visibility of active panel */
+        .draggable-panel[style*="z-index: 10"] {
+            box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.7), 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Version indicator */
+        .version-indicator {
+            position: fixed;
+            bottom: 5px;
+            left: 5px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: monospace;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Version indicator -->
+    <div class="version-indicator">v2.0.77</div>
+    
+    <!-- The layout will be generated dynamically by layout-manager.js -->
+    <!-- We only need to include our JavaScript files below -->
+    
+    <!-- FINAL Font Fix Script - Maximum Visibility and Coverage -->
+    <script src="final-font-fix.js"></script>
+    
+    <!-- Core functionality - use defer for better performance -->
+    <script src="js/cloud-storage-adapter.js?v=1.0" defer></script>
+    <script src="js/cloud-status-ui.js?v=1.0" defer></script>
+    <script src="js/data-handler.js" defer></script>
+    <script src="js/game-data.js" defer></script>
+    <!-- Use enhanced drag handler for v2.0.77 -->
+    <script src="js/drag-handler-v2.0.77.js" defer></script>
+    <script src="js/character-manager.js?v=1.1" defer></script>
+    <script src="js/layout-manager.js?v=1.3" defer></script>
+    <!-- Direct patch to layout-manager initialization -->
+    <script src="patch-init-settings.js" defer></script>
+    <script src="js/gm-tools.js?v=1.4" defer></script>
+    <script src="js/initiative-tracker.js?v=1.0" defer></script>
+    <script src="js/debug-helper.js?v=1.0" defer></script>
+    <script src="test-cloud-storage.js?v=1.0" defer></script>
+    <!-- Fix for UI Scaling and Font options -->
+    <script src="js/fix-scaling.js" defer></script>
+    
+    <!-- Targeted fix for stubborn panels that don't respond to font scaling -->
+    <script src="js/panel-font-fix.js" defer></script>
+    
+    <!-- Enhanced UI Diagnostics Tool for v2.0.77 -->
+    <script src="js/ui-diagnostics-v2.0.77.js" defer></script>
+    
+    <!-- Add emergency error boundary script -->
+    <script>
+        // Global error handler
+        window.addEventListener('error', function(event) {
+            console.error('Global error caught:', event.error);
+            
+            // Check if the error is related to drag operations
+            if (window.dragHandler && 
+                (event.error.message && event.error.message.includes('drag') || 
+                event.error.stack && event.error.stack.includes('drag'))) {
+                
+                console.log('Drag-related error detected, attempting recovery...');
+                
+                // Try to reset drag state
+                if (typeof window.dragHandler.resetDragState === 'function') {
+                    window.dragHandler.resetDragState();
+                    console.log('Drag state reset complete');
+                }
+            }
+            
+            // Don't display errors for cross-origin scripts
+            if (event.filename && event.filename.startsWith(window.location.origin)) {
+                // Create error notification if not already present
+                if (!document.getElementById('error-notification')) {
+                    const notification = document.createElement('div');
+                    notification.id = 'error-notification';
+                    notification.style.cssText = `
+                        position: fixed;
+                        bottom: 20px;
+                        left: 20px;
+                        background: rgba(255, 0, 0, 0.8);
+                        color: white;
+                        padding: 10px;
+                        border-radius: 5px;
+                        font-family: monospace;
+                        z-index: 10000;
+                        max-width: 80%;
+                    `;
+                    notification.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 5px;">Error Detected</div>
+                        <div style="font-size: 12px;">${event.error.message || 'Unknown error'}</div>
+                        <div style="font-size: 10px; margin-top: 5px;">Use Ctrl+Shift+R for emergency reset if needed</div>
+                    `;
+                    document.body.appendChild(notification);
+                    
+                    // Auto-remove after 10 seconds
+                    setTimeout(() => {
+                        const el = document.getElementById('error-notification');
+                        if (el) el.remove();
+                    }, 10000);
+                }
+            }
+        });
+        
+        // Periodic check for stuck drag state
+        setInterval(function() {
+            if (window.dragHandler && window.dragHandler.getDiagnosticInfo) {
+                const info = window.dragHandler.getDiagnosticInfo();
+                
+                // If drag lock is on but no current panel for over 10 seconds, reset
+                if (info.dragLock && !info.hasCurrentPanel && !info.isResizing) {
+                    console.warn('Detected stuck drag lock, resetting...');
+                    window.dragHandler.resetDragState();
+                }
+            }
+        }, 10000);
+    </script>
+    
+    <!-- Add initialization logic -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log("DOM fully loaded, initializing application v2.0.77...");
+            
+            try {
+                // Initialize cloud storage first, if available
+                if (typeof window.cloudStorage !== 'undefined' && 
+                    typeof window.cloudStorage.init === 'function') {
+                    await window.cloudStorage.init();
+                    console.log("Cloud Storage initialized");
+                }
+                
+                // Initialize cloud status UI
+                if (typeof window.cloudStatusUI !== 'undefined' && 
+                    typeof window.cloudStatusUI.init === 'function') {
+                    await window.cloudStatusUI.init();
+                    console.log("Cloud Status UI initialized");
+                }
+                
+                // Make sure gmTools is attached to window
+                if (typeof gmTools !== 'undefined') {
+                    window.gmTools = gmTools;
+                    console.log("GM Tools object attached to window");
+                }
+                
+                // Initialize GM Tools
+                if (typeof window.gmTools !== 'undefined') {
+                    window.gmTools.init();
+                    console.log("GM Tools initialized from desktop.html");
+                } else {
+                    console.error("GM Tools object not found on window!");
+                }
+            } catch (error) {
+                console.error("Error during initialization:", error);
+            }
+        });
+    </script>
+</body>
+</html>

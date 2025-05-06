@@ -1,0 +1,59 @@
+/**
+ * Cyberpunk RED GM Screen - UI Scaling System
+ * This CSS provides scaling functionality that adapts with the settings
+ */
+
+/* Use the CSS variables set by layout-manager.js */
+html {
+  /* Set default scaling values - these will be overridden by JS */
+  --cp-ui-scale: 1;
+  --cp-content-scale: 1;
+  --cp-base-font-size: 16px;
+  --cp-font-family: 'Share Tech Mono', monospace;
+}
+
+body {
+  font-size: calc(var(--cp-base-font-size));
+  font-family: var(--cp-font-family);
+}
+
+/* Apply scaling to the main container to affect all elements */
+.cp-app {
+  transform: scale(var(--cp-ui-scale));
+  transform-origin: top left;
+}
+
+/* Scale content elements */
+.cp-panel__content {
+  font-size: calc(var(--cp-base-font-size) * var(--cp-content-scale));
+}
+
+/* Scale specific UI elements */
+.cp-sidebar {
+  width: calc(var(--cyber-sidebar-width) * var(--cp-ui-scale));
+}
+
+.cp-panel__title,
+.cp-text-h1,
+.cp-text-h2,
+.cp-text-h3,
+.cp-text-h4 {
+  font-size: calc(var(--font-size-h4) * var(--cp-ui-scale));
+}
+
+/* Scale form elements */
+.cp-form-control {
+  font-size: calc(var(--cp-base-font-size) * var(--cp-content-scale));
+  padding: calc(var(--spacing-tiny) * var(--cp-ui-scale));
+}
+
+.cp-btn {
+  font-size: calc(var(--font-size-small) * var(--cp-ui-scale));
+  padding: calc(var(--spacing-tiny) * var(--cp-ui-scale)) calc(var(--spacing-small) * var(--cp-ui-scale));
+}
+
+/* Ensure the scaling-preview updates instantly when settings are changed */
+#cp-preview-text {
+  font-family: var(--cp-font-family);
+  font-size: calc(var(--cp-base-font-size) * var(--cp-content-scale));
+}

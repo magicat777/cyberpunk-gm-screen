@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+    <title>Cyberpunk RED GM Screen | Digital Game Master Tools</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta name="keywords" content="cyberpunk red, game master screen, rpg tools, tabletop rpg, gm screen, cyberpunk, role-playing game, dice roller, character management">
+    <meta name="author" content="Cyberpunk RED GM Screen Project">
+    <meta name="robots" content="index, follow">
+    <meta name="application-name" content="Cyberpunk RED GM Screen">
+    <meta name="theme-color" content="#121212">
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    
+    <!-- Open Graph / Facebook Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/desktop.html">
+    <meta property="og:title" content="Cyberpunk RED GM Screen | Digital Game Master Tools">
+    <meta property="og:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta property="og:image" content="https://yourdomain.com/images/og-image.jpg">
+    
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://yourdomain.com/desktop.html">
+    <meta name="twitter:title" content="Cyberpunk RED GM Screen | Digital Game Master Tools">
+    <meta name="twitter:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
+    <meta name="twitter:image" content="https://yourdomain.com/images/twitter-image.jpg">
+    
+    <!-- Stylesheet Links -->
+    <link rel="stylesheet" href="css/desktop-layout.css">
+    <link rel="stylesheet" href="css/gm-tools.css?v=1.3">
+    
+    <!-- Authentication Check -->
+    <script src="js/auth-handler.js"></script>
+    <script>
+        // Redirect to login if not authenticated
+        if (!authHandler.isAuthenticated()) {
+            window.location.href = 'secure-login.html';
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- We'll use the new layout system instead of the old CSS -->
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    
+    <!-- Canonical URL - Helps prevent duplicate content issues -->
+    <link rel="canonical" href="https://yourdomain.com/desktop.html">
+    
+    <!-- Structured Data - For better search engine understanding -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Cyberpunk RED GM Screen",
+      "description": "A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "url": "https://yourdomain.com/desktop.html",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      },
+      "genre": "Tabletop RPG Tool",
+      "softwareVersion": "2.0.77",
+      "author": {
+        "@type": "Organization",
+        "name": "Cyberpunk RED GM Screen Project"
+      },
+      "featureList": "Rule references, character management, GM notes, dice roller, custom layouts",
+      "copyrightYear": "2023",
+      "keywords": "cyberpunk red, game master screen, rpg tools, tabletop rpg, gm screen"
+    }
+    </script>
+</head>
+<body>
+    <!-- The layout will be generated dynamically by layout-manager.js -->
+    <!-- We only need to include our JavaScript files below -->
+    
+    <!-- Core functionality - use defer for better performance -->
+    <script src="js/data-handler.js" defer></script>
+    <script src="js/game-data.js" defer></script>
+    <script src="js/drag-handler.js" defer></script>
+    <script src="js/character-manager.js?v=1.1" defer></script>
+    <script src="js/layout-manager.js?v=1.3" defer></script>
+    <script src="js/gm-tools.js?v=1.4" defer></script>
+    <script src="js/debug-helper.js?v=1.0" defer></script>
+    
+    <!-- Add initialization logic -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded, initializing application...");
+            
+            // Make sure gmTools is attached to window
+            if (typeof gmTools !== 'undefined') {
+                window.gmTools = gmTools;
+                console.log("GM Tools object attached to window");
+            }
+            
+            // Initialize GM Tools
+            if (typeof window.gmTools !== 'undefined') {
+                window.gmTools.init();
+                console.log("GM Tools initialized from desktop.html");
+            } else {
+                console.error("GM Tools object not found on window!");
+            }
+            
+            // Initialize character manager first
+            characterManager.init();
+            
+            // Don't auto-create sample characters
+            /* Sample characters can be created manually if needed
+            if (characterManager.getAllPlayerCharacters().length === 0 && 
+                characterManager.getAllNpcs().length === 0) {
+                characterManager.createSampleCharacters();
+            }
+            */
+            
+            // Initialize the layout manager
+            window.layoutManager = new LayoutManager();
+            window.layoutManager.init();
+            
+            // For development: Error handling
+            window.addEventListener('error', (event) => {
+                console.error('JavaScript Error:', event.error);
+                alert(`Error: ${event.error.message}`);
+            });
+        });
+    </script>
+
+    <!-- Character list item template - hidden, used for cloning -->
+    <template id="cp-character-list-item-template">
+        <div class="cp-character-list-item" data-character-id="">
+            <div class="cp-character-list-item-header">
+                <div class="cp-character-list-item-name"></div>
+                <div class="cp-character-list-item-role"></div>
+            </div>
+            <div class="cp-character-list-item-stats">
+                <div class="cp-character-stat cp-stat-hp">
+                    <span class="cp-stat-label">HP:</span>
+                    <span class="cp-stat-current"></span>/<span class="cp-stat-max"></span>
+                </div>
+                <div class="cp-character-stat cp-stat-armor">
+                    <span class="cp-stat-label">Armor:</span>
+                    <span class="cp-stat-head"></span>/<span class="cp-stat-body"></span>
+                </div>
+            </div>
+            <div class="cp-character-list-item-actions">
+                <button class="cp-button cp-button-xs cp-edit-character">Edit</button>
+                <button class="cp-button cp-button-xs cp-view-character">View</button>
+            </div>
+        </div>
+    </template>
+</body>
+</html>
