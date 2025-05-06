@@ -1,0 +1,68 @@
+name: Navigation Validation
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'docs/**/*.html'
+      - 'docs/**/*.css'
+      - 'ci/validate-navigation.js'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'docs/**/*.html'
+      - 'docs/**/*.css'
+      - 'ci/validate-navigation.js'
+  workflow_dispatch:
+    # Manual trigger
+
+jobs:
+  validate-navigation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm install cheerio
+    
+    - name: Validate navigation
+      run: |
+        node ci/validate-navigation.js docs
+    
+    - name: Check breadcrumbs consistency
+      run: |
+        echo "Checking breadcrumb consistency..."
+        find docs -name "*.html" -exec grep -l 'breadcrumb' {} \; | xargs -I{} grep -o -E 'href="[^"]+"' {} | sort | uniq -c | sort -nr
+    
+    - name: Generate navigation report
+      if: always()
+      run: |
+        echo "# Navigation Validation Report" > navigation-report.md
+        echo "" >> navigation-report.md
+        echo "## Results" >> navigation-report.md
+        echo "" >> navigation-report.md
+        echo "- **Date:** $(date)" >> navigation-report.md
+        echo "- **Branch:** ${{ github.ref_name }}" >> navigation-report.md
+        echo "- **Commit:** ${{ github.sha }}" >> navigation-report.md
+        echo "" >> navigation-report.md
+        
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ **Navigation validation passed**" >> navigation-report.md
+        else
+          echo "❌ **Navigation validation failed**" >> navigation-report.md
+        fi
+    
+    - name: Upload navigation report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: navigation-report
+        path: navigation-report.md
