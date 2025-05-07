@@ -3,6 +3,9 @@
 <head>
     <title>Cyberpunk RED - Super Minimal</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="js/hotfix.js"></script>
+    <script src="js/debug-panel.js"></script>
+    <script src="js/panel-fix.js"></script>
 </head>
 <body>
     <!-- Toolbar with dropdown menus -->
@@ -68,155 +71,26 @@
             <span>Font Settings</span>
             <button class="close-button" id="close-font-controls">&times;</button>
         </div>
-        
-        <!-- Font Families -->
-        <div class="font-options">
-            <label>Font Family</label>
-            <select id="font-family">
-                <optgroup label="Cyberpunk Fonts">
-                    <option value="'Cyberpunk', Orbitron, sans-serif">Cyberpunk</option>
-                    <option value="'Acquire', 'Share Tech Mono', monospace">Acquire</option>
-                    <option value="'VeniteAdoremus', Rajdhani, sans-serif">Venite Adoremus</option>
-                    <option value="'Angora', Arial, sans-serif">Angora</option>
-                </optgroup>
-                <optgroup label="System Fonts">
-                    <option value="monospace">Monospace</option>
-                    <option value="sans-serif">Sans-serif</option>
-                    <option value="serif">Serif</option>
-                    <option value="'Courier New', monospace">Courier New</option>
-                    <option value="Arial, sans-serif">Arial</option>
-                    <option value="'Times New Roman', serif">Times New Roman</option>
-                </optgroup>
-                <optgroup label="Modern Fonts">
-                    <option value="Roboto, sans-serif">Roboto</option>
-                    <option value="'Open Sans', sans-serif">Open Sans</option>
-                    <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
-                </optgroup>
-            </select>
-        </div>
-        
-        <!-- Font Size -->
         <div class="font-options">
             <label>Font Size</label>
             <div class="font-buttons">
-                <button class="font-size-btn" data-size="10">XS</button>
-                <button class="font-size-btn" data-size="12">S</button>
-                <button class="font-size-btn active" data-size="16">M</button>
-                <button class="font-size-btn" data-size="20">L</button>
-                <button class="font-size-btn" data-size="24">XL</button>
-            </div>
-            <input type="range" id="font-size-slider" min="8" max="32" value="16" step="1">
-            <div class="size-display"><span id="font-size-value">16</span>px</div>
-        </div>
-        
-        <!-- Font Weight -->
-        <div class="font-options">
-            <label>Font Weight</label>
-            <select id="font-weight">
-                <option value="normal">Normal</option>
-                <option value="bold">Bold</option>
-                <option value="lighter">Light</option>
-            </select>
-        </div>
-        
-        <!-- Font Style -->
-        <div class="font-options">
-            <label>Font Style</label>
-            <select id="font-style">
-                <option value="normal">Normal</option>
-                <option value="italic">Italic</option>
-            </select>
-        </div>
-        
-        <!-- Preview -->
-        <div class="font-preview">
-            <label>Preview</label>
-            <div id="font-preview-text" style="border: 1px solid #00ccff; padding: 10px; margin-top: 5px; min-height: 60px;">
-                The quick neon fox jumps over the lazy chrome dog
+                <button class="font-size-btn" data-size="12">Small</button>
+                <button class="font-size-btn active" data-size="16">Medium</button>
+                <button class="font-size-btn" data-size="20">Large</button>
             </div>
         </div>
-        
+        <div class="font-options">
+            <label>Font Family</label>
+            <select id="font-family">
+                <option value="monospace">Monospace</option>
+                <option value="sans-serif">Sans-serif</option>
+                <option value="serif">Serif</option>
+            </select>
+        </div>
         <button id="apply-font">Apply Font</button>
     </div>
-    
-    <!-- Font face definitions -->
-    <style>
-        @font-face {
-            font-family: 'Cyberpunk';
-            src: url('fonts/Cyberpunk.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
-        
-        @font-face {
-            font-family: 'Acquire';
-            src: url('fonts/Acquire.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
-        
-        @font-face {
-            font-family: 'VeniteAdoremus';
-            src: url('fonts/VeniteAdoremus.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
-        
-        @font-face {
-            font-family: 'Angora';
-            src: url('fonts/Angora.woff2') format('woff2');
-            font-weight: normal;
-            font-style: normal;
-        }
-        
-        /* Additional styling for font controls */
-        .font-options {
-            margin-bottom: 15px;
-        }
-        
-        .size-display {
-            text-align: center;
-            margin-top: 5px;
-        }
-        
-        #font-size-slider {
-            width: 100%;
-            margin-top: 10px;
-            background-color: #1e3a5a;
-            height: 5px;
-            -webkit-appearance: none;
-            appearance: none;
-            outline: none;
-        }
-        
-        #font-size-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: #00ccff;
-            cursor: pointer;
-        }
-        
-        #font-size-slider::-moz-range-thumb {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: #00ccff;
-            cursor: pointer;
-            border: none;
-        }
-    </style>
 
     <script>
-        // Error handling
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.error("Error: ", message, "at", source, "line", lineno, "column", colno);
-            alert("JavaScript error: " + message + "\nLine: " + lineno + "\nSee console for details");
-            return true;
-        };
-
         // Panel counter for positioning
         let panelCount = 0;
         let currentFontSize = 16;
@@ -282,50 +156,40 @@
         
         // Create a panel
         function createPanel(title) {
-            console.log("Creating panel:", title);
             panelCount++;
             
-            try {
-                // Create panel
-                const panel = document.createElement('div');
-                panel.className = 'panel';
-                panel.id = 'panel-' + title.toLowerCase().replace(/\s+/g, '-');
-                panel.style.left = (20 + panelCount * 25) + 'px';
-                panel.style.top = (20 + panelCount * 25) + 'px';
-                panel.style.zIndex = panelCount;
-                
-                // Add header and content
-                panel.innerHTML = `
-                    <div class="panel-header">
-                        <div>${title}</div>
-                        <button class="close-button">&times;</button>
-                    </div>
-                    <div class="panel-content"></div>
-                    <div class="resize-handle"></div>
-                `;
-                
-                // Add panel to document
-                document.body.appendChild(panel);
-                console.log("Panel added to DOM:", panel.id);
-                
-                // Make panel draggable
-                makeDraggable(panel);
-                
-                // Make panel resizable
-                makeResizable(panel);
-                
-                // Add close functionality
-                panel.querySelector('.close-button').addEventListener('click', function() {
-                    panel.remove();
-                    console.log("Panel closed:", title);
-                });
-                
-                return panel;
-            } catch (error) {
-                console.error("Error creating panel:", title, error);
-                alert("Error creating panel: " + title + "\n" + error.message);
-                return null;
-            }
+            // Create panel
+            const panel = document.createElement('div');
+            panel.className = 'panel';
+            panel.style.left = (20 + panelCount * 25) + 'px';
+            panel.style.top = (20 + panelCount * 25) + 'px';
+            panel.style.zIndex = panelCount;
+            
+            // Add header and content
+            panel.innerHTML = `
+                <div class="panel-header">
+                    <div>${title}</div>
+                    <button class="close-button">&times;</button>
+                </div>
+                <div class="panel-content"></div>
+                <div class="resize-handle"></div>
+            `;
+            
+            // Add panel to document
+            document.body.appendChild(panel);
+            
+            // Make panel draggable
+            makeDraggable(panel);
+            
+            // Make panel resizable
+            makeResizable(panel);
+            
+            // Add close functionality
+            panel.querySelector('.close-button').addEventListener('click', function() {
+                panel.remove();
+            });
+            
+            return panel;
         }
         
         // Create a notes panel
@@ -1047,91 +911,64 @@
         
         // Create a character sheet panel
         function createCharacterPanel() {
-            console.log("Inside createCharacterPanel function");
-            try {
-                const panel = createPanel('Character Sheet');
-                if (!panel) {
-                    console.error("Failed to create base panel for Character Sheet");
-                    return null;
-                }
-                
-                console.log("Setting panel size");
-                panel.style.width = "500px";
-                panel.style.height = "600px";
-                
-                console.log("Setting panel HTML content");
-                panel.querySelector('.panel-content').innerHTML = `
-                    <div style="padding: 10px;">
-                        <input type="text" placeholder="Character Name" style="width: 100%; font-size: 18px; margin-bottom: 10px;">
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
-                            <div>
-                                <div><strong>Stats</strong></div>
-                                <div>INT: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                                <div>REF: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                                <div>DEX: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                                <div>TECH: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                                <div>COOL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                                <div>WILL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                                <div>LUCK: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                                <div>MOVE: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                                <div>BODY: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                                <div>EMP: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                            </div>
-                            <div>
-                                <div><strong>Derived Stats</strong></div>
-                                <div>HP: <span id="char-hp-calc">35</span></div>
-                                <div>Humanity: <span id="char-humanity-calc">50</span></div>
-                                <div><strong>Current Status</strong></div>
-                                <div>HP: <input type="number" id="char-current-hp" value="35" style="width: 40px;"></div>
-                                <div>Armor: <input type="number" id="char-armor-sp" value="11" style="width: 40px;"></div>
-                            </div>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <div><strong>Skills</strong> (Add comma-separated list)</div>
-                            <textarea style="width: 100%; height: 80px;">Handgun +5, Stealth +3, Athletics +4, Perception +4, Conversation +3, Brawling +2, Education +2, Streetwise +4</textarea>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <div><strong>Weapons</strong> (Add comma-separated list)</div>
-                            <textarea style="width: 100%; height: 60px;">Medium Pistol (2d6), Combat Knife (1d6), Heavy Pistol (3d6)</textarea>
+            const panel = createPanel('Character Sheet');
+            panel.style.width = "500px";
+            panel.style.height = "600px";
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="padding: 10px;">
+                    <input type="text" placeholder="Character Name" style="width: 100%; font-size: 18px; margin-bottom: 10px;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+                        <div>
+                            <div><strong>Stats</strong></div>
+                            <div>INT: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>REF: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>DEX: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>TECH: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>COOL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>WILL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>LUCK: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>MOVE: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>BODY: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>EMP: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
                         </div>
                         <div>
-                            <div><strong>Cyberware & Gear</strong> (Add comma-separated list)</div>
-                            <textarea style="width: 100%; height: 60px;">Cybereye (Infrared), Light Armorjack (SP11), Agent (Pocket AI), Medscanner</textarea>
+                            <div><strong>Derived Stats</strong></div>
+                            <div>HP: <span id="hp-calc">35</span></div>
+                            <div>Humanity: <span id="humanity-calc">50</span></div>
+                            <div><strong>Current Status</strong></div>
+                            <div>HP: <input type="number" id="current-hp" value="35" style="width: 40px;"></div>
+                            <div>Armor: <input type="number" id="armor-sp" value="11" style="width: 40px;"></div>
                         </div>
                     </div>
-                `;
-                
-                console.log("Setting up HP calculation");
-                try {
-                    // Add HP calculation - using panel-specific IDs to avoid conflicts
-                    const bodyInput = panel.querySelector('input[min="1"][max="10"]:nth-of-type(9)');
-                    const hpCalc = panel.querySelector('#char-hp-calc');
-                    const currentHP = panel.querySelector('#char-current-hp');
-                    
-                    if (bodyInput && hpCalc && currentHP) {
-                        bodyInput.addEventListener('change', function() {
-                            const body = parseInt(this.value) || 5;
-                            const hp = 10 + (body * 5);
-                            hpCalc.textContent = hp;
-                            currentHP.value = hp;
-                        });
-                    } else {
-                        console.error("Failed to find Character Sheet HP elements", {
-                            bodyInput: !!bodyInput,
-                            hpCalc: !!hpCalc,
-                            currentHP: !!currentHP
-                        });
-                    }
-                } catch (innerError) {
-                    console.error("Error setting up HP calculation", innerError);
-                }
-                
-                console.log("Character Sheet panel created successfully");
-                return panel;
-            } catch (error) {
-                console.error("Error in createCharacterPanel:", error);
-                return null;
-            }
+                    <div style="margin-bottom: 15px;">
+                        <div><strong>Skills</strong> (Add comma-separated list)</div>
+                        <textarea style="width: 100%; height: 80px;">Handgun +5, Stealth +3, Athletics +4, Perception +4, Conversation +3, Brawling +2, Education +2, Streetwise +4</textarea>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <div><strong>Weapons</strong> (Add comma-separated list)</div>
+                        <textarea style="width: 100%; height: 60px;">Medium Pistol (2d6), Combat Knife (1d6), Heavy Pistol (3d6)</textarea>
+                    </div>
+                    <div>
+                        <div><strong>Cyberware & Gear</strong> (Add comma-separated list)</div>
+                        <textarea style="width: 100%; height: 60px;">Cybereye (Infrared), Light Armorjack (SP11), Agent (Pocket AI), Medscanner</textarea>
+                    </div>
+                </div>
+            `;
+            
+            // Add HP calculation
+            const bodyInput = panel.querySelector('input[min="1"][max="10"]:nth-of-type(9)');
+            const hpCalc = panel.querySelector('#hp-calc');
+            const currentHP = panel.querySelector('#current-hp');
+            
+            bodyInput.addEventListener('change', function() {
+                const body = parseInt(this.value) || 5;
+                const hp = 10 + (body * 5);
+                hpCalc.textContent = hp;
+                currentHP.value = hp;
+            });
+            
+            return panel;
         }
         
         // Create an NPC generator panel
@@ -1622,9 +1459,6 @@
         }
         
         // Font control functions
-        let currentFontWeight = 'normal';
-        let currentFontStyle = 'normal';
-        
         function updateFontSize(size) {
             currentFontSize = size;
             document.body.style.fontSize = size + 'px';
@@ -1634,68 +1468,20 @@
             buttons.forEach(btn => {
                 btn.classList.toggle('active', parseInt(btn.getAttribute('data-size')) === size);
             });
-            
-            // Update slider and display
-            const sizeSlider = document.getElementById('font-size-slider');
-            const sizeDisplay = document.getElementById('font-size-value');
-            
-            if (sizeSlider) sizeSlider.value = size;
-            if (sizeDisplay) sizeDisplay.textContent = size;
-            
-            // Update preview
-            updateFontPreview();
         }
         
         function updateFontFamily(family) {
             currentFontFamily = family;
             document.body.style.fontFamily = family;
-            
-            // Update preview
-            updateFontPreview();
-        }
-        
-        function updateFontWeight(weight) {
-            currentFontWeight = weight;
-            document.body.style.fontWeight = weight;
-            
-            // Update preview
-            updateFontPreview();
-        }
-        
-        function updateFontStyle(style) {
-            currentFontStyle = style;
-            document.body.style.fontStyle = style;
-            
-            // Update preview
-            updateFontPreview();
-        }
-        
-        function updateFontPreview() {
-            const previewText = document.getElementById('font-preview-text');
-            if (!previewText) return;
-            
-            previewText.style.fontFamily = currentFontFamily;
-            previewText.style.fontSize = currentFontSize + 'px';
-            previewText.style.fontWeight = currentFontWeight;
-            previewText.style.fontStyle = currentFontStyle;
         }
         
         // Add event listeners once the DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM fully loaded");
-            
-            try {
-                // Panel creation event listeners
-                const addNotesBtn = document.getElementById('add-notes');
-                if (addNotesBtn) {
-                    addNotesBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        console.log("Creating Notes panel");
-                        createNotesPanel();
-                    });
-                } else {
-                    console.error("Element not found: add-notes");
-                }
+            // Panel creation event listeners
+            document.getElementById('add-notes').addEventListener('click', function(e) {
+                e.preventDefault();
+                createNotesPanel();
+            });
             
             document.getElementById('add-dice').addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1742,78 +1528,35 @@
                 createNetrunningPanel();
             });
             
-            // Helper function to safely create a panel
-            function safeCreatePanel(e, panelFunction, panelName) {
+            document.getElementById('add-character').addEventListener('click', function(e) {
                 e.preventDefault();
-                console.log(`Creating ${panelName} panel`);
-                try {
-                    const panel = panelFunction();
-                    if (panel) {
-                        console.log(`${panelName} panel created successfully`);
-                    } else {
-                        console.error(`${panelName} panel creation returned null`);
-                    }
-                } catch (error) {
-                    console.error(`Error creating ${panelName} panel:`, error);
-                    alert(`Error creating ${panelName} panel: ${error.message}`);
-                }
-            }
+                createCharacterPanel();
+            });
             
-            // Add debug logs for character panels
-            const addCharacterBtn = document.getElementById('add-character');
-            if (addCharacterBtn) {
-                addCharacterBtn.addEventListener('click', function(e) {
-                    safeCreatePanel(e, createCharacterPanel, 'Character Sheet');
-                });
-            } else {
-                console.error("Element not found: add-character");
-            }
+            document.getElementById('add-npc').addEventListener('click', function(e) {
+                e.preventDefault();
+                createNPCPanel();
+            });
             
-            const addNpcBtn = document.getElementById('add-npc');
-            if (addNpcBtn) {
-                addNpcBtn.addEventListener('click', function(e) {
-                    safeCreatePanel(e, createNPCPanel, 'NPC Generator');
-                });
-            } else {
-                console.error("Element not found: add-npc");
-            }
+            document.getElementById('add-loot').addEventListener('click', function(e) {
+                e.preventDefault();
+                createLootPanel();
+            });
             
-            const addLootBtn = document.getElementById('add-loot');
-            if (addLootBtn) {
-                addLootBtn.addEventListener('click', function(e) {
-                    safeCreatePanel(e, createLootPanel, 'Loot Generator');
-                });
-            } else {
-                console.error("Element not found: add-loot");
-            }
+            document.getElementById('add-map').addEventListener('click', function(e) {
+                e.preventDefault();
+                createMapPanel();
+            });
             
-            // Add debug logs for world panels
-            const addMapBtn = document.getElementById('add-map');
-            if (addMapBtn) {
-                addMapBtn.addEventListener('click', function(e) {
-                    safeCreatePanel(e, createMapPanel, 'Night City Map');
-                });
-            } else {
-                console.error("Element not found: add-map");
-            }
+            document.getElementById('add-location').addEventListener('click', function(e) {
+                e.preventDefault();
+                createLocationPanel();
+            });
             
-            const addLocationBtn = document.getElementById('add-location');
-            if (addLocationBtn) {
-                addLocationBtn.addEventListener('click', function(e) {
-                    safeCreatePanel(e, createLocationPanel, 'Location Generator');
-                });
-            } else {
-                console.error("Element not found: add-location");
-            }
-            
-            const addEncounterBtn = document.getElementById('add-encounter');
-            if (addEncounterBtn) {
-                addEncounterBtn.addEventListener('click', function(e) {
-                    safeCreatePanel(e, createEncounterPanel, 'Random Encounter');
-                });
-            } else {
-                console.error("Element not found: add-encounter");
-            }
+            document.getElementById('add-encounter').addEventListener('click', function(e) {
+                e.preventDefault();
+                createEncounterPanel();
+            });
             
             // Font size buttons
             document.querySelectorAll('.font-size-btn').forEach(button => {
@@ -1823,54 +1566,20 @@
                 });
             });
             
-            // Font size slider
-            const fontSizeSlider = document.getElementById('font-size-slider');
-            if (fontSizeSlider) {
-                fontSizeSlider.addEventListener('input', function() {
-                    const size = parseInt(this.value);
-                    updateFontSize(size);
-                });
-            }
-            
             // Font family select
-            const fontFamilySelect = document.getElementById('font-family');
-            if (fontFamilySelect) {
-                fontFamilySelect.addEventListener('change', function() {
-                    updateFontFamily(this.value);
-                });
-            }
-            
-            // Font weight select
-            const fontWeightSelect = document.getElementById('font-weight');
-            if (fontWeightSelect) {
-                fontWeightSelect.addEventListener('change', function() {
-                    updateFontWeight(this.value);
-                });
-            }
-            
-            // Font style select
-            const fontStyleSelect = document.getElementById('font-style');
-            if (fontStyleSelect) {
-                fontStyleSelect.addEventListener('change', function() {
-                    updateFontStyle(this.value);
-                });
-            }
+            document.getElementById('font-family').addEventListener('change', function() {
+                updateFontFamily(this.value);
+            });
             
             // Apply font button
-            const applyFontBtn = document.getElementById('apply-font');
-            if (applyFontBtn) {
-                applyFontBtn.addEventListener('click', function() {
-                    console.log("Applying font settings to all panels");
-                    const panels = document.querySelectorAll('.panel');
-                    panels.forEach(panel => {
-                        panel.style.fontSize = currentFontSize + 'px';
-                        panel.style.fontFamily = currentFontFamily;
-                        panel.style.fontWeight = currentFontWeight;
-                        panel.style.fontStyle = currentFontStyle;
-                    });
-                    alert('Font settings applied to all panels');
+            document.getElementById('apply-font').addEventListener('click', function() {
+                const panels = document.querySelectorAll('.panel');
+                panels.forEach(panel => {
+                    panel.style.fontSize = currentFontSize + 'px';
+                    panel.style.fontFamily = currentFontFamily;
                 });
-            }
+                alert('Font applied to all panels');
+            });
             
             // Layout management
             document.getElementById('save-layout').addEventListener('click', function(e) {
