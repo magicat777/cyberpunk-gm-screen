@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyberpunk GM Screen - Layout Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="js/hotfix.js"></script>
+    <script src="js/debug-panel.js"></script>
+    <script src="js/panel-fix.js"></script>
+    <script src="js/layout-save-improved.js"></script>
+    <script src="js/layout-test.js"></script>
+    <style>
+        .test-instructions {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #1e1e2d;
+            border: 1px solid #00ccff;
+            color: #e0e0e0;
+        }
+        
+        .test-section {
+            margin-bottom: 15px;
+        }
+        
+        .test-section h3 {
+            color: #00ccff;
+            margin-top: 0;
+        }
+        
+        .test-list {
+            list-style-type: decimal;
+            padding-left: 20px;
+        }
+        
+        .test-list li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar with dropdown menus -->
+    <div class="toolbar">
+        <div class="title">Cyberpunk GM Screen - Layout System Test</div>
+        
+        <!-- Panel menu -->
+        <div class="dropdown">
+            <button class="dropbtn">Add Panel</button>
+            <div class="dropdown-content">
+                <div class="menu-category">GM Tools</div>
+                <a href="#" id="add-notes">Notes</a>
+                <a href="#" id="add-dice">Dice Roller</a>
+                <a href="#" id="add-rules">Rules Reference</a>
+            </div>
+        </div>
+        
+        <!-- Layout menu -->
+        <div class="dropdown">
+            <button class="dropbtn">Layout</button>
+            <div class="dropdown-content">
+                <a href="#" id="save-layout">Save Layout</a>
+                <a href="#" id="load-layout">Load Layout</a>
+                <a href="#" id="clear-layout">Clear Layout</a>
+                <a href="#" id="reset-layout">Reset Layout</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-instructions">
+        <h2>Layout Save Improved - Test Page</h2>
+        
+        <div class="test-section">
+            <h3>Overview</h3>
+            <p>This page is designed to test the improved layout save functionality. Use the test console that appears to run various tests of the layout save system.</p>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Procedure</h3>
+            <ol class="test-list">
+                <li>Click "Add Test Panels" to create some panels</li>
+                <li>Arrange panels as desired or click "Random Panel Positions"</li>
+                <li>Click "Save Current Layout" to save the layout</li>
+                <li>Test clearing and restoring the layout</li>
+                <li>Test export/import functionality</li>
+                <li>Test notifications and error handling</li>
+                <li>Refresh the page to see if auto-save restores layout</li>
+            </ol>
+        </div>
+        
+        <div class="test-section">
+            <h3>Expected Results</h3>
+            <ul>
+                <li>Panel positions should be saved and restored</li>
+                <li>Export/Import should preserve layout exactly</li>
+                <li>Notifications should appear instead of alerts</li>
+                <li>Error handling should prevent the app from breaking</li>
+                <li>Auto-save should work when enabled</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Basic panel functionality for testing
+        let panelCount = 0;
+        
+        // Create a panel with the given title
+        function createPanel(title) {
+            const panel = document.createElement('div');
+            panel.className = 'panel';
+            panel.style.width = '300px';
+            panel.style.height = '200px';
+            panel.style.top = `${120 + (panelCount * 30)}px`;
+            panel.style.left = `${100 + (panelCount * 50)}px`;
+            panel.style.zIndex = panelCount + 10;
+            
+            // Add header
+            const header = document.createElement('div');
+            header.className = 'panel-header';
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.textContent = title;
+            
+            const closeButton = document.createElement('button');
+            closeButton.className = 'close-button';
+            closeButton.innerHTML = '&times;';
+            closeButton.addEventListener('click', () => panel.remove());
+            
+            header.appendChild(titleDiv);
+            header.appendChild(closeButton);
+            
+            // Add content
+            const content = document.createElement('div');
+            content.className = 'panel-content';
+            content.innerHTML = `<p>This is a sample ${title} panel.</p>`;
+            
+            // Make panel draggable
+            makeElementDraggable(panel, header);
+            
+            // Add resize handle
+            addResizeHandle(panel);
+            
+            // Add elements to panel
+            panel.appendChild(header);
+            panel.appendChild(content);
+            
+            // Add to document
+            document.body.appendChild(panel);
+            
+            // Increment panel count
+            panelCount++;
+            
+            return panel;
+        }
+        
+        // Create specific panel types
+        function createNotesPanel() {
+            const panel = createPanel('Notes');
+            const content = panel.querySelector('.panel-content');
+            
+            // Add a textarea
+            content.innerHTML = '';
+            const textarea = document.createElement('textarea');
+            textarea.style.width = '100%';
+            textarea.style.height = '100%';
+            textarea.style.boxSizing = 'border-box';
+            textarea.style.resize = 'none';
+            textarea.style.backgroundColor = '#252532';
+            textarea.style.color = '#e0e0e0';
+            textarea.style.border = '1px solid #333';
+            textarea.style.padding = '5px';
+            
+            content.appendChild(textarea);
+            
+            return panel;
+        }
+        
+        function createDicePanel() {
+            return createPanel('Dice Roller');
+        }
+        
+        function createRulesPanel() {
+            return createPanel('Rules Reference');
+        }
+        
+        // Make an element draggable
+        function makeElementDraggable(element, handle) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            handle.style.cursor = 'move';
+            handle.onmousedown = dragMouseDown;
+            
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                
+                // Get the mouse cursor position at startup
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                
+                // Bring panel to front
+                element.style.zIndex = ++panelCount + 100;
+                
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+            
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                
+                // Calculate the new cursor position
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                
+                // Set the element's new position
+                element.style.top = (element.offsetTop - pos2) + "px";
+                element.style.left = (element.offsetLeft - pos1) + "px";
+            }
+            
+            function closeDragElement() {
+                // Stop moving when mouse button is released
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+        
+        // Add a resize handle to a panel
+        function addResizeHandle(panel) {
+            const handle = document.createElement('div');
+            handle.className = 'resize-handle';
+            handle.style.position = 'absolute';
+            handle.style.width = '10px';
+            handle.style.height = '10px';
+            handle.style.bottom = '0';
+            handle.style.right = '0';
+            handle.style.cursor = 'nwse-resize';
+            handle.style.backgroundColor = '#00ccff';
+            
+            panel.appendChild(handle);
+            
+            let startX, startY, startWidth, startHeight;
+            
+            handle.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = parseInt(document.defaultView.getComputedStyle(panel).width, 10);
+                startHeight = parseInt(document.defaultView.getComputedStyle(panel).height, 10);
+                
+                document.addEventListener('mousemove', resizePanel);
+                document.addEventListener('mouseup', stopResize);
+            });
+            
+            function resizePanel(e) {
+                panel.style.width = (startWidth + e.clientX - startX) + 'px';
+                panel.style.height = (startHeight + e.clientY - startY) + 'px';
+            }
+            
+            function stopResize() {
+                document.removeEventListener('mousemove', resizePanel);
+                document.removeEventListener('mouseup', stopResize);
+            }
+        }
+        
+        // Event listeners for panel creation
+        document.getElementById('add-notes').addEventListener('click', function(e) {
+            e.preventDefault();
+            createNotesPanel();
+        });
+        
+        document.getElementById('add-dice').addEventListener('click', function(e) {
+            e.preventDefault();
+            createDicePanel();
+        });
+        
+        document.getElementById('add-rules').addEventListener('click', function(e) {
+            e.preventDefault();
+            createRulesPanel();
+        });
+        
+        // Event listeners for layout management
+        document.getElementById('clear-layout').addEventListener('click', function(e) {
+            e.preventDefault();
+            const panels = document.querySelectorAll('.panel');
+            panels.forEach(panel => panel.remove());
+        });
+        
+        // Panel count for positioning
+        let panelCount = 0;
+    </script>
+</body>
+</html>
