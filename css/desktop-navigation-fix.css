@@ -1,0 +1,59 @@
+/**
+ * Cyberpunk RED GM Screen - Desktop Navigation Fix
+ * Adjusts styles for proper integration of navigation and desktop UI
+ */
+
+/* Adjust the main container to account for navigation */
+.cp-main-container {
+    height: calc(100vh - var(--nav-height, 100px) - var(--breadcrumb-height, 40px)) !important;
+    margin-top: 0 !important;
+}
+
+/* Define navigation heights */
+:root {
+    --nav-height: 60px;
+    --breadcrumb-height: 40px;
+}
+
+/* Ensure navigation is always on top */
+.primary-nav {
+    z-index: 1000;
+    position: relative;
+}
+
+.breadcrumb-nav {
+    z-index: 900;
+    position: relative;
+}
+
+/* Fix mobile navigation dropdown positioning */
+@media (max-width: 768px) {
+    .cp-main-container {
+        height: calc(100vh - var(--nav-height, 60px) - var(--breadcrumb-height, 30px)) !important;
+    }
+    
+    :root {
+        --nav-height: 60px;
+        --breadcrumb-height: 30px;
+    }
+    
+    .nav-menu.show {
+        top: var(--nav-height);
+    }
+}
+
+/* Make sure desktop UI bg doesn't overlap */
+body {
+    background-color: var(--cyber-bg);
+}
+
+/* Fix for any scrolling issues */
+html, body {
+    overflow: hidden;
+    height: 100%;
+}
+
+/* Ensure panels stay within bounds */
+.cp-main-content {
+    overflow: auto;
+}
