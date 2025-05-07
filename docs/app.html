@@ -88,6 +88,13 @@
     </div>
 
     <script>
+        // Error handling
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error("Error: ", message, "at", source, "line", lineno, "column", colno);
+            alert("JavaScript error: " + message + "\nLine: " + lineno + "\nSee console for details");
+            return true;
+        };
+
         // Panel counter for positioning
         let panelCount = 0;
         let currentFontSize = 16;
@@ -153,40 +160,50 @@
         
         // Create a panel
         function createPanel(title) {
+            console.log("Creating panel:", title);
             panelCount++;
             
-            // Create panel
-            const panel = document.createElement('div');
-            panel.className = 'panel';
-            panel.style.left = (20 + panelCount * 25) + 'px';
-            panel.style.top = (20 + panelCount * 25) + 'px';
-            panel.style.zIndex = panelCount;
-            
-            // Add header and content
-            panel.innerHTML = `
-                <div class="panel-header">
-                    <div>${title}</div>
-                    <button class="close-button">&times;</button>
-                </div>
-                <div class="panel-content"></div>
-                <div class="resize-handle"></div>
-            `;
-            
-            // Add panel to document
-            document.body.appendChild(panel);
-            
-            // Make panel draggable
-            makeDraggable(panel);
-            
-            // Make panel resizable
-            makeResizable(panel);
-            
-            // Add close functionality
-            panel.querySelector('.close-button').addEventListener('click', function() {
-                panel.remove();
-            });
-            
-            return panel;
+            try {
+                // Create panel
+                const panel = document.createElement('div');
+                panel.className = 'panel';
+                panel.id = 'panel-' + title.toLowerCase().replace(/\s+/g, '-');
+                panel.style.left = (20 + panelCount * 25) + 'px';
+                panel.style.top = (20 + panelCount * 25) + 'px';
+                panel.style.zIndex = panelCount;
+                
+                // Add header and content
+                panel.innerHTML = `
+                    <div class="panel-header">
+                        <div>${title}</div>
+                        <button class="close-button">&times;</button>
+                    </div>
+                    <div class="panel-content"></div>
+                    <div class="resize-handle"></div>
+                `;
+                
+                // Add panel to document
+                document.body.appendChild(panel);
+                console.log("Panel added to DOM:", panel.id);
+                
+                // Make panel draggable
+                makeDraggable(panel);
+                
+                // Make panel resizable
+                makeResizable(panel);
+                
+                // Add close functionality
+                panel.querySelector('.close-button').addEventListener('click', function() {
+                    panel.remove();
+                    console.log("Panel closed:", title);
+                });
+                
+                return panel;
+            } catch (error) {
+                console.error("Error creating panel:", title, error);
+                alert("Error creating panel: " + title + "\n" + error.message);
+                return null;
+            }
         }
         
         // Create a notes panel
@@ -908,64 +925,91 @@
         
         // Create a character sheet panel
         function createCharacterPanel() {
-            const panel = createPanel('Character Sheet');
-            panel.style.width = "500px";
-            panel.style.height = "600px";
-            
-            panel.querySelector('.panel-content').innerHTML = `
-                <div style="padding: 10px;">
-                    <input type="text" placeholder="Character Name" style="width: 100%; font-size: 18px; margin-bottom: 10px;">
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
-                        <div>
-                            <div><strong>Stats</strong></div>
-                            <div>INT: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                            <div>REF: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                            <div>DEX: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                            <div>TECH: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                            <div>COOL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                            <div>WILL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                            <div>LUCK: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                            <div>MOVE: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                            <div>BODY: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
-                            <div>EMP: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+            console.log("Inside createCharacterPanel function");
+            try {
+                const panel = createPanel('Character Sheet');
+                if (!panel) {
+                    console.error("Failed to create base panel for Character Sheet");
+                    return null;
+                }
+                
+                console.log("Setting panel size");
+                panel.style.width = "500px";
+                panel.style.height = "600px";
+                
+                console.log("Setting panel HTML content");
+                panel.querySelector('.panel-content').innerHTML = `
+                    <div style="padding: 10px;">
+                        <input type="text" placeholder="Character Name" style="width: 100%; font-size: 18px; margin-bottom: 10px;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+                            <div>
+                                <div><strong>Stats</strong></div>
+                                <div>INT: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                <div>REF: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                <div>DEX: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                <div>TECH: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                <div>COOL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                <div>WILL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                <div>LUCK: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                <div>MOVE: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                <div>BODY: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                <div>EMP: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            </div>
+                            <div>
+                                <div><strong>Derived Stats</strong></div>
+                                <div>HP: <span id="char-hp-calc">35</span></div>
+                                <div>Humanity: <span id="char-humanity-calc">50</span></div>
+                                <div><strong>Current Status</strong></div>
+                                <div>HP: <input type="number" id="char-current-hp" value="35" style="width: 40px;"></div>
+                                <div>Armor: <input type="number" id="char-armor-sp" value="11" style="width: 40px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <div><strong>Skills</strong> (Add comma-separated list)</div>
+                            <textarea style="width: 100%; height: 80px;">Handgun +5, Stealth +3, Athletics +4, Perception +4, Conversation +3, Brawling +2, Education +2, Streetwise +4</textarea>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <div><strong>Weapons</strong> (Add comma-separated list)</div>
+                            <textarea style="width: 100%; height: 60px;">Medium Pistol (2d6), Combat Knife (1d6), Heavy Pistol (3d6)</textarea>
                         </div>
                         <div>
-                            <div><strong>Derived Stats</strong></div>
-                            <div>HP: <span id="hp-calc">35</span></div>
-                            <div>Humanity: <span id="humanity-calc">50</span></div>
-                            <div><strong>Current Status</strong></div>
-                            <div>HP: <input type="number" id="current-hp" value="35" style="width: 40px;"></div>
-                            <div>Armor: <input type="number" id="armor-sp" value="11" style="width: 40px;"></div>
+                            <div><strong>Cyberware & Gear</strong> (Add comma-separated list)</div>
+                            <textarea style="width: 100%; height: 60px;">Cybereye (Infrared), Light Armorjack (SP11), Agent (Pocket AI), Medscanner</textarea>
                         </div>
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <div><strong>Skills</strong> (Add comma-separated list)</div>
-                        <textarea style="width: 100%; height: 80px;">Handgun +5, Stealth +3, Athletics +4, Perception +4, Conversation +3, Brawling +2, Education +2, Streetwise +4</textarea>
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <div><strong>Weapons</strong> (Add comma-separated list)</div>
-                        <textarea style="width: 100%; height: 60px;">Medium Pistol (2d6), Combat Knife (1d6), Heavy Pistol (3d6)</textarea>
-                    </div>
-                    <div>
-                        <div><strong>Cyberware & Gear</strong> (Add comma-separated list)</div>
-                        <textarea style="width: 100%; height: 60px;">Cybereye (Infrared), Light Armorjack (SP11), Agent (Pocket AI), Medscanner</textarea>
-                    </div>
-                </div>
-            `;
-            
-            // Add HP calculation
-            const bodyInput = panel.querySelector('input[min="1"][max="10"]:nth-of-type(9)');
-            const hpCalc = panel.querySelector('#hp-calc');
-            const currentHP = panel.querySelector('#current-hp');
-            
-            bodyInput.addEventListener('change', function() {
-                const body = parseInt(this.value) || 5;
-                const hp = 10 + (body * 5);
-                hpCalc.textContent = hp;
-                currentHP.value = hp;
-            });
-            
-            return panel;
+                `;
+                
+                console.log("Setting up HP calculation");
+                try {
+                    // Add HP calculation - using panel-specific IDs to avoid conflicts
+                    const bodyInput = panel.querySelector('input[min="1"][max="10"]:nth-of-type(9)');
+                    const hpCalc = panel.querySelector('#char-hp-calc');
+                    const currentHP = panel.querySelector('#char-current-hp');
+                    
+                    if (bodyInput && hpCalc && currentHP) {
+                        bodyInput.addEventListener('change', function() {
+                            const body = parseInt(this.value) || 5;
+                            const hp = 10 + (body * 5);
+                            hpCalc.textContent = hp;
+                            currentHP.value = hp;
+                        });
+                    } else {
+                        console.error("Failed to find Character Sheet HP elements", {
+                            bodyInput: !!bodyInput,
+                            hpCalc: !!hpCalc,
+                            currentHP: !!currentHP
+                        });
+                    }
+                } catch (innerError) {
+                    console.error("Error setting up HP calculation", innerError);
+                }
+                
+                console.log("Character Sheet panel created successfully");
+                return panel;
+            } catch (error) {
+                console.error("Error in createCharacterPanel:", error);
+                return null;
+            }
         }
         
         // Create an NPC generator panel
@@ -1474,11 +1518,20 @@
         
         // Add event listeners once the DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Panel creation event listeners
-            document.getElementById('add-notes').addEventListener('click', function(e) {
-                e.preventDefault();
-                createNotesPanel();
-            });
+            console.log("DOM fully loaded");
+            
+            try {
+                // Panel creation event listeners
+                const addNotesBtn = document.getElementById('add-notes');
+                if (addNotesBtn) {
+                    addNotesBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log("Creating Notes panel");
+                        createNotesPanel();
+                    });
+                } else {
+                    console.error("Element not found: add-notes");
+                }
             
             document.getElementById('add-dice').addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1525,35 +1578,78 @@
                 createNetrunningPanel();
             });
             
-            document.getElementById('add-character').addEventListener('click', function(e) {
+            // Helper function to safely create a panel
+            function safeCreatePanel(e, panelFunction, panelName) {
                 e.preventDefault();
-                createCharacterPanel();
-            });
+                console.log(`Creating ${panelName} panel`);
+                try {
+                    const panel = panelFunction();
+                    if (panel) {
+                        console.log(`${panelName} panel created successfully`);
+                    } else {
+                        console.error(`${panelName} panel creation returned null`);
+                    }
+                } catch (error) {
+                    console.error(`Error creating ${panelName} panel:`, error);
+                    alert(`Error creating ${panelName} panel: ${error.message}`);
+                }
+            }
             
-            document.getElementById('add-npc').addEventListener('click', function(e) {
-                e.preventDefault();
-                createNPCPanel();
-            });
+            // Add debug logs for character panels
+            const addCharacterBtn = document.getElementById('add-character');
+            if (addCharacterBtn) {
+                addCharacterBtn.addEventListener('click', function(e) {
+                    safeCreatePanel(e, createCharacterPanel, 'Character Sheet');
+                });
+            } else {
+                console.error("Element not found: add-character");
+            }
             
-            document.getElementById('add-loot').addEventListener('click', function(e) {
-                e.preventDefault();
-                createLootPanel();
-            });
+            const addNpcBtn = document.getElementById('add-npc');
+            if (addNpcBtn) {
+                addNpcBtn.addEventListener('click', function(e) {
+                    safeCreatePanel(e, createNPCPanel, 'NPC Generator');
+                });
+            } else {
+                console.error("Element not found: add-npc");
+            }
             
-            document.getElementById('add-map').addEventListener('click', function(e) {
-                e.preventDefault();
-                createMapPanel();
-            });
+            const addLootBtn = document.getElementById('add-loot');
+            if (addLootBtn) {
+                addLootBtn.addEventListener('click', function(e) {
+                    safeCreatePanel(e, createLootPanel, 'Loot Generator');
+                });
+            } else {
+                console.error("Element not found: add-loot");
+            }
             
-            document.getElementById('add-location').addEventListener('click', function(e) {
-                e.preventDefault();
-                createLocationPanel();
-            });
+            // Add debug logs for world panels
+            const addMapBtn = document.getElementById('add-map');
+            if (addMapBtn) {
+                addMapBtn.addEventListener('click', function(e) {
+                    safeCreatePanel(e, createMapPanel, 'Night City Map');
+                });
+            } else {
+                console.error("Element not found: add-map");
+            }
             
-            document.getElementById('add-encounter').addEventListener('click', function(e) {
-                e.preventDefault();
-                createEncounterPanel();
-            });
+            const addLocationBtn = document.getElementById('add-location');
+            if (addLocationBtn) {
+                addLocationBtn.addEventListener('click', function(e) {
+                    safeCreatePanel(e, createLocationPanel, 'Location Generator');
+                });
+            } else {
+                console.error("Element not found: add-location");
+            }
+            
+            const addEncounterBtn = document.getElementById('add-encounter');
+            if (addEncounterBtn) {
+                addEncounterBtn.addEventListener('click', function(e) {
+                    safeCreatePanel(e, createEncounterPanel, 'Random Encounter');
+                });
+            } else {
+                console.error("Element not found: add-encounter");
+            }
             
             // Font size buttons
             document.querySelectorAll('.font-size-btn').forEach(button => {
