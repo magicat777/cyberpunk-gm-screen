@@ -163,21 +163,38 @@
         }, 500);
     }
     
+    // Tracking for method calls to avoid spamming
+    const methodCallTimers = {};
+    const METHOD_THROTTLE_MS = 2000; // Only log once per 2 seconds for the same method
+    
     function instrumentMethod(obj, methodName, displayName) {
         const original = obj[methodName];
         if (typeof original !== 'function') return;
         
         obj[methodName] = function(...args) {
-            console.log(`UI Diagnostics: ${displayName} called with:`, args);
+            // Check if we should log this call
+            const now = Date.now();
+            const lastCallTime = methodCallTimers[displayName] || 0;
+            const shouldLog = now - lastCallTime > METHOD_THROTTLE_MS;
+            
+            if (shouldLog) {
+                console.log(`UI Diagnostics: ${displayName} called with:`, args);
+                methodCallTimers[displayName] = now;
+            }
+            
             try {
                 const result = original.apply(this, args);
-                console.log(`UI Diagnostics: ${displayName} completed successfully`);
                 
-                // Refresh diagnostics after method completes
-                setTimeout(refreshDiagnostics, 100);
+                if (shouldLog) {
+                    console.log(`UI Diagnostics: ${displayName} completed successfully`);
+                    
+                    // Refresh diagnostics after method completes, but only if we're logging
+                    setTimeout(refreshDiagnostics, 100);
+                }
                 
                 return result;
             } catch (err) {
+                // Always log errors regardless of throttling
                 console.error(`UI Diagnostics: Error in ${displayName}:`, err);
                 throw err;
             }

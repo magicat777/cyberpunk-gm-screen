@@ -91,10 +91,18 @@ function fixScalingSystem() {
         return;
     }
 
+    // Track last log times to prevent spam
+    let lastSaveLogTime = 0;
+    const LOG_THROTTLE_MS = 3000; // Only log once per 3 seconds
+    
     // Override the saveSettings function to ensure persistent settings
     const originalSaveSettings = window.layoutManager.saveSettings;
     window.layoutManager.saveSettings = function() {
-        console.log('Saving settings with persistence fix');
+        const now = Date.now();
+        if (now - lastSaveLogTime > LOG_THROTTLE_MS) {
+            console.log('Saving settings with persistence fix');
+            lastSaveLogTime = now;
+        }
         
         if (typeof originalSaveSettings === 'function') {
             originalSaveSettings.call(this);
@@ -104,7 +112,9 @@ function fixScalingSystem() {
         if (this.settings && this.settings.scaling) {
             try {
                 sessionStorage.setItem('cp-scaling-settings', JSON.stringify(this.settings.scaling));
-                console.log('Scaling settings saved to sessionStorage for persistence');
+                if (now - lastSaveLogTime > LOG_THROTTLE_MS) {
+                    console.log('Scaling settings saved to sessionStorage for persistence');
+                }
             } catch (err) {
                 console.error('Failed to save scaling settings to sessionStorage:', err);
             }
@@ -139,9 +149,16 @@ function fixScalingSystem() {
     // Store the original applyScalingSettings function
     const originalApplyScalingSettings = window.layoutManager.applyScalingSettings;
 
+    // Track last apply log time to prevent spam
+    let lastApplyLogTime = 0;
+    
     // Replace with enhanced version that ensures CSS variables are properly set
     window.layoutManager.applyScalingSettings = function() {
-        console.log('Applying scaling settings with persistence fix');
+        const now = Date.now();
+        if (now - lastApplyLogTime > LOG_THROTTLE_MS) {
+            console.log('Applying scaling settings with persistence fix');
+            lastApplyLogTime = now;
+        }
 
         // Make sure settings exist
         if (!this.settings || !this.settings.scaling) {
@@ -158,12 +175,14 @@ function fixScalingSystem() {
         document.documentElement.style.setProperty('--cp-font-family', fontFamily);
         document.documentElement.style.setProperty('--cp-content-scale', contentScale / 100);
 
-        console.log('Applied UI scaling:', {
-            uiScale: uiScale / 100,
-            fontSize: `${fontSize}px`,
-            fontFamily,
-            contentScale: contentScale / 100
-        });
+        if (now - lastApplyLogTime > LOG_THROTTLE_MS) {
+            console.log('Applied UI scaling:', {
+                uiScale: uiScale / 100,
+                fontSize: `${fontSize}px`,
+                fontFamily,
+                contentScale: contentScale / 100
+            });
+        }
         
         // Add a simple validation check
         setTimeout(() => {

@@ -65,8 +65,16 @@ function initializePanelFontFix() {
 /**
  * Update the targeted styles with specific focus on stubborn panels
  */
+// Track last update log time to prevent spam
+let lastUpdateLogTime = 0;
+const LOG_THROTTLE_MS = 3000; // Only log once per 3 seconds
+
 function updateStyles(fontSize, fontFamily) {
-    console.log(`Panel Font Fix: Updating styles with font size ${fontSize}px and family ${fontFamily}`);
+    const now = Date.now();
+    if (now - lastUpdateLogTime > LOG_THROTTLE_MS) {
+        console.log(`Panel Font Fix: Updating styles with font size ${fontSize}px and family ${fontFamily}`);
+        lastUpdateLogTime = now;
+    }
     
     const styleEl = document.getElementById('panel-font-fix-style');
     if (!styleEl) return;
