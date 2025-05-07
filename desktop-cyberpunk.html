@@ -38,6 +38,9 @@
     <meta name="twitter:description" content="A comprehensive digital game master screen for Cyberpunk RED tabletop RPG with rules reference, character management, and GM tools.">
     <meta name="twitter:image" content="https://yourdomain.com/images/twitter-image.jpg">
     
+    <!-- Navigation Stylesheet -->
+    <link rel="stylesheet" href="css/cyberpunk-navigation.css">
+    <link rel="stylesheet" href="css/cyberpunk-navigation-layout.css">
     <!-- Cyberpunk UI Stylesheet -->
     <link rel="stylesheet" href="css/cyberpunk-ui.css">
     <!-- Initiative Tracker Stylesheet -->
@@ -57,6 +60,73 @@
     </script>
 </head>
 <body>
+    <!-- Primary Navigation -->
+    <nav class="primary-nav" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <!-- Mobile navigation toggle -->
+            <button class="mobile-nav-toggle" aria-expanded="false" aria-controls="nav-menu">
+                <span class="toggle-icon"></span>
+                <span class="toggle-text">Menu</span>
+            </button>
+
+            <!-- Site logo -->
+            <a href="index.html" class="site-logo">
+                Cyberpunk RED <span>GM Screen v2.0.77</span>
+            </a>
+
+            <!-- Navigation menu -->
+            <ul id="nav-menu" class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle active" aria-expanded="false" aria-haspopup="true">Tools</a>
+                    <ul class="dropdown-menu" aria-label="Tools submenu">
+                        <li><a href="desktop.html" class="dropdown-item">GM Dashboard</a></li>
+                        <li><a href="desktop-cyberpunk.html" class="dropdown-item active">GM Interface</a></li>
+                        <li><a href="initiative-tracker.html" class="dropdown-item">Initiative Tracker</a></li>
+                        <li><a href="character-manager.html" class="dropdown-item">Character Manager</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" aria-expanded="false" aria-haspopup="true">Reference</a>
+                    <ul class="dropdown-menu" aria-label="Reference submenu">
+                        <li><a href="rules-reference.html" class="dropdown-item">Rules Reference</a></li>
+                        <li><a href="combat-reference.html" class="dropdown-item">Combat Reference</a></li>
+                        <li><a href="netrunning-reference.html" class="dropdown-item">Netrunning Guide</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" aria-expanded="false" aria-haspopup="true">Documentation</a>
+                    <ul class="dropdown-menu" aria-label="Documentation submenu">
+                        <li><a href="docs/user-guides/getting-started.html" class="dropdown-item">Getting Started</a></li>
+                        <li><a href="docs/user-guides/gm-tools-guide.html" class="dropdown-item">GM Tools Guide</a></li>
+                        <li><a href="docs/user-guides/ui-customization.html" class="dropdown-item">UI Customization</a></li>
+                        <li><a href="docs/technical/deployment.html" class="dropdown-item">Deployment Guide</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="secure-login.html" class="nav-link">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb-nav" aria-label="Breadcrumb navigation">
+        <ol class="breadcrumb-list">
+            <li class="breadcrumb-item">
+                <a href="index.html" class="breadcrumb-link">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="#" class="breadcrumb-link">Tools</a>
+            </li>
+            <li class="breadcrumb-item">
+                <span class="breadcrumb-current">GM Interface</span>
+            </li>
+        </ol>
+    </div>
+    
     <!-- Background Effects -->
     <div class="cp-grid-bg"></div>
     <div class="cp-noise"></div>
@@ -586,6 +656,8 @@
     <script src="js/panel-font-fix.js" defer></script>
     <!-- UI Diagnostics Tool - helps identify and fix UI issues -->
     <script src="js/ui-diagnostics.js" defer></script>
+    <!-- Navigation functionality -->
+    <script src="js/cyberpunk-navigation.js" defer></script>
     
     <!-- Initialize Application -->
     <script defer>

@@ -1,0 +1,122 @@
+/**
+ * Cyberpunk RED GM Screen - Navigation Layout Adjustments
+ * CSS for integrating the navigation component with different page layouts
+ */
+
+/* Adjust main content areas to account for navigation */
+body {
+    padding-top: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Desktop.html layout adjustments */
+#cp-main-container {
+    margin-top: 10px;
+}
+
+/* Cyberpunk UI layout adjustments */
+.cp-app {
+    margin-top: 10px;
+}
+
+.cp-admin-bar {
+    position: relative;
+    top: 0;
+    z-index: 99;
+}
+
+/* Fix for background effects */
+.cp-grid-bg,
+.cp-noise,
+.cp-scanlines,
+.cp-glitch-effect {
+    top: 100px;
+    height: calc(100% - 100px);
+}
+
+/* Fix for full-screen modals */
+.cp-modal {
+    z-index: 1000;
+}
+
+/* Compatibility for login page layout */
+.login-page-content {
+    position: relative;
+    z-index: 5;
+}
+
+/* Media queries for responsive adjustments */
+@media (max-width: 768px) {
+    /* Smaller screens */
+    .cp-admin-bar {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+    }
+    
+    .cp-admin-controls {
+        margin-top: 10px;
+    }
+    
+    .cp-logo {
+        font-size: 1.2rem;
+    }
+    
+    /* Adjust dropdowns to avoid overlap with navigation dropdowns */
+    .cp-dropdown-content {
+        top: calc(100% + 5px);
+    }
+}
+
+/* Ensure tooltips don't get hidden by navigation */
+.cp-tooltip {
+    z-index: 500;
+}
+
+/* Ensure we don't break any existing UI components */
+.primary-nav {
+    flex-shrink: 0;
+}
+
+.breadcrumb-nav {
+    flex-shrink: 0;
+}
+
+/* Dark mode specific adjustments */
+.dark-theme .primary-nav {
+    background-color: rgba(5, 5, 10, 0.9);
+}
+
+.dark-theme .breadcrumb-nav {
+    background-color: rgba(5, 5, 10, 0.7);
+}
+
+/* Light mode specific adjustments */
+.light-theme .primary-nav {
+    background-color: rgba(240, 240, 245, 0.9);
+    border-bottom: 1px solid var(--neon-blue);
+}
+
+.light-theme .breadcrumb-nav {
+    background-color: rgba(240, 240, 245, 0.7);
+    border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.light-theme .nav-link {
+    color: #333;
+}
+
+.light-theme .site-logo {
+    color: var(--neon-pink);
+    text-shadow: 0 0 5px rgba(255, 0, 165, 0.3);
+}
+
+.light-theme .breadcrumb-link {
+    color: var(--neon-blue);
+}
+
+.light-theme .breadcrumb-current {
+    color: var(--neon-pink);
+}
