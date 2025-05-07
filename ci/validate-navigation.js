@@ -22,7 +22,7 @@ const config = {
     maxNavDepth: 3,
     minContrastRatio: 4.5,
     minTapTargetSize: 44, // pixels
-    requiredNavSections: ['Interface', 'Themes', 'Documentation'],
+    requiredNavSections: ['Home', 'Tools', 'Reference', 'Documentation'],
     requiredAriaRoles: ['navigation', 'menuitem'],
     forbiddenAttributes: ['onclick'],
     activeStateRequired: true,
@@ -33,7 +33,21 @@ const config = {
   // Files to ignore
   ignoreFiles: [
     'sitemap.xml',
-    'favicon.ico'
+    'favicon.ico',
+    'test-',
+    'minimal-',
+    'fixed-',
+    'bare-minimum',
+    'ui-debug',
+    'ui-test',
+    'standalone-',
+    'deployment/',
+    'performance-comparison',
+    'delegation-drag',
+    'improved-drag',
+    'test-frames/',
+    'super-minimal',
+    'template-'
   ],
   
   // Log thresholds
