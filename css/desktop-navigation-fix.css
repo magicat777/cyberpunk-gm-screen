@@ -3,19 +3,21 @@
  * Adjusts styles for proper integration of navigation and desktop UI
  */
 
-/* Adjust the main container to account for navigation */
-.cp-main-container {
-    height: calc(100vh - var(--nav-height, 100px) - var(--breadcrumb-height, 40px)) !important;
-    margin-top: 0 !important;
-}
-
-/* Define navigation heights */
+/* Define navigation heights with a combined total */
 :root {
     --nav-height: 60px;
     --breadcrumb-height: 40px;
+    --total-nav-height: calc(var(--nav-height) + var(--breadcrumb-height));
 }
 
-/* Ensure navigation is always on top */
+/* Adjust the main container to account for navigation */
+.cp-main-container {
+    height: calc(100vh - var(--total-nav-height)) !important;
+    margin-top: 0 !important;
+    position: relative;
+}
+
+/* Ensure navigation is always on top with correct z-index values */
 .primary-nav {
     z-index: 1000;
     position: relative;
@@ -26,15 +28,38 @@
     position: relative;
 }
 
+/* Set proper z-index hierarchy for UI components */
+#cp-admin-bar {
+    z-index: 800;
+}
+
+/* Each panel needs to be explicitly positioned */
+.panel {
+    position: absolute !important;
+    min-width: 300px;
+    min-height: 200px;
+    z-index: 5;
+}
+
+/* Make panel headers stand out for dragging */
+.panel-header {
+    cursor: move;
+    user-select: none;
+}
+
+/* Ensure that panels can't be dragged above the navigation */
+#cp-main-content {
+    position: relative !important;
+    height: calc(100% - var(--cyber-header-height)) !important;
+    overflow: hidden !important;
+}
+
 /* Fix mobile navigation dropdown positioning */
 @media (max-width: 768px) {
-    .cp-main-container {
-        height: calc(100vh - var(--nav-height, 60px) - var(--breadcrumb-height, 30px)) !important;
-    }
-    
     :root {
         --nav-height: 60px;
         --breadcrumb-height: 30px;
+        --total-nav-height: calc(var(--nav-height) + var(--breadcrumb-height));
     }
     
     .nav-menu.show {
@@ -45,15 +70,46 @@
 /* Make sure desktop UI bg doesn't overlap */
 body {
     background-color: var(--cyber-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Fix for any scrolling issues */
 html, body {
     overflow: hidden;
     height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
-/* Ensure panels stay within bounds */
-.cp-main-content {
+/* Resize handle styling */
+.resize-handle {
+    position: absolute;
+    width: 15px !important;
+    height: 15px !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    cursor: nwse-resize !important;
+    z-index: 10 !important;
+    background-color: var(--cyber-blue);
+    opacity: 0.6;
+}
+
+/* Ensure panel content is scrollable if too large */
+.panel-content {
     overflow: auto;
+    height: calc(100% - var(--panel-header-height)) !important;
+}
+
+/* Add visual feedback when dragging */
+.panel.dragging {
+    opacity: 0.8;
+    box-shadow: 0 0 15px rgba(0, 179, 230, 0.7);
+}
+
+/* Improve button visibility */
+.panel-controls button {
+    margin-left: 5px;
+    cursor: pointer;
 }
