@@ -68,24 +68,146 @@
             <span>Font Settings</span>
             <button class="close-button" id="close-font-controls">&times;</button>
         </div>
-        <div class="font-options">
-            <label>Font Size</label>
-            <div class="font-buttons">
-                <button class="font-size-btn" data-size="12">Small</button>
-                <button class="font-size-btn active" data-size="16">Medium</button>
-                <button class="font-size-btn" data-size="20">Large</button>
-            </div>
-        </div>
+        
+        <!-- Font Families -->
         <div class="font-options">
             <label>Font Family</label>
             <select id="font-family">
-                <option value="monospace">Monospace</option>
-                <option value="sans-serif">Sans-serif</option>
-                <option value="serif">Serif</option>
+                <optgroup label="Cyberpunk Fonts">
+                    <option value="'Cyberpunk', Orbitron, sans-serif">Cyberpunk</option>
+                    <option value="'Acquire', 'Share Tech Mono', monospace">Acquire</option>
+                    <option value="'VeniteAdoremus', Rajdhani, sans-serif">Venite Adoremus</option>
+                    <option value="'Angora', Arial, sans-serif">Angora</option>
+                </optgroup>
+                <optgroup label="System Fonts">
+                    <option value="monospace">Monospace</option>
+                    <option value="sans-serif">Sans-serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                </optgroup>
+                <optgroup label="Modern Fonts">
+                    <option value="Roboto, sans-serif">Roboto</option>
+                    <option value="'Open Sans', sans-serif">Open Sans</option>
+                    <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+                </optgroup>
             </select>
         </div>
+        
+        <!-- Font Size -->
+        <div class="font-options">
+            <label>Font Size</label>
+            <div class="font-buttons">
+                <button class="font-size-btn" data-size="10">XS</button>
+                <button class="font-size-btn" data-size="12">S</button>
+                <button class="font-size-btn active" data-size="16">M</button>
+                <button class="font-size-btn" data-size="20">L</button>
+                <button class="font-size-btn" data-size="24">XL</button>
+            </div>
+            <input type="range" id="font-size-slider" min="8" max="32" value="16" step="1">
+            <div class="size-display"><span id="font-size-value">16</span>px</div>
+        </div>
+        
+        <!-- Font Weight -->
+        <div class="font-options">
+            <label>Font Weight</label>
+            <select id="font-weight">
+                <option value="normal">Normal</option>
+                <option value="bold">Bold</option>
+                <option value="lighter">Light</option>
+            </select>
+        </div>
+        
+        <!-- Font Style -->
+        <div class="font-options">
+            <label>Font Style</label>
+            <select id="font-style">
+                <option value="normal">Normal</option>
+                <option value="italic">Italic</option>
+            </select>
+        </div>
+        
+        <!-- Preview -->
+        <div class="font-preview">
+            <label>Preview</label>
+            <div id="font-preview-text" style="border: 1px solid #00ccff; padding: 10px; margin-top: 5px; min-height: 60px;">
+                The quick neon fox jumps over the lazy chrome dog
+            </div>
+        </div>
+        
         <button id="apply-font">Apply Font</button>
     </div>
+    
+    <!-- Font face definitions -->
+    <style>
+        @font-face {
+            font-family: 'Cyberpunk';
+            src: url('fonts/Cyberpunk.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Acquire';
+            src: url('fonts/Acquire.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'VeniteAdoremus';
+            src: url('fonts/VeniteAdoremus.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Angora';
+            src: url('fonts/Angora.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        /* Additional styling for font controls */
+        .font-options {
+            margin-bottom: 15px;
+        }
+        
+        .size-display {
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        #font-size-slider {
+            width: 100%;
+            margin-top: 10px;
+            background-color: #1e3a5a;
+            height: 5px;
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+        }
+        
+        #font-size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #00ccff;
+            cursor: pointer;
+        }
+        
+        #font-size-slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #00ccff;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
 
     <script>
         // Error handling
@@ -1500,6 +1622,9 @@
         }
         
         // Font control functions
+        let currentFontWeight = 'normal';
+        let currentFontStyle = 'normal';
+        
         function updateFontSize(size) {
             currentFontSize = size;
             document.body.style.fontSize = size + 'px';
@@ -1509,11 +1634,50 @@
             buttons.forEach(btn => {
                 btn.classList.toggle('active', parseInt(btn.getAttribute('data-size')) === size);
             });
+            
+            // Update slider and display
+            const sizeSlider = document.getElementById('font-size-slider');
+            const sizeDisplay = document.getElementById('font-size-value');
+            
+            if (sizeSlider) sizeSlider.value = size;
+            if (sizeDisplay) sizeDisplay.textContent = size;
+            
+            // Update preview
+            updateFontPreview();
         }
         
         function updateFontFamily(family) {
             currentFontFamily = family;
             document.body.style.fontFamily = family;
+            
+            // Update preview
+            updateFontPreview();
+        }
+        
+        function updateFontWeight(weight) {
+            currentFontWeight = weight;
+            document.body.style.fontWeight = weight;
+            
+            // Update preview
+            updateFontPreview();
+        }
+        
+        function updateFontStyle(style) {
+            currentFontStyle = style;
+            document.body.style.fontStyle = style;
+            
+            // Update preview
+            updateFontPreview();
+        }
+        
+        function updateFontPreview() {
+            const previewText = document.getElementById('font-preview-text');
+            if (!previewText) return;
+            
+            previewText.style.fontFamily = currentFontFamily;
+            previewText.style.fontSize = currentFontSize + 'px';
+            previewText.style.fontWeight = currentFontWeight;
+            previewText.style.fontStyle = currentFontStyle;
         }
         
         // Add event listeners once the DOM is loaded
@@ -1659,20 +1823,54 @@
                 });
             });
             
+            // Font size slider
+            const fontSizeSlider = document.getElementById('font-size-slider');
+            if (fontSizeSlider) {
+                fontSizeSlider.addEventListener('input', function() {
+                    const size = parseInt(this.value);
+                    updateFontSize(size);
+                });
+            }
+            
             // Font family select
-            document.getElementById('font-family').addEventListener('change', function() {
-                updateFontFamily(this.value);
-            });
+            const fontFamilySelect = document.getElementById('font-family');
+            if (fontFamilySelect) {
+                fontFamilySelect.addEventListener('change', function() {
+                    updateFontFamily(this.value);
+                });
+            }
+            
+            // Font weight select
+            const fontWeightSelect = document.getElementById('font-weight');
+            if (fontWeightSelect) {
+                fontWeightSelect.addEventListener('change', function() {
+                    updateFontWeight(this.value);
+                });
+            }
+            
+            // Font style select
+            const fontStyleSelect = document.getElementById('font-style');
+            if (fontStyleSelect) {
+                fontStyleSelect.addEventListener('change', function() {
+                    updateFontStyle(this.value);
+                });
+            }
             
             // Apply font button
-            document.getElementById('apply-font').addEventListener('click', function() {
-                const panels = document.querySelectorAll('.panel');
-                panels.forEach(panel => {
-                    panel.style.fontSize = currentFontSize + 'px';
-                    panel.style.fontFamily = currentFontFamily;
+            const applyFontBtn = document.getElementById('apply-font');
+            if (applyFontBtn) {
+                applyFontBtn.addEventListener('click', function() {
+                    console.log("Applying font settings to all panels");
+                    const panels = document.querySelectorAll('.panel');
+                    panels.forEach(panel => {
+                        panel.style.fontSize = currentFontSize + 'px';
+                        panel.style.fontFamily = currentFontFamily;
+                        panel.style.fontWeight = currentFontWeight;
+                        panel.style.fontStyle = currentFontStyle;
+                    });
+                    alert('Font settings applied to all panels');
                 });
-                alert('Font applied to all panels');
-            });
+            }
             
             // Layout management
             document.getElementById('save-layout').addEventListener('click', function(e) {
