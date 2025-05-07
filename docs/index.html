@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyberpunk RED GM Screen</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        #login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #121212;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .login-box {
+            background-color: #1e1e2d;
+            border: 1px solid #00ccff;
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+        }
+        
+        input {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #2a2a3a;
+            color: #e0e0e0;
+            border: 1px solid #00ccff;
+        }
+        
+        button {
+            background-color: #1e3a5a;
+            color: #00ccff;
+            border: 1px solid #00ccff;
+            padding: 10px 20px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+        }
+        
+        #app-container {
+            display: none;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .logout-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Container -->
+    <div id="login-container">
+        <div class="login-box">
+            <h2 style="color: #00ccff; margin-bottom: 20px;">Cyberpunk RED GM Screen</h2>
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="checkPassword()">Log In</button>
+        </div>
+    </div>
+    
+    <!-- App Container -->
+    <div id="app-container">
+        <button class="logout-button" onclick="logout()">Logout</button>
+        <iframe src="app.html"></iframe>
+    </div>
+    
+    <script>
+        // Simple password protection - change 'cyberpunk' to your desired password
+        function checkPassword() {
+            const password = document.getElementById('password').value;
+            if (password === 'cyberpunk') {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+                // Save authentication state in localStorage
+                localStorage.setItem('authenticated', 'true');
+            } else {
+                alert('Incorrect password');
+            }
+        }
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authenticated');
+            window.location.reload();
+        }
+        
+        // Check if already authenticated
+        window.onload = function() {
+            if (localStorage.getItem('authenticated') === 'true') {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('app-container').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

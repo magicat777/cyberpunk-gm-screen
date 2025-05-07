@@ -1,0 +1,111 @@
+ <!DOCTYPE html>
+  <html>
+  <head>
+      <title>Cyberpunk GM Screen Hotfix</title>
+      <style>
+          body {
+              font-family: 'Arial', sans-serif;
+              max-width: 800px;
+              margin: 0 auto;
+              padding: 20px;
+              background: #121212;
+              color: #eee;
+          }
+          h1, h2 {
+              color: #00ccff;
+          }
+          pre {
+              background: #1e1e2d;
+              padding: 15px;
+              border-radius: 5px;
+              overflow-x: auto;
+              color: #00ffcc;
+          }
+          .button {
+              display: inline-block;
+              background: #1e3a5a;
+              color: #00ccff;
+              border: 1px solid #00ccff;
+              padding: 10px 20px;
+              text-decoration: none;
+              margin: 20px 0;
+          }
+          .button:hover {
+              background: #2a4a6a;
+          }
+      </style>
+  </head>
+  <body>
+      <h1>Cyberpunk GM Screen Hotfix</h1>
+
+      <p>This page provides a fix for UI issues on the Cyberpunk GM Screen.</p>
+
+      <h2>Option 1: Bookmarklet</h2>
+      <p>Drag this link to your bookmarks bar ↓</p>
+      <p><a href="javascript:(function(){const s=document.createElement('script');s.textContent=`(function(){function e(){const
+  e=document.querySelectorAll('.panel, .cp-panel,
+  .draggable-panel');e.forEach(e=>{!function(e){if(!e||!0===e._madeMovable)return;let t=e.querySelector('.panel-header,
+  .cp-panel-header');if(!t)return;let n=!1,a,o,l,d;t.addEventListener('mousedown',function(t){t.target.closest('button')||(n=!0,a=t
+  .clientX,o=t.clientY,l=e.offsetLeft,d=e.offsetTop,e.style.zIndex='100',e.classList.add('dragging'),t.preventDefault())}),document
+  .addEventListener('mousemove',function(t){if(!n)return;const r=l+t.clientX-a,i=d+t.clientY-o,c=(document.querySelector('.primary-
+  nav')?.offsetHeight||0)+(document.querySelector('.breadcrumb-nav')?.offsetHeight||0);e.style.left=`${Math.max(0,r)}px`,e.style.to
+  p=`${Math.max(c,i)}px`}),document.addEventListener('mouseup',function(){n&&(n=!1,e.classList.remove('dragging'),setTimeout(()=>{e
+  .style.zIndex='10'},100))});if(!e.querySelector('.resize-handle')){const
+  t=document.createElement('div');t.className='resize-handle',t.style.cssText='position:absolute;width:15px;height:15px;bottom:0;ri
+  ght:0;background-color:#00ccff;cursor:nwse-resize;opacity:0.5;z-index:11',e.appendChild(t);let
+  n=!1,l,d;t.addEventListener('mousedown',function(t){n=!0,a=t.clientX,o=t.clientY,l=e.offsetWidth,d=e.offsetHeight,e.style.zIndex=
+  '100',t.preventDefault(),t.stopPropagation()}),document.addEventListener('mousemove',function(t){if(!n)return;const
+  r=l+t.clientX-a,i=d+t.clientY-o;r>=200&&(e.style.width=`${r}px`),i>=100&&(e.style.height=`${i}px`)}),document.addEventListener('m
+  ouseup',function(){n&&(n=!1)})}e._madeMovable=!0}(e)})}function
+  t(){document.querySelectorAll('.cp-dropdown-button').forEach(e=>{if(e._fixed)return;const
+  t=e.nextElementSibling;t&&t.classList.contains('cp-dropdown-content')&&(t.style.display='none',e.addEventListener('click',functio
+  n(e){e.preventDefault(),e.stopPropagation();const
+  n='block'===t.style.display;t.style.display=n?'none':'block',document.querySelectorAll('.cp-dropdown-content').forEach(e=>{e!==t&
+  &'block'===e.style.display&&(e.style.display='none')})}),e._fixed=!0)}),document.addEventListener('click',function(e){e.target.cl
+  osest('.cp-dropdown')||document.querySelectorAll('.cp-dropdown-content').forEach(e=>{e.style.display='none'})})}function
+  n(){const e=document.getElementById('cp-save-state');e&&!e._fixed&&(e.addEventListener('click',function(){if(window.layoutManager
+  &&'function'==typeof window.layoutManager.saveSettings){window.layoutManager.saveSettings();const e=this.textContent;this.textCon
+  tent='Saved!',setTimeout(()=>{this.textContent=e},1500)}}),e._fixed=!0);document.querySelectorAll('.cp-dropdown
+  a[data-profile]').forEach(e=>{e._fixed||(e.addEventListener('click',function(t){t.preventDefault();const
+  n=this.getAttribute('data-profile');if(window.layoutManager&&'function'==typeof
+  window.layoutManager.loadProfile){window.layoutManager.loadProfile(n);const
+  e=document.getElementById('cp-current-profile');e&&(e.textContent=n.charAt(0).toUpperCase()+n.slice(1))}const
+  a=this.closest('.cp-dropdown-content');a&&(a.style.display='none')}),e._fixed=!0)})}function a(){document.querySelectorAll('.drop
+  down-toggle').forEach(e=>{e._fixed||(e.addEventListener('click',function(t){t.preventDefault(),t.stopPropagation();const
+  n='true'===this.getAttribute('aria-expanded');this.setAttribute('aria-expanded',!n),this.classList.toggle('active');const
+  a=this.nextElementSibling;a&&a.classList.contains('dropdown-menu')&&a.classList.toggle('show')}),e._fixed=!0)}),document.addEvent
+  Listener('click',function(e){e.target.closest('.dropdown')||document.querySelectorAll('.dropdown-menu.show').forEach(e=>{e.classL
+  ist.remove('show');const t=e.previousElementSibling;t&&t.classList.contains('dropdown-toggle')&&(t.setAttribute('aria-expanded','
+  false'),t.classList.remove('active'))})})}const
+  o=document.createElement('style');o.textContent='.dragging{opacity:0.8;box-shadow:0 0 20px
+  rgba(0,204,255,0.6)}.resize-handle{position:absolute;width:15px;height:15px;right:0;bottom:0;cursor:nwse-resize;background-color:
+  #00ccff;opacity:0.5;z-index:11}.resize-handle:hover{opacity:0.8}',document.head.appendChild(o),setTimeout(()=>{e(),t(),n(),a()},1
+  000)})();`;document.head.appendChild(s);console.log('Hotfix applied!')})();" class="button">CP UI Fix</a></p>
+
+      <h2>Option 2: Create a Pull Request</h2>
+      <p>For a permanent fix, create a pull request with these settings:</p>
+      <pre>base: master ← compare: fix/desktop-ui-navigation</pre>
+
+      <p>Steps:</p>
+      <ol>
+          <li>Go to <a href="https://github.com/magicat777/cyberpunk-gm-screen/pull/new/fix/desktop-ui-navigation"
+  target="_blank">GitHub Pull Request page</a></li>
+          <li>Set base to "master"</li>
+          <li>Set compare to "fix/desktop-ui-navigation"</li>
+          <li>Click "Create pull request"</li>
+          <li>Add title: "Fix desktop UI interaction and navigation"</li>
+          <li>Add description: "Fixes UI issues including panel drag-and-drop, dropdown menus, and navigation components"</li>
+          <li>Click "Create pull request" again</li>
+          <li>Click "Merge pull request"</li>
+      </ol>
+
+      <h2>How to Use the Bookmarklet</h2>
+      <ol>
+          <li>Drag the "CP UI Fix" button to your bookmarks bar</li>
+          <li>Visit <a href="https://magicat777.github.io/cyberpunk-gm-screen/desktop.html" target="_blank">Cyberpunk GM
+  Screen</a></li>
+          <li>Click the bookmarklet from your bookmarks bar</li>
+          <li>The UI should now be fully functional</li>
+      </ol>
+  </body>
+  </html>
