@@ -34,17 +34,34 @@
 }
 
 /* Each panel needs to be explicitly positioned */
-.panel {
+.panel, .cp-panel, .draggable-panel {
     position: absolute !important;
     min-width: 300px;
     min-height: 200px;
     z-index: 5;
+    background-color: #1e1e2d;
+    border: 1px solid #00ccff;
+    box-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
+    user-select: none;
 }
 
 /* Make panel headers stand out for dragging */
-.panel-header {
-    cursor: move;
-    user-select: none;
+.panel-header, .cp-panel-header {
+    cursor: move !important;
+    user-select: none !important;
+    background-color: #2a2a3a !important;
+    padding: 10px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-bottom: 1px solid #00ccff !important;
+}
+
+/* Make dragging visible */
+.dragging {
+    opacity: 0.8 !important;
+    box-shadow: 0 0 20px rgba(0, 204, 255, 0.6) !important;
+    transition: box-shadow 0.2s ease !important;
 }
 
 /* Ensure that panels can't be dragged above the navigation */
