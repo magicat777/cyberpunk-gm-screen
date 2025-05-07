@@ -40,6 +40,7 @@
     <meta name="twitter:image" content="https://yourdomain.com/images/twitter-image.jpg">
     
     <!-- Stylesheet Links -->
+    <link rel="stylesheet" href="css/cyberpunk-navigation.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/gm-tools.css?v=1.3">
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -75,6 +76,68 @@
     </script>
 </head>
 <body>
+    <!-- Primary Navigation -->
+    <nav class="primary-nav" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <!-- Mobile navigation toggle -->
+            <button class="mobile-nav-toggle" aria-expanded="false" aria-controls="nav-menu">
+                <span class="toggle-icon"></span>
+                <span class="toggle-text">Menu</span>
+            </button>
+
+            <!-- Site logo -->
+            <a href="index.html" class="site-logo">
+                Cyberpunk RED <span>GM Screen</span>
+            </a>
+
+            <!-- Navigation menu -->
+            <ul id="nav-menu" class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link active">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" aria-expanded="false" aria-haspopup="true">Tools</a>
+                    <ul class="dropdown-menu" aria-label="Tools submenu">
+                        <li><a href="desktop.html" class="dropdown-item">GM Dashboard</a></li>
+                        <li><a href="desktop-v2.0.77.html" class="dropdown-item">GM Dashboard v2.0.77</a></li>
+                        <li><a href="desktop-cyberpunk.html" class="dropdown-item">GM Interface</a></li>
+                        <li><a href="initiative-tracker.html" class="dropdown-item">Initiative Tracker</a></li>
+                        <li><a href="character-manager.html" class="dropdown-item">Character Manager</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" aria-expanded="false" aria-haspopup="true">Reference</a>
+                    <ul class="dropdown-menu" aria-label="Reference submenu">
+                        <li><a href="rules-reference.html" class="dropdown-item">Rules Reference</a></li>
+                        <li><a href="combat-reference.html" class="dropdown-item">Combat Reference</a></li>
+                        <li><a href="netrunning-reference.html" class="dropdown-item">Netrunning Guide</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" aria-expanded="false" aria-haspopup="true">Documentation</a>
+                    <ul class="dropdown-menu" aria-label="Documentation submenu">
+                        <li><a href="docs/user-guides/getting-started.html" class="dropdown-item">Getting Started</a></li>
+                        <li><a href="docs/user-guides/gm-tools-guide.html" class="dropdown-item">GM Tools Guide</a></li>
+                        <li><a href="docs/user-guides/ui-customization.html" class="dropdown-item">UI Customization</a></li>
+                        <li><a href="docs/technical/deployment.html" class="dropdown-item">Deployment Guide</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="secure-login.html" class="nav-link">Login</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb-nav" aria-label="Breadcrumb navigation">
+        <ol class="breadcrumb-list">
+            <li class="breadcrumb-item">
+                <span class="breadcrumb-current">Home</span>
+            </li>
+        </ol>
+    </div>
+    
     <div id="splash-screen" class="splash">
         <div class="glitch-wrapper">
             <h1 class="glitch" data-text="CYBERPUNK RED">CYBERPUNK RED</h1>
@@ -166,5 +229,7 @@
     <script src="js/gm-tools.js?v=1.4" defer></script>
     <script src="js/debug-helper.js?v=1.0" defer></script>
     <script src="js/main.js" defer></script>
+    <!-- Navigation functionality -->
+    <script src="js/cyberpunk-navigation.js" defer></script>
 </body>
 </html>
