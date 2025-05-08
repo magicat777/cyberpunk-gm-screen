@@ -16,40 +16,174 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: var(--cp-color-bg-primary);
-    color: var(--cp-color-text-primary);
-    font-family: var(--cp-font-family-base);
-    font-size: var(--cp-font-size-base);
+    background-color: var(--background-primary, #121212);
+    color: var(--neutral-light, #e0e0e0);
+    font-family: var(--font-primary, sans-serif);
+    font-size: 16px;
     overflow: hidden;
     transition: background-color 0.3s, color 0.3s;
 }
 
 /* Add theme switching classes - applied to body element */
 body.theme-neon-synthwave {
-    --theme-primary: var(--cp-neon-color-primary);
-    --theme-secondary: var(--cp-neon-color-secondary);
-    --theme-accent: var(--cp-neon-color-accent);
-    --theme-bg-primary: var(--cp-neon-color-bg-primary);
-    --theme-bg-secondary: var(--cp-neon-color-bg-secondary);
-    --theme-text-primary: var(--cp-neon-color-text-primary);
-    --theme-panel-bg: var(--cp-neon-color-panel-bg);
-    --theme-panel-border: var(--cp-neon-color-panel-border);
-    --theme-shadow: var(--cp-neon-shadow);
+    /* Import theme variables */
+    --background-primary: #120b1e;     /* Deep purple-black */
+    --background-secondary: #1e0f33;   /* Rich purple */
+    --background-tertiary: #2a1645;    /* Lighter purple */
+    --background-overlay: rgba(18, 11, 30, 0.85); /* For modal overlays */
+    
+    /* Accent Colors */
+    --accent-cyan: #00ffff;            /* Bright cyan */
+    --accent-cyan-dim: #00ccff;        /* Dimmer cyan */
+    --accent-magenta: #ff00ff;         /* Vivid magenta */
+    --accent-magenta-dim: #cc00cc;     /* Dimmer magenta */
+    --accent-yellow: #ffff00;          /* Vivid yellow */
+    --accent-red: #ff2a6d;             /* Hot pink-red */
+    --accent-green: #05ffa1;           /* Bright teal-green */
+    --accent-purple: #b967ff;          /* Rich purple */
+    --accent-blue: #01b4ff;            /* Electric blue */
+    
+    /* Neutral Colors */
+    --neutral-dark: #0c0c1e;           /* Deep blue-black */
+    --neutral-medium: #534f80;         /* Purple-gray */
+    --neutral-light: #e6e6ff;          /* Purplish white */
+    --neutral-muted: #a3a0d1;          /* Faded purple-white */
+    
+    /* Theme mapping */
+    --theme-primary: var(--accent-magenta);
+    --theme-secondary: var(--background-tertiary);
+    --theme-accent: var(--accent-cyan);
+    --theme-bg-primary: var(--background-primary);
+    --theme-bg-secondary: var(--background-secondary);
+    --theme-text-primary: var(--neutral-light);
+    --theme-panel-bg: rgba(30, 15, 51, 0.8);
+    --theme-panel-border: var(--accent-magenta);
+    --theme-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    
+    /* Fonts */
+    --font-primary: 'Segoe UI', 'Roboto', sans-serif;
+    --font-display: 'Cyberpunk', 'BladeRunner', 'Segoe UI', sans-serif;
+    --font-mono: 'Consolas', 'Courier New', monospace;
+    
+    /* Effects */
+    --glow-text: 0 0 5px var(--accent-magenta);
+    --focus-shadow: 0 0 15px var(--accent-magenta), 0 0 30px rgba(255, 0, 255, 0.4);
+    
+    /* Grid Background Effect */
+    background-color: var(--background-primary);
+    background-image: 
+        linear-gradient(rgba(185, 103, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(185, 103, 255, 0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: 0 0;
+}
+
+/* Synthwave Sun - only applied to neon-synthwave theme */
+body.theme-neon-synthwave::before {
+    content: '';
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255, 0, 161, 0.4) 0%, rgba(255, 0, 161, 0) 70%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Mountains Silhouette - only applied to neon-synthwave theme */
+body.theme-neon-synthwave::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: linear-gradient(180deg, rgba(18, 11, 30, 0) 0%, var(--background-primary) 90%), 
+              linear-gradient(135deg, rgba(42, 22, 69, 0.7) 25%, transparent 25%) 0 50px,
+              linear-gradient(225deg, rgba(42, 22, 69, 0.7) 25%, transparent 25%) 0 50px,
+              linear-gradient(315deg, rgba(42, 22, 69, 0.7) 25%, transparent 25%),
+              linear-gradient(45deg, rgba(42, 22, 69, 0.7) 25%, transparent 25%);
+    background-size: 100px 100px;
+    opacity: 0.8;
+    z-index: -1;
+    pointer-events: none;
 }
 
 body.theme-tech-noir {
-    --theme-primary: var(--cp-noir-color-primary);
-    --theme-secondary: var(--cp-noir-color-secondary);
-    --theme-accent: var(--cp-noir-color-accent);
-    --theme-bg-primary: var(--cp-noir-color-bg-primary);
-    --theme-bg-secondary: var(--cp-noir-color-bg-secondary);
-    --theme-text-primary: var(--cp-noir-color-text-primary);
-    --theme-panel-bg: var(--cp-noir-color-panel-bg);
-    --theme-panel-border: var(--cp-noir-color-panel-border);
-    --theme-shadow: var(--cp-noir-shadow);
+    /* Import theme variables */
+    --background-primary: #0a0e11;     /* Deep blue-black */
+    --background-secondary: #121a1e;   /* Dark steel blue */
+    --background-tertiary: #1a2428;    /* Darker teal */
+    --background-overlay: rgba(10, 14, 17, 0.9); /* For modal overlays */
+    
+    /* Accent Colors */
+    --accent-cyan: #05c2c7;            /* Muted terminal teal */
+    --accent-cyan-dim: #0a8f92;        /* Dimmer teal */
+    --accent-green: #39ff14;           /* Terminal green */
+    --accent-green-dim: #2bb70f;       /* Dimmer green */
+    --accent-amber: #ffb000;           /* Terminal amber */
+    --accent-amber-dim: #cc8c00;       /* Dimmer amber */
+    --accent-red: #ff3a47;             /* Danger red */
+    --accent-blue: #005fde;            /* Deep blue */
+    
+    /* Neutral Colors */
+    --neutral-dark: #080c0e;           /* Almost black */
+    --neutral-medium: #39474e;         /* Dark gray with blue tint */
+    --neutral-light: #a3b0b8;          /* Light blue-gray */
+    --neutral-muted: #617986;          /* Muted blue-gray */
+    
+    /* Theme mapping */
+    --theme-primary: var(--accent-green);
+    --theme-secondary: var(--background-tertiary);
+    --theme-accent: var(--accent-amber);
+    --theme-bg-primary: var(--background-primary);
+    --theme-bg-secondary: var(--background-secondary);
+    --theme-text-primary: var(--accent-green);
+    --theme-panel-bg: var(--background-secondary);
+    --theme-panel-border: var(--accent-green);
+    --theme-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+    
+    /* Fonts */
+    --font-primary: 'Share Tech Mono', 'Courier New', monospace;
+    --font-display: 'Share Tech Mono', 'VT323', 'Courier New', monospace;
+    --font-mono: 'Share Tech Mono', 'Courier New', monospace;
+    
+    /* Effects */
+    --glow-text: 0 0 3px var(--accent-green);
+    --focus-shadow: 0 0 10px var(--accent-green);
+    
+    /* Terminal CRT effect */
+    background-color: var(--background-primary);
+    color: var(--accent-green);
+    text-shadow: var(--glow-text);
+}
+
+/* Scanline Effect - only applied to tech-noir theme */
+body.theme-tech-noir::before {
+    content: "";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        transparent 2px,
+        rgba(57, 255, 20, 0.05) 2px,
+        rgba(57, 255, 20, 0.05) 4px
+    );
+    background-size: 100% 4px;
+    z-index: 2000;
+    pointer-events: none;
+    opacity: 0.3;
 }
 
 body.theme-minimal {
+    /* Theme colors */
     --theme-primary: #00ccff;
     --theme-secondary: #254b75;
     --theme-accent: #ff5555;
@@ -59,13 +193,30 @@ body.theme-minimal {
     --theme-panel-bg: #1e1e2d;
     --theme-panel-border: #00ccff;
     --theme-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
+    
+    /* Neutral colors */
+    --neutral-dark: #121212;
+    --neutral-medium: #424242;
+    --neutral-light: #e0e0e0;
+    --neutral-muted: #a0a0a0;
+    
+    /* Fonts */
+    --font-primary: 'Segoe UI', 'Roboto', sans-serif;
+    --font-display: 'Segoe UI', 'Roboto', sans-serif;
+    --font-mono: 'Consolas', 'Courier New', monospace;
+    
+    /* Effects */
+    --glow-text: none;
+    --focus-shadow: 0 0 15px rgba(0, 204, 255, 0.5);
+    
+    background-color: var(--theme-bg-primary);
 }
 
 /* Toolbar */
 .toolbar {
     background-color: var(--theme-bg-secondary);
     color: var(--theme-primary);
-    padding: var(--cp-spacing-md);
+    padding: 1rem;
     display: flex;
     align-items: center;
     border-bottom: 1px solid var(--theme-primary);
@@ -74,11 +225,58 @@ body.theme-minimal {
     position: relative;
 }
 
+/* Special toolbar styling for neon-synthwave */
+body.theme-neon-synthwave .toolbar {
+    background: linear-gradient(90deg, var(--background-secondary), rgba(42, 22, 69, 0.8));
+    border-bottom: 2px solid var(--accent-magenta);
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+}
+
+/* Special toolbar styling for tech-noir */
+body.theme-tech-noir .toolbar {
+    background-color: var(--background-secondary);
+    border-bottom: 1px solid var(--accent-green);
+    position: relative;
+}
+
+body.theme-tech-noir .toolbar::before {
+    content: "> SYSTEM READY";
+    position: absolute;
+    top: 5px;
+    right: 150px;
+    color: var(--accent-amber);
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+
 .title {
     font-weight: bold;
-    margin-right: var(--cp-spacing-lg);
-    font-family: var(--cp-font-family-display);
+    margin-right: 1.5rem;
+    font-family: var(--font-display, sans-serif);
     letter-spacing: 1px;
+}
+
+/* Title styling in different themes */
+body.theme-neon-synthwave .title {
+    color: var(--accent-magenta);
+    text-shadow: 0 0 10px var(--accent-magenta);
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+body.theme-tech-noir .title {
+    color: var(--accent-green);
+    text-shadow: 0 0 5px var(--accent-green);
+    font-size: 1.1rem;
+    font-family: var(--font-mono);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+body.theme-tech-noir .title::before {
+    content: "> ";
+    color: var(--accent-amber);
 }
 
 /* Buttons */
@@ -86,12 +284,12 @@ button {
     background-color: var(--theme-secondary);
     color: var(--theme-primary);
     border: 1px solid var(--theme-primary);
-    margin: var(--cp-spacing-xs);
-    padding: var(--cp-spacing-xs) var(--cp-spacing-sm);
+    margin: 0.25rem;
+    padding: 0.25rem 0.5rem;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    border-radius: var(--cp-border-radius-sm);
-    font-family: var(--cp-font-family-base);
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    border-radius: 2px;
+    font-family: var(--font-primary);
 }
 
 button:hover {
@@ -102,6 +300,54 @@ button:hover {
 
 button:active {
     transform: translateY(1px);
+}
+
+/* Theme-specific button styling */
+body.theme-neon-synthwave button {
+    background-color: rgba(42, 22, 69, 0.7);
+    color: var(--accent-magenta);
+    border: 1px solid var(--accent-magenta);
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    box-shadow: 0 0 5px rgba(255, 0, 255, 0.3);
+    font-weight: bold;
+}
+
+body.theme-neon-synthwave button:hover {
+    background-color: var(--accent-magenta);
+    color: var(--background-primary);
+    box-shadow: 0 0 10px var(--accent-magenta);
+    text-shadow: none;
+}
+
+body.theme-tech-noir button {
+    background-color: var(--background-tertiary);
+    color: var(--accent-green);
+    border: 1px solid var(--accent-green);
+    border-radius: 0;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+body.theme-tech-noir button:hover {
+    background-color: var(--accent-green);
+    color: var(--background-primary);
+    box-shadow: 0 0 5px var(--accent-green);
+    text-shadow: none;
+}
+
+body.theme-tech-noir button::before {
+    content: "[";
+    margin-right: 2px;
+}
+
+body.theme-tech-noir button::after {
+    content: "]";
+    margin-left: 2px;
 }
 
 /* Dropdown Menu */
@@ -173,29 +419,29 @@ button:active {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-radius: var(--cp-border-radius-md);
+    border-radius: 4px;
     transition: box-shadow 0.3s;
 }
 
 .panel:hover {
-    box-shadow: var(--cp-focus-shadow);
+    box-shadow: var(--focus-shadow);
 }
 
 .panel-header {
     background-color: var(--theme-secondary);
-    padding: var(--cp-spacing-sm);
+    padding: 0.5rem;
     display: flex;
     justify-content: space-between;
     cursor: move;
     border-bottom: 1px solid var(--theme-primary);
-    border-top-left-radius: var(--cp-border-radius-sm);
-    border-top-right-radius: var(--cp-border-radius-sm);
-    font-family: var(--cp-font-family-display);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    font-family: var(--font-display);
 }
 
 .panel-content {
     flex-grow: 1;
-    padding: var(--cp-spacing-md);
+    padding: 1rem;
     overflow: auto;
 }
 
@@ -206,8 +452,8 @@ button:active {
     cursor: pointer;
     font-weight: bold;
     margin: 0;
-    padding: 0 var(--cp-spacing-xs);
-    font-size: var(--cp-font-size-lg);
+    padding: 0 0.25rem;
+    font-size: 1.25rem;
     line-height: 16px;
 }
 
@@ -215,6 +461,100 @@ button:active {
     color: var(--theme-accent);
     background: none;
     transform: scale(1.2);
+}
+
+/* Theme-specific panel styling for Neon Synthwave */
+body.theme-neon-synthwave .panel {
+    background-color: rgba(30, 15, 51, 0.85);
+    border: 2px solid var(--accent-magenta);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    backdrop-filter: blur(5px);
+    border-radius: 6px;
+}
+
+body.theme-neon-synthwave .panel:hover {
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.7);
+}
+
+body.theme-neon-synthwave .panel-header {
+    background: linear-gradient(90deg, var(--accent-magenta-dim), var(--background-tertiary));
+    border-bottom: 2px solid var(--accent-magenta);
+    color: var(--accent-magenta);
+    text-shadow: 0 0 5px var(--accent-magenta);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.6rem 1rem;
+}
+
+body.theme-neon-synthwave .panel-content {
+    border-top: 1px solid rgba(255, 0, 255, 0.3);
+}
+
+body.theme-neon-synthwave .close-button {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 5px var(--accent-cyan);
+}
+
+body.theme-neon-synthwave .close-button:hover {
+    color: var(--accent-yellow);
+    text-shadow: 0 0 5px var(--accent-yellow);
+}
+
+/* Theme-specific panel styling for Tech Noir */
+body.theme-tech-noir .panel {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--accent-green);
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+    border-radius: 0;
+    position: relative;
+}
+
+body.theme-tech-noir .panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--accent-green);
+    box-shadow: 0 0 8px var(--accent-green);
+}
+
+body.theme-tech-noir .panel-header {
+    background-color: var(--background-tertiary);
+    border-bottom: 1px solid var(--accent-green);
+    border-radius: 0;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    color: var(--accent-green);
+    text-shadow: 0 0 3px var(--accent-green);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    position: relative;
+}
+
+body.theme-tech-noir .panel-header::before {
+    content: "> ";
+    color: var(--accent-amber);
+}
+
+body.theme-tech-noir .panel-header::after {
+    content: attr(data-id);
+    position: absolute;
+    top: 0.2rem;
+    right: 2rem;
+    font-size: 0.7rem;
+    color: var(--accent-amber);
+    opacity: 0.6;
+}
+
+body.theme-tech-noir .close-button {
+    color: var(--accent-amber);
+    font-family: var(--font-mono);
+}
+
+body.theme-tech-noir .close-button:hover {
+    color: var(--accent-red);
 }
 
 /* Font controls */
@@ -511,22 +851,48 @@ input[type="number"] {
 }
 
 .theme-switcher label {
-    margin-right: var(--cp-spacing-sm);
+    margin-right: 0.5rem;
     color: var(--theme-primary);
+    font-family: var(--font-display);
+    text-shadow: var(--glow-text);
+}
+
+body.theme-neon-synthwave .theme-switcher label {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 5px var(--accent-cyan);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+body.theme-tech-noir .theme-switcher label {
+    color: var(--accent-amber);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+body.theme-tech-noir .theme-switcher label::before {
+    content: "[ ";
+}
+
+body.theme-tech-noir .theme-switcher label::after {
+    content: " ]";
 }
 
 .theme-options {
     display: flex;
-    gap: var(--cp-spacing-xs);
+    gap: 0.25rem;
 }
 
 .theme-option {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid transparent;
-    transition: transform 0.2s;
+    transition: all 0.2s ease;
+    position: relative;
 }
 
 .theme-option.active {
@@ -538,17 +904,46 @@ input[type="number"] {
     transform: scale(1.1);
 }
 
+/* Neon theme option with animated gradient */
 .theme-neon {
-    background: linear-gradient(45deg, #ff00ff, #00ffff);
-    box-shadow: 0 0 8px #ff00ff;
+    background: linear-gradient(-45deg, #ff00ff, #00ffff, #ff00ff);
+    background-size: 200% 200%;
+    box-shadow: 0 0 10px #ff00ff;
+    animation: gradientBG 3s ease infinite;
 }
 
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Tech Noir theme option with scanlines */
 .theme-noir {
-    background: linear-gradient(45deg, #30cbbe, #330867);
-    box-shadow: 0 0 8px #30cbbe;
+    background: #39ff14;
+    box-shadow: 0 0 10px #39ff14;
+    overflow: hidden;
+    position: relative;
 }
 
+.theme-noir::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        transparent 50%, 
+        rgba(0, 0, 0, 0.5) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+}
+
+/* Minimal theme option */
 .theme-minimal {
     background: linear-gradient(45deg, #1e1e2d, #121212);
     box-shadow: 0 0 8px #00ccff;
+    border: 1px solid #00ccff;
 }
