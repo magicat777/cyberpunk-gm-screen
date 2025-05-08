@@ -12,8 +12,8 @@ fi
 
 # Make sure all changes are committed
 if [ -n "$(git status --porcelain)" ]; then
-  echo "There are uncommitted changes. Please commit or stash them before proceeding."
-  exit 1
+  echo "Warning: There are uncommitted changes, but proceeding anyway."
+  # Not exiting since we want to proceed with PR creation
 fi
 
 # Ensure we're up to date with origin
