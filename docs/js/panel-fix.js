@@ -242,7 +242,7 @@
                     console.error('Error fixing HP calculation in character sheet:', hpError);
                 }
                 
-                // Add save button for character sheet
+                // Add save button for character sheet and set up auto-save
                 try {
                     if (panel) {
                         const content = panel.querySelector('.panel-content');
@@ -262,11 +262,12 @@
                                 saveCharacterSheet(panel);
                             });
                             
-                            // Create load button
+                            // Create load buttons
                             const loadButton = document.createElement('button');
-                            loadButton.textContent = 'Load Character';
+                            loadButton.textContent = 'Load From File';
+                            loadButton.style.marginRight = '10px';
                             
-                            // Add event listener for loading
+                            // Add event listener for loading from file
                             loadButton.addEventListener('click', function() {
                                 const fileInput = document.createElement('input');
                                 fileInput.type = 'file';
@@ -299,16 +300,94 @@
                                 }, 5000);
                             });
                             
+                            // Create load from storage button
+                            const loadStorageButton = document.createElement('button');
+                            loadStorageButton.textContent = 'Load Saved';
+                            
+                            // Add event listener for loading from storage
+                            loadStorageButton.addEventListener('click', function() {
+                                loadCharacterFromStorage(panel);
+                            });
+                            
                             // Add buttons to container
                             saveButtonContainer.appendChild(saveButton);
                             saveButtonContainer.appendChild(loadButton);
+                            saveButtonContainer.appendChild(loadStorageButton);
                             
                             // Add container to panel content
                             content.appendChild(saveButtonContainer);
+                            
+                            // Add auto-save functionality
+                            const addAutoSave = (element) => {
+                                if (element) {
+                                    element.addEventListener('change', () => {
+                                        // Auto-save to localStorage
+                                        try {
+                                            const charData = extractCharacterData(panel);
+                                            if (charData) {
+                                                saveCharacterToLocalStorage(charData);
+                                                console.log('Character auto-saved');
+                                            }
+                                        } catch (error) {
+                                            console.error('Error auto-saving character:', error);
+                                        }
+                                    });
+                                }
+                            };
+                            
+                            // Add auto-save to all form elements
+                            // Name input
+                            const nameInput = panel.querySelector('input[placeholder="Character Name"]');
+                            if (nameInput) {
+                                addAutoSave(nameInput);
+                                // Also add input event for real-time saving
+                                nameInput.addEventListener('input', () => {
+                                    try {
+                                        const charData = extractCharacterData(panel);
+                                        if (charData) {
+                                            saveCharacterToLocalStorage(charData);
+                                        }
+                                    } catch (e) {
+                                        // Silently fail for input events
+                                    }
+                                });
+                            }
+                            
+                            // All stat inputs
+                            const statInputs = panel.querySelectorAll('input[type="number"]');
+                            statInputs.forEach(input => addAutoSave(input));
+                            
+                            // All textareas
+                            const textareas = panel.querySelectorAll('textarea');
+                            textareas.forEach(textarea => {
+                                addAutoSave(textarea);
+                                // Also add input event for real-time saving
+                                textarea.addEventListener('input', () => {
+                                    try {
+                                        const charData = extractCharacterData(panel);
+                                        if (charData) {
+                                            saveCharacterToLocalStorage(charData);
+                                        }
+                                    } catch (e) {
+                                        // Silently fail for input events
+                                    }
+                                });
+                            });
+                            
+                            // Try to load the last character
+                            try {
+                                const lastCharStr = localStorage.getItem('cyberpunk-last-character');
+                                if (lastCharStr) {
+                                    const lastChar = JSON.parse(lastCharStr);
+                                    loadCharacterData(panel, lastChar);
+                                }
+                            } catch (e) {
+                                console.warn('Failed to load last character:', e);
+                            }
                         }
                     }
                 } catch (error) {
-                    console.error('Error adding save button to character sheet:', error);
+                    console.error('Error adding save functionality to character sheet:', error);
                 }
                 
                 return panel;
@@ -333,36 +412,124 @@
         console.log('Character Panel function patched');
     }
     
-    // Function to save character sheet data
-    function saveCharacterSheet(panel) {
+    // Function to extract character data from panel
+    function extractCharacterData(panel) {
         try {
-            // Extract character data
+            // Get name input
+            const nameInput = panel.querySelector('input[placeholder="Character Name"]');
+            const name = nameInput ? nameInput.value : '';
+            
+            // Extract derived stats safely with fallbacks
+            const derivedStats = {
+                hp: parseInt(panel.querySelector('#hp-calc')?.textContent || '35'),
+                humanity: parseInt(panel.querySelector('#humanity-calc')?.textContent || '50'),
+                currentHP: parseInt(panel.querySelector('#current-hp')?.value || '35'),
+                armor: parseInt(panel.querySelector('#armor-sp')?.value || '11')
+            };
+            
+            // Get textareas safely with fallbacks
+            const textareas = panel.querySelectorAll('textarea');
+            const skills = textareas.length >= 1 ? textareas[0].value : '';
+            const weapons = textareas.length >= 2 ? textareas[1].value : '';
+            const gear = textareas.length >= 3 ? textareas[2].value : '';
+            
+            // Create base character data
             const charData = {
-                name: panel.querySelector('input[placeholder="Character Name"]').value,
+                name: name,
                 stats: {},
-                derivedStats: {
-                    hp: parseInt(panel.querySelector('#hp-calc').textContent),
-                    humanity: parseInt(panel.querySelector('#humanity-calc').textContent),
-                    currentHP: parseInt(panel.querySelector('#current-hp').value),
-                    armor: parseInt(panel.querySelector('#armor-sp').value)
-                },
-                skills: panel.querySelectorAll('textarea')[0].value,
-                weapons: panel.querySelectorAll('textarea')[1].value,
-                gear: panel.querySelectorAll('textarea')[2].value,
+                derivedStats: derivedStats,
+                skills: skills,
+                weapons: weapons,
+                gear: gear,
                 created: new Date().toISOString(),
-                version: "1.0"
+                lastSaved: new Date().toISOString(),
+                version: "1.1"
             };
             
             // Get all stat inputs
             const statInputs = panel.querySelectorAll('input[type="number"][min="1"][max="10"]');
             const statLabels = ['INT', 'REF', 'DEX', 'TECH', 'COOL', 'WILL', 'LUCK', 'MOVE', 'BODY', 'EMP'];
             
-            // Assign stats by position (assuming they're in order)
+            // Assign stats by position and label
             for (let i = 0; i < Math.min(statInputs.length, statLabels.length); i++) {
-                charData.stats[statLabels[i]] = parseInt(statInputs[i].value);
+                charData.stats[statLabels[i]] = parseInt(statInputs[i].value || '5');
             }
             
-            // Create a download link
+            // Try to find stats by label text if available
+            statInputs.forEach(input => {
+                const parent = input.parentElement;
+                if (parent && parent.textContent) {
+                    // Extract label from parent text (like "INT: <input>")
+                    const labelMatch = parent.textContent.match(/([A-Z]{2,4}):/i);
+                    if (labelMatch && labelMatch[1]) {
+                        const label = labelMatch[1].toUpperCase();
+                        if (statLabels.includes(label)) {
+                            charData.stats[label] = parseInt(input.value || '5');
+                        }
+                    }
+                }
+            });
+            
+            return charData;
+        } catch (error) {
+            console.error('Error extracting character data:', error);
+            return null;
+        }
+    }
+    
+    // Function to save character data to localStorage
+    function saveCharacterToLocalStorage(charData) {
+        if (!charData) return false;
+        
+        try {
+            // Save to localStorage
+            const charList = getCharacterListFromStorage();
+            
+            // Update or add this character
+            const existingIndex = charList.findIndex(c => c.name === charData.name);
+            if (existingIndex >= 0) {
+                charList[existingIndex] = charData;
+            } else {
+                charList.push(charData);
+            }
+            
+            // Save back to localStorage
+            localStorage.setItem('cyberpunk-characters', JSON.stringify(charList));
+            
+            // Also save as the last active character
+            localStorage.setItem('cyberpunk-last-character', JSON.stringify(charData));
+            
+            return true;
+        } catch (error) {
+            console.error('Error saving character to localStorage:', error);
+            return false;
+        }
+    }
+    
+    // Function to get character list from localStorage
+    function getCharacterListFromStorage() {
+        try {
+            const storedList = localStorage.getItem('cyberpunk-characters');
+            return storedList ? JSON.parse(storedList) : [];
+        } catch (error) {
+            console.error('Error getting character list from localStorage:', error);
+            return [];
+        }
+    }
+    
+    // Function to save character sheet data
+    function saveCharacterSheet(panel) {
+        try {
+            // Extract character data
+            const charData = extractCharacterData(panel);
+            if (!charData) {
+                throw new Error('Could not extract character data');
+            }
+            
+            // Save to localStorage
+            const localSaved = saveCharacterToLocalStorage(charData);
+            
+            // Create a download link for backup
             const dataStr = JSON.stringify(charData, null, 2);
             const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
             
@@ -381,19 +548,33 @@
             document.body.removeChild(downloadLink);
             
             console.log('Character saved:', fileName);
-            alert(`Character saved as ${fileName}`);
+            
+            // Show save status
+            const savedMessage = localSaved ? 
+                `Character "${charData.name}" saved to browser and file` : 
+                `Character "${charData.name}" saved to file (browser storage failed)`;
+            
+            alert(savedMessage);
+            return charData;
         } catch (error) {
             console.error('Error saving character:', error);
             alert(`Error saving character: ${error.message}`);
+            return null;
         }
     }
     
     // Function to load character data
     function loadCharacterData(panel, charData) {
         try {
+            // Validate character data
+            if (!charData || typeof charData !== 'object') {
+                throw new Error('Invalid character data');
+            }
+            
             // Load character name
-            if (charData.name) {
-                panel.querySelector('input[placeholder="Character Name"]').value = charData.name;
+            const nameInput = panel.querySelector('input[placeholder="Character Name"]');
+            if (nameInput && charData.name) {
+                nameInput.value = charData.name;
             }
             
             // Load stats
@@ -401,29 +582,49 @@
                 const statInputs = panel.querySelectorAll('input[type="number"][min="1"][max="10"]');
                 const statLabels = ['INT', 'REF', 'DEX', 'TECH', 'COOL', 'WILL', 'LUCK', 'MOVE', 'BODY', 'EMP'];
                 
+                // First try loading by position
                 for (let i = 0; i < Math.min(statInputs.length, statLabels.length); i++) {
                     if (charData.stats[statLabels[i]] !== undefined) {
                         statInputs[i].value = charData.stats[statLabels[i]];
                     }
                 }
+                
+                // Then try loading by finding matching labels
+                statInputs.forEach(input => {
+                    const parent = input.parentElement;
+                    if (parent && parent.textContent) {
+                        // Extract label from parent text (like "INT: <input>")
+                        const labelMatch = parent.textContent.match(/([A-Z]{2,4}):/i);
+                        if (labelMatch && labelMatch[1]) {
+                            const label = labelMatch[1].toUpperCase();
+                            if (charData.stats[label] !== undefined) {
+                                input.value = charData.stats[label];
+                            }
+                        }
+                    }
+                });
             }
             
             // Load derived stats
             if (charData.derivedStats) {
-                if (charData.derivedStats.hp !== undefined && panel.querySelector('#hp-calc')) {
-                    panel.querySelector('#hp-calc').textContent = charData.derivedStats.hp;
+                if (charData.derivedStats.hp !== undefined) {
+                    const hpCalc = panel.querySelector('#hp-calc');
+                    if (hpCalc) hpCalc.textContent = charData.derivedStats.hp;
                 }
                 
-                if (charData.derivedStats.humanity !== undefined && panel.querySelector('#humanity-calc')) {
-                    panel.querySelector('#humanity-calc').textContent = charData.derivedStats.humanity;
+                if (charData.derivedStats.humanity !== undefined) {
+                    const humanityCalc = panel.querySelector('#humanity-calc');
+                    if (humanityCalc) humanityCalc.textContent = charData.derivedStats.humanity;
                 }
                 
-                if (charData.derivedStats.currentHP !== undefined && panel.querySelector('#current-hp')) {
-                    panel.querySelector('#current-hp').value = charData.derivedStats.currentHP;
+                if (charData.derivedStats.currentHP !== undefined) {
+                    const currentHP = panel.querySelector('#current-hp');
+                    if (currentHP) currentHP.value = charData.derivedStats.currentHP;
                 }
                 
-                if (charData.derivedStats.armor !== undefined && panel.querySelector('#armor-sp')) {
-                    panel.querySelector('#armor-sp').value = charData.derivedStats.armor;
+                if (charData.derivedStats.armor !== undefined) {
+                    const armorSP = panel.querySelector('#armor-sp');
+                    if (armorSP) armorSP.value = charData.derivedStats.armor;
                 }
             }
             
@@ -442,11 +643,149 @@
                 textareas[2].value = charData.gear;
             }
             
+            // Save to localStorage as current character
+            saveCharacterToLocalStorage(charData);
+            
             console.log('Character loaded successfully');
             alert(`Character "${charData.name || 'Unnamed'}" loaded successfully`);
+            return true;
         } catch (error) {
             console.error('Error loading character data:', error);
             alert(`Error loading character: ${error.message}`);
+            return false;
+        }
+    }
+    
+    // Function to load character from localStorage
+    function loadCharacterFromStorage(panel) {
+        try {
+            // Try to load last active character first
+            let charData = null;
+            
+            try {
+                const lastCharStr = localStorage.getItem('cyberpunk-last-character');
+                if (lastCharStr) {
+                    charData = JSON.parse(lastCharStr);
+                }
+            } catch (e) {
+                console.warn('Error loading last character:', e);
+            }
+            
+            if (charData) {
+                // Load directly if we have last character
+                return loadCharacterData(panel, charData);
+            } else {
+                // Otherwise show character list dialog
+                const charList = getCharacterListFromStorage();
+                
+                if (charList && charList.length > 0) {
+                    // Create character selection dialog
+                    const dialog = document.createElement('div');
+                    dialog.className = 'character-select-dialog';
+                    dialog.style.position = 'fixed';
+                    dialog.style.top = '50%';
+                    dialog.style.left = '50%';
+                    dialog.style.transform = 'translate(-50%, -50%)';
+                    dialog.style.backgroundColor = '#1e1e2d';
+                    dialog.style.border = '1px solid #00ccff';
+                    dialog.style.borderRadius = '5px';
+                    dialog.style.padding = '15px';
+                    dialog.style.zIndex = '10000';
+                    dialog.style.minWidth = '300px';
+                    dialog.style.maxWidth = '500px';
+                    
+                    // Add title
+                    const title = document.createElement('h2');
+                    title.textContent = 'Select Character';
+                    title.style.margin = '0 0 15px 0';
+                    title.style.borderBottom = '1px solid #00ccff';
+                    title.style.paddingBottom = '5px';
+                    dialog.appendChild(title);
+                    
+                    // Add character list
+                    const list = document.createElement('div');
+                    list.style.maxHeight = '300px';
+                    list.style.overflowY = 'auto';
+                    list.style.marginBottom = '15px';
+                    
+                    charList.forEach((char, index) => {
+                        const charItem = document.createElement('div');
+                        charItem.style.padding = '8px';
+                        charItem.style.borderBottom = '1px solid #333';
+                        charItem.style.cursor = 'pointer';
+                        charItem.style.display = 'flex';
+                        charItem.style.justifyContent = 'space-between';
+                        charItem.style.alignItems = 'center';
+                        
+                        // Character name and info
+                        const nameSpan = document.createElement('span');
+                        const date = new Date(char.lastSaved || char.created);
+                        nameSpan.innerHTML = `<strong>${char.name || 'Unnamed Character'}</strong><br>
+                                             <small>Last saved: ${date.toLocaleString()}</small>`;
+                        
+                        // Load button
+                        const loadBtn = document.createElement('button');
+                        loadBtn.textContent = 'Load';
+                        loadBtn.style.marginLeft = '10px';
+                        loadBtn.style.padding = '5px 10px';
+                        
+                        loadBtn.addEventListener('click', () => {
+                            // Remove dialog
+                            document.body.removeChild(dialog);
+                            document.body.removeChild(backdrop);
+                            
+                            // Load character
+                            loadCharacterData(panel, char);
+                        });
+                        
+                        charItem.appendChild(nameSpan);
+                        charItem.appendChild(loadBtn);
+                        list.appendChild(charItem);
+                    });
+                    
+                    dialog.appendChild(list);
+                    
+                    // Add buttons
+                    const buttonGroup = document.createElement('div');
+                    buttonGroup.style.display = 'flex';
+                    buttonGroup.style.justifyContent = 'flex-end';
+                    
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.style.padding = '8px 15px';
+                    cancelBtn.addEventListener('click', () => {
+                        document.body.removeChild(dialog);
+                        document.body.removeChild(backdrop);
+                    });
+                    
+                    buttonGroup.appendChild(cancelBtn);
+                    dialog.appendChild(buttonGroup);
+                    
+                    // Create backdrop
+                    const backdrop = document.createElement('div');
+                    backdrop.style.position = 'fixed';
+                    backdrop.style.top = '0';
+                    backdrop.style.left = '0';
+                    backdrop.style.width = '100%';
+                    backdrop.style.height = '100%';
+                    backdrop.style.backgroundColor = 'rgba(0,0,0,0.7)';
+                    backdrop.style.zIndex = '9999';
+                    
+                    // Add dialog to document
+                    document.body.appendChild(backdrop);
+                    document.body.appendChild(dialog);
+                    
+                    return true;
+                } else {
+                    console.log('No saved characters found');
+                    alert('No saved characters found');
+                    return false;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading character from storage:', error);
+            alert(`Error loading character: ${error.message}`);
+            return false;
         }
     }
     
