@@ -4,11 +4,7 @@
     <title>Cyberpunk RED - GM Screen</title>
     <link rel="stylesheet" href="css/styles-modern.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="js/hotfix.js"></script>
-    <script src="js/debug-panel.js"></script>
-    <script src="js/panel-fix.js"></script>
-    <script src="js/table-save.js"></script>
-    <script src="js/layout-save-improved.js"></script>
+    <script src="js/app-modern.js"></script>
 </head>
 <body class="theme-neon-synthwave">
     <!-- Toolbar with dropdown menus -->
@@ -376,6 +372,232 @@
             localStorage.setItem('cyberpunk-theme', themeName);
         }
         
+        // Layout functions
+        function saveLayout() {
+            // Get all panels
+            const panels = document.querySelectorAll('.panel');
+            const savedPanels = [];
+            
+            panels.forEach(panel => {
+                const title = panel.querySelector('.panel-header div').textContent;
+                
+                savedPanels.push({
+                    title: title,
+                    left: panel.style.left,
+                    top: panel.style.top,
+                    width: panel.style.width,
+                    height: panel.style.height,
+                    zIndex: panel.style.zIndex
+                });
+            });
+            
+            localStorage.setItem('cyberpunk-layout', JSON.stringify(savedPanels));
+            alert('Layout saved');
+        }
+        
+        function loadLayout() {
+            const savedLayout = localStorage.getItem('cyberpunk-layout');
+            
+            if (!savedLayout) {
+                alert('No saved layout found');
+                return;
+            }
+            
+            // Clear current layout
+            document.querySelectorAll('.panel').forEach(panel => panel.remove());
+            
+            // Parse saved layout
+            const panels = JSON.parse(savedLayout);
+            
+            // Special handling based on panel titles
+            panels.forEach(panel => {
+                let newPanel;
+                
+                // Create appropriate panel type based on title
+                if (panel.title === 'Notes') {
+                    newPanel = createNotesPanel();
+                } else if (panel.title === 'Dice Roller') {
+                    newPanel = createDicePanel();
+                } else if (panel.title === 'Rules Reference') {
+                    newPanel = createRulesPanel();
+                } else if (panel.title === 'Initiative Tracker') {
+                    newPanel = createInitiativePanel();
+                } else if (panel.title === 'Game Timer') {
+                    newPanel = createTimerPanel();
+                } else if (panel.title === 'Calculator') {
+                    newPanel = createCalculatorPanel();
+                } else if (panel.title === 'Weapons Table') {
+                    newPanel = createWeaponsPanel();
+                } else if (panel.title === 'Armor Table') {
+                    newPanel = createArmorPanel();
+                } else if (panel.title === 'Critical Injuries') {
+                    newPanel = createCriticalInjuryPanel();
+                } else if (panel.title === 'Netrunning') {
+                    newPanel = createNetrunningPanel();
+                } else if (panel.title.includes('Character')) {
+                    newPanel = createCharacterPanel();
+                } else if (panel.title.includes('NPC')) {
+                    newPanel = createNPCPanel();
+                } else if (panel.title.includes('Loot')) {
+                    newPanel = createLootPanel();
+                } else if (panel.title.includes('Map')) {
+                    newPanel = createMapPanel();
+                } else if (panel.title.includes('Location')) {
+                    newPanel = createLocationPanel();
+                } else if (panel.title.includes('Encounter')) {
+                    newPanel = createEncounterPanel();
+                } else {
+                    // Default to notes panel
+                    newPanel = createNotesPanel();
+                }
+                
+                // Apply saved position and size
+                newPanel.style.left = panel.left;
+                newPanel.style.top = panel.top;
+                if (panel.width) newPanel.style.width = panel.width;
+                if (panel.height) newPanel.style.height = panel.height;
+                newPanel.style.zIndex = panel.zIndex;
+            });
+            
+            alert('Layout loaded');
+        }
+        
+        function clearLayout() {
+            document.querySelectorAll('.panel').forEach(panel => panel.remove());
+        }
+        
+        function resetLayout() {
+            // Clear current layout
+            document.querySelectorAll('.panel').forEach(panel => panel.remove());
+            
+            // Create default layout
+            createNotesPanel();
+            createDicePanel();
+            createInitiativePanel();
+        }
+        
+        function autoOrganizePanels() {
+            const panels = document.querySelectorAll('.panel');
+            if (panels.length === 0) return;
+            
+            // Sort panels by title
+            const sortedPanels = Array.from(panels).sort((a, b) => {
+                const titleA = a.querySelector('.panel-header div').textContent;
+                const titleB = b.querySelector('.panel-header div').textContent;
+                return titleA.localeCompare(titleB);
+            });
+            
+            // Calculate grid dimensions
+            const totalPanels = sortedPanels.length;
+            const cols = Math.ceil(Math.sqrt(totalPanels)); // Square-ish grid
+            
+            // Get available space
+            const containerWidth = window.innerWidth - 40; // 20px margin on each side
+            const containerHeight = window.innerHeight - 100; // 100px for toolbar and margins
+            
+            // Calculate panel dimensions
+            const panelWidth = Math.floor(containerWidth / cols);
+            const panelHeight = Math.floor(containerHeight / Math.ceil(totalPanels / cols));
+            
+            // Position panels
+            sortedPanels.forEach((panel, index) => {
+                const row = Math.floor(index / cols);
+                const col = index % cols;
+                
+                panel.style.left = (20 + col * panelWidth) + 'px';
+                panel.style.top = (70 + row * panelHeight) + 'px'; // 70px to account for toolbar
+                panel.style.width = (panelWidth - 20) + 'px'; // 10px gap on each side
+                panel.style.height = (panelHeight - 20) + 'px'; // 10px gap on each side
+                panel.style.zIndex = index + 1;
+            });
+            
+            alert('Panels organized by name');
+        }
+        
+        function fitPanelsToWindow() {
+            const panels = document.querySelectorAll('.panel');
+            if (panels.length === 0) return;
+            
+            // Group panels by type (based on title)
+            const panelGroups = {};
+            
+            panels.forEach(panel => {
+                const title = panel.querySelector('.panel-header div').textContent;
+                
+                // Extract panel type from title
+                let type = title.split(' ')[0].toLowerCase();
+                if (!panelGroups[type]) {
+                    panelGroups[type] = [];
+                }
+                panelGroups[type].push(panel);
+            });
+            
+            // Get list of panel types
+            const panelTypes = Object.keys(panelGroups);
+            
+            // Calculate layout based on number of panel types
+            const numGroups = panelTypes.length;
+            let rows, cols;
+            
+            if (numGroups <= 2) {
+                rows = 1;
+                cols = numGroups;
+            } else if (numGroups <= 6) {
+                rows = 2;
+                cols = Math.ceil(numGroups / rows);
+            } else {
+                rows = 3;
+                cols = Math.ceil(numGroups / rows);
+            }
+            
+            // Get available space
+            const containerWidth = window.innerWidth - 40;
+            const containerHeight = window.innerHeight - 100;
+            
+            // Calculate cell dimensions
+            const cellWidth = Math.floor(containerWidth / cols);
+            const cellHeight = Math.floor(containerHeight / rows);
+            
+            // Position panels by group
+            panelTypes.forEach((type, groupIndex) => {
+                const row = Math.floor(groupIndex / cols);
+                const col = groupIndex % cols;
+                
+                const groupPanels = panelGroups[type];
+                const numPanelsInGroup = groupPanels.length;
+                
+                if (numPanelsInGroup === 1) {
+                    // Single panel - fill the cell
+                    const panel = groupPanels[0];
+                    panel.style.left = (20 + col * cellWidth) + 'px';
+                    panel.style.top = (70 + row * cellHeight) + 'px';
+                    panel.style.width = (cellWidth - 20) + 'px';
+                    panel.style.height = (cellHeight - 20) + 'px';
+                    panel.style.zIndex = groupIndex + 1;
+                } else {
+                    // Multiple panels - create a sub-grid
+                    const subCols = Math.ceil(Math.sqrt(numPanelsInGroup));
+                    const subRows = Math.ceil(numPanelsInGroup / subCols);
+                    
+                    const subCellWidth = Math.floor(cellWidth / subCols);
+                    const subCellHeight = Math.floor(cellHeight / subRows);
+                    
+                    groupPanels.forEach((panel, subIndex) => {
+                        const subRow = Math.floor(subIndex / subCols);
+                        const subCol = subIndex % subCols;
+                        
+                        panel.style.left = (20 + col * cellWidth + subCol * subCellWidth) + 'px';
+                        panel.style.top = (70 + row * cellHeight + subRow * subCellHeight) + 'px';
+                        panel.style.width = (subCellWidth - 20) + 'px';
+                        panel.style.height = (subCellHeight - 20) + 'px';
+                        panel.style.zIndex = groupIndex + 1;
+                    });
+                }
+            });
+            
+            alert('Panels fit to window and organized by type');
+        }
+        
         // Add event listeners once the DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Theme switcher
@@ -409,7 +631,70 @@
             });
             
             // Add other event listeners for remaining panel types
-            // ...
+            document.getElementById('add-initiative').addEventListener('click', function(e) {
+                e.preventDefault();
+                createInitiativePanel();
+            });
+            
+            document.getElementById('add-timer').addEventListener('click', function(e) {
+                e.preventDefault();
+                createTimerPanel();
+            });
+            
+            document.getElementById('add-calculator').addEventListener('click', function(e) {
+                e.preventDefault();
+                createCalculatorPanel();
+            });
+            
+            document.getElementById('add-weapons').addEventListener('click', function(e) {
+                e.preventDefault();
+                createWeaponsPanel();
+            });
+            
+            document.getElementById('add-armor').addEventListener('click', function(e) {
+                e.preventDefault();
+                createArmorPanel();
+            });
+            
+            document.getElementById('add-critical').addEventListener('click', function(e) {
+                e.preventDefault();
+                createCriticalInjuryPanel();
+            });
+            
+            document.getElementById('add-netrunning').addEventListener('click', function(e) {
+                e.preventDefault();
+                createNetrunningPanel();
+            });
+            
+            document.getElementById('add-character').addEventListener('click', function(e) {
+                e.preventDefault();
+                createCharacterPanel();
+            });
+            
+            document.getElementById('add-npc').addEventListener('click', function(e) {
+                e.preventDefault();
+                createNPCPanel();
+            });
+            
+            document.getElementById('add-loot').addEventListener('click', function(e) {
+                e.preventDefault();
+                createLootPanel();
+            });
+            
+            document.getElementById('add-map').addEventListener('click', function(e) {
+                e.preventDefault();
+                createMapPanel();
+            });
+            
+            document.getElementById('add-location').addEventListener('click', function(e) {
+                e.preventDefault();
+                createLocationPanel();
+            });
+            
+            document.getElementById('add-encounter').addEventListener('click', function(e) {
+                e.preventDefault();
+                createEncounterPanel();
+            });
             
             // Font size buttons
             document.querySelectorAll('.font-size-btn').forEach(button => {
@@ -460,6 +745,41 @@
                 } else {
                     alert('Animations enabled');
                 }
+            });
+            
+            // Layout menu event listeners
+            document.getElementById('save-layout').addEventListener('click', function(e) {
+                e.preventDefault();
+                saveLayout();
+            });
+            
+            document.getElementById('load-layout').addEventListener('click', function(e) {
+                e.preventDefault();
+                loadLayout();
+            });
+            
+            document.getElementById('clear-layout').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm('Remove all panels?')) {
+                    clearLayout();
+                }
+            });
+            
+            document.getElementById('reset-layout').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (confirm('Reset to default layout?')) {
+                    resetLayout();
+                }
+            });
+            
+            document.getElementById('auto-organize').addEventListener('click', function(e) {
+                e.preventDefault();
+                autoOrganizePanels();
+            });
+            
+            document.getElementById('fit-to-window').addEventListener('click', function(e) {
+                e.preventDefault();
+                fitPanelsToWindow();
             });
             
             // Create an initial notes panel
