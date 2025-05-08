@@ -27,7 +27,9 @@
             { id: 'add-npc', type: 'NPC Generator', resultId: 'npc-result', generatorId: 'generate-npc' },
             { id: 'add-loot', type: 'Loot Generator', resultId: 'loot-result', generatorId: 'generate-loot' },
             { id: 'add-location', type: 'Location Generator', resultId: 'location-result', generatorId: 'generate-location-details' },
-            { id: 'add-encounter', type: 'Random Encounter', resultId: 'encounter-result', generatorId: 'generate-encounter' }
+            { id: 'add-encounter', type: 'Random Encounter', resultId: 'encounter-result', generatorId: 'generate-encounter' },
+            { id: 'add-critical', type: 'Critical Injuries', resultId: 'critical-result', generatorId: 'roll-critical' },
+            { id: 'add-netrunning', type: 'Netrunning', resultId: 'architecture-result', generatorId: 'generate-architecture' }
         ];
         
         // Add panel creation observers
@@ -93,6 +95,18 @@
                     type: 'Random Encounter', 
                     resultId: 'encounter-result', 
                     generatorId: 'generate-encounter' 
+                });
+            } else if (headerText === 'Critical Injuries') {
+                enhanceTablePanel(panel, { 
+                    type: 'Critical Injuries', 
+                    resultId: 'critical-result', 
+                    generatorId: 'roll-critical' 
+                });
+            } else if (headerText === 'Netrunning') {
+                enhanceTablePanel(panel, { 
+                    type: 'Netrunning', 
+                    resultId: 'architecture-result', 
+                    generatorId: 'generate-architecture' 
                 });
             }
         });
@@ -183,7 +197,9 @@
                 if (resultDiv.innerHTML.trim() === 'Click to generate a location' || 
                     resultDiv.innerHTML.trim() === 'Click to generate an NPC' ||
                     resultDiv.innerHTML.trim() === 'Click to generate loot' ||
-                    resultDiv.innerHTML.trim() === 'Click to generate an encounter') {
+                    resultDiv.innerHTML.trim() === 'Click to generate an encounter' ||
+                    resultDiv.innerHTML.trim() === 'Roll to generate a critical injury' ||
+                    resultDiv.innerHTML.trim() === 'Click to generate a NET architecture') {
                     alert('Generate something first!');
                     return;
                 }
@@ -199,7 +215,9 @@
                 if (resultDiv.innerHTML.trim() === 'Click to generate a location' || 
                     resultDiv.innerHTML.trim() === 'Click to generate an NPC' ||
                     resultDiv.innerHTML.trim() === 'Click to generate loot' ||
-                    resultDiv.innerHTML.trim() === 'Click to generate an encounter') {
+                    resultDiv.innerHTML.trim() === 'Click to generate an encounter' ||
+                    resultDiv.innerHTML.trim() === 'Roll to generate a critical injury' ||
+                    resultDiv.innerHTML.trim() === 'Click to generate a NET architecture') {
                     alert('Generate something first!');
                     return;
                 }
@@ -238,7 +256,9 @@
                     if (resultDiv.innerHTML.trim() !== 'Click to generate a location' && 
                         resultDiv.innerHTML.trim() !== 'Click to generate an NPC' &&
                         resultDiv.innerHTML.trim() !== 'Click to generate loot' &&
-                        resultDiv.innerHTML.trim() !== 'Click to generate an encounter') {
+                        resultDiv.innerHTML.trim() !== 'Click to generate an encounter' &&
+                        resultDiv.innerHTML.trim() !== 'Roll to generate a critical injury' &&
+                        resultDiv.innerHTML.trim() !== 'Click to generate a NET architecture') {
                         
                         // Add to history
                         historyState.results.push(resultDiv.innerHTML);

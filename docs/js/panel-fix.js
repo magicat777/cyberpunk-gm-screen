@@ -376,13 +376,20 @@
                             
                             // Try to load the last character
                             try {
-                                const lastCharStr = localStorage.getItem('cyberpunk-last-character');
-                                if (lastCharStr) {
-                                    const lastChar = JSON.parse(lastCharStr);
-                                    loadCharacterData(panel, lastChar);
-                                }
+                                setTimeout(() => {
+                                    try {
+                                        const lastCharStr = localStorage.getItem('cyberpunk-last-character');
+                                        if (lastCharStr) {
+                                            const lastChar = JSON.parse(lastCharStr);
+                                            loadCharacterData(panel, lastChar);
+                                            console.log('Auto-loaded last used character');
+                                        }
+                                    } catch (e) {
+                                        console.warn('Failed to load last character:', e);
+                                    }
+                                }, 300); // Delay to ensure panel is fully initialized
                             } catch (e) {
-                                console.warn('Failed to load last character:', e);
+                                console.warn('Failed to set up character auto-load:', e);
                             }
                         }
                     }
@@ -479,9 +486,15 @@
     
     // Function to save character data to localStorage
     function saveCharacterToLocalStorage(charData) {
-        if (!charData) return false;
+        if (!charData) {
+            console.error('Cannot save empty character data to localStorage');
+            return false;
+        }
         
         try {
+            // Debug logging
+            console.log('Saving character to localStorage:', charData.name || 'Unnamed');
+            
             // Save to localStorage
             const charList = getCharacterListFromStorage();
             
@@ -489,15 +502,26 @@
             const existingIndex = charList.findIndex(c => c.name === charData.name);
             if (existingIndex >= 0) {
                 charList[existingIndex] = charData;
+                console.log(`Updated existing character "${charData.name}" in storage`);
             } else {
                 charList.push(charData);
+                console.log(`Added new character "${charData.name}" to storage`);
             }
             
             // Save back to localStorage
-            localStorage.setItem('cyberpunk-characters', JSON.stringify(charList));
+            const saveResult = localStorage.setItem('cyberpunk-characters', JSON.stringify(charList));
             
             // Also save as the last active character
             localStorage.setItem('cyberpunk-last-character', JSON.stringify(charData));
+            console.log(`Character "${charData.name}" set as last active character`);
+            
+            // Verify storage
+            try {
+                const savedChar = JSON.parse(localStorage.getItem('cyberpunk-last-character'));
+                console.log(`Verified character save: "${savedChar.name}" is now in storage`);
+            } catch (e) {
+                console.warn('Could not verify character save:', e);
+            }
             
             return true;
         } catch (error) {
