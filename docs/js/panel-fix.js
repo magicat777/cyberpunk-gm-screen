@@ -76,74 +76,170 @@
         // Replace with fixed version
         window.createCharacterPanel = function() {
             try {
-                // Create the panel using the original function
-                const panel = originalFn();
+                // Create a base panel first - this is a fallback approach to ensure
+                // we always return a valid panel even if errors occur
+                let panel = null;
+                
+                try {
+                    // Create the panel using the original function
+                    panel = originalFn();
+                } catch (createError) {
+                    console.error('Error in original createCharacterPanel:', createError);
+                    
+                    // Create a basic panel as fallback
+                    if (typeof createPanel === 'function') {
+                        panel = createPanel('Character Sheet');
+                        panel.style.width = "500px";
+                        panel.style.height = "600px";
+                        
+                        if (panel) {
+                            panel.querySelector('.panel-content').innerHTML = `
+                                <div style="padding: 10px;">
+                                    <input type="text" placeholder="Character Name" style="width: 100%; font-size: 18px; margin-bottom: 10px;">
+                                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+                                        <div>
+                                            <div><strong>Stats</strong></div>
+                                            <div>INT: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                            <div>REF: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                            <div>DEX: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                            <div>TECH: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                            <div>COOL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                            <div>WILL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                            <div>LUCK: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                            <div>MOVE: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                            <div>BODY: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                            <div>EMP: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                                        </div>
+                                        <div>
+                                            <div><strong>Derived Stats</strong></div>
+                                            <div>HP: <span id="hp-calc">35</span></div>
+                                            <div>Humanity: <span id="humanity-calc">50</span></div>
+                                            <div><strong>Current Status</strong></div>
+                                            <div>HP: <input type="number" id="current-hp" value="35" style="width: 40px;"></div>
+                                            <div>Armor: <input type="number" id="armor-sp" value="11" style="width: 40px;"></div>
+                                        </div>
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <div><strong>Skills</strong> (Add comma-separated list)</div>
+                                        <textarea style="width: 100%; height: 80px;">Handgun +5, Stealth +3, Athletics +4, Perception +4, Conversation +3, Brawling +2, Education +2, Streetwise +4</textarea>
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <div><strong>Weapons</strong> (Add comma-separated list)</div>
+                                        <textarea style="width: 100%; height: 60px;">Medium Pistol (2d6), Combat Knife (1d6), Heavy Pistol (3d6)</textarea>
+                                    </div>
+                                    <div>
+                                        <div><strong>Cyberware & Gear</strong> (Add comma-separated list)</div>
+                                        <textarea style="width: 100%; height: 60px;">Cybereye (Infrared), Light Armorjack (SP11), Agent (Pocket AI), Medscanner</textarea>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+                
+                // If we still don't have a panel, throw an error
+                if (!panel) {
+                    throw new Error('Unable to create character panel');
+                }
                 
                 // Fix the BODY input selector issue
-                if (panel) {
-                    try {
-                        // Remove the existing event listener that's causing the error
-                        const bodyInput = panel.querySelector('input[min="1"][max="10"]:nth-of-type(9)');
-                        const hpCalc = panel.querySelector('#hp-calc');
-                        const currentHP = panel.querySelector('#current-hp');
-                        
-                        // If any of these elements is missing, use a safer approach
-                        if (!bodyInput || !hpCalc || !currentHP) {
-                            console.log('Using safer approach for character sheet HP calculation');
-                            
-                            // Get all number inputs
-                            const statInputs = panel.querySelectorAll('input[type="number"][min="1"][max="10"]');
-                            let bodyInput = null;
-                            
-                            // Find the one that looks like the BODY stat (9th one or one labeled BODY)
-                            if (statInputs.length >= 9) {
-                                // Try to find by text content of previous element
-                                for (let i = 0; i < statInputs.length; i++) {
-                                    const prevText = statInputs[i].previousElementSibling?.textContent?.trim() ||
-                                                    statInputs[i].parentElement?.textContent?.trim() || '';
-                                    
-                                    if (prevText.includes('BODY')) {
-                                        bodyInput = statInputs[i];
-                                        break;
-                                    }
-                                }
-                                
-                                // If not found by label, use the 9th one (counting from 0)
-                                if (!bodyInput && statInputs.length >= 9) {
-                                    bodyInput = statInputs[8]; // 9th input (0-indexed)
-                                }
+                try {
+                    // First, try finding the body input using multiple strategies
+                    let bodyInput = null;
+                    let hpCalc = null;
+                    let currentHP = null;
+                    
+                    // Strategy 1: Try original selector
+                    bodyInput = panel.querySelector('input[min="1"][max="10"]:nth-of-type(9)');
+                    
+                    // Strategy 2: Try finding by parent text
+                    if (!bodyInput) {
+                        const statLabels = panel.querySelectorAll('div');
+                        for (let i = 0; i < statLabels.length; i++) {
+                            if (statLabels[i].textContent && statLabels[i].textContent.trim().includes('BODY:')) {
+                                bodyInput = statLabels[i].querySelector('input');
+                                if (bodyInput) break;
                             }
-                            
-                            // Add new event listener if we found the input
-                            if (bodyInput) {
-                                // Find the HP elements by ID or create them if needed
-                                let hpCalc = panel.querySelector('#hp-calc');
-                                let currentHP = panel.querySelector('#current-hp');
-                                
-                                // Add change event listener
-                                bodyInput.addEventListener('change', function() {
-                                    const body = parseInt(this.value) || 5;
-                                    const hp = 10 + (body * 5);
-                                    
-                                    if (hpCalc) hpCalc.textContent = hp;
-                                    if (currentHP) currentHP.value = hp;
-                                });
-                                
-                                console.log('Character sheet HP calculation fixed');
-                            }
-                        } else {
-                            // Original elements found, just add the event listener safely
-                            bodyInput.addEventListener('change', function() {
-                                const body = parseInt(this.value) || 5;
-                                const hp = 10 + (body * 5);
-                                hpCalc.textContent = hp;
-                                currentHP.value = hp;
-                            });
-                            console.log('Character sheet using original HP calculation');
                         }
-                    } catch (error) {
-                        console.error('Error fixing character sheet:', error);
                     }
+                    
+                    // Strategy 3: Look at all numeric inputs
+                    if (!bodyInput) {
+                        const allInputs = panel.querySelectorAll('input[type="number"][min="1"][max="10"]');
+                        
+                        // Find by label text in parent div
+                        for (let i = 0; i < allInputs.length; i++) {
+                            const parent = allInputs[i].parentElement;
+                            if (parent && parent.textContent && parent.textContent.includes('BODY')) {
+                                bodyInput = allInputs[i];
+                                break;
+                            }
+                        }
+                        
+                        // If still not found, try the 9th input if available
+                        if (!bodyInput && allInputs.length >= 9) {
+                            bodyInput = allInputs[8]; // 9th input (0-indexed)
+                        }
+                    }
+                    
+                    // Find HP elements
+                    hpCalc = panel.querySelector('#hp-calc');
+                    currentHP = panel.querySelector('#current-hp');
+                    
+                    // If we don't have HP elements, try to create them
+                    if (!hpCalc || !currentHP) {
+                        // Look for derived stats section
+                        const sections = panel.querySelectorAll('div > div > strong');
+                        for (let i = 0; i < sections.length; i++) {
+                            if (sections[i].textContent === 'Derived Stats') {
+                                const statsSection = sections[i].parentElement.parentElement;
+                                
+                                // Create missing elements if needed
+                                if (!hpCalc) {
+                                    const hpDiv = document.createElement('div');
+                                    hpDiv.innerHTML = 'HP: <span id="hp-calc">35</span>';
+                                    statsSection.appendChild(hpDiv);
+                                    hpCalc = hpDiv.querySelector('#hp-calc');
+                                }
+                                
+                                if (!currentHP) {
+                                    const hpInput = document.createElement('div');
+                                    hpInput.innerHTML = 'Current HP: <input type="number" id="current-hp" value="35" style="width: 40px;">';
+                                    statsSection.appendChild(hpInput);
+                                    currentHP = hpInput.querySelector('#current-hp');
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Add the event listener if we found the body input
+                    if (bodyInput) {
+                        console.log('Found BODY input for character sheet');
+                        
+                        // Calculate initial HP
+                        const initialBody = parseInt(bodyInput.value) || 5;
+                        const initialHP = 10 + (initialBody * 5);
+                        
+                        // Set initial values
+                        if (hpCalc) hpCalc.textContent = initialHP;
+                        if (currentHP) currentHP.value = initialHP;
+                        
+                        // Add change event listener
+                        bodyInput.addEventListener('change', function() {
+                            const body = parseInt(this.value) || 5;
+                            const hp = 10 + (body * 5);
+                            
+                            if (hpCalc) hpCalc.textContent = hp;
+                            if (currentHP) currentHP.value = hp;
+                        });
+                        
+                        console.log('Character sheet HP calculation fixed');
+                    } else {
+                        console.warn('Could not find BODY input for character sheet');
+                    }
+                } catch (hpError) {
+                    console.error('Error fixing HP calculation in character sheet:', hpError);
                 }
                 
                 // Add save button for character sheet
