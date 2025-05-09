@@ -2651,6 +2651,146 @@
     </script>
     
     <script>
+        // Define local functions for use by event handlers - these will be accessible from the event listeners
+        function clearLayout() {
+            console.log('Running local clearLayout function');
+            
+            // Get all panels and remove them
+            const panels = document.querySelectorAll('.panel, div[role="region"]');
+            
+            if (panels.length > 0) {
+                if (confirm('Are you sure you want to remove all panels?')) {
+                    panels.forEach(panel => panel.remove());
+                    showNotification('All panels removed', 'success');
+                    return true;
+                }
+            } else {
+                showNotification('No panels to clear', 'info');
+            }
+            return false;
+        }
+        
+        function autoOrganizePanels() {
+            console.log('Running local autoOrganizePanels function');
+            
+            // Get all panels
+            const panels = document.querySelectorAll('.panel, div[role="region"]');
+            if (panels.length === 0) {
+                showNotification('No panels to organize', 'info');
+                return;
+            }
+            
+            // Calculate grid dimensions
+            const count = panels.length;
+            const columns = Math.ceil(Math.sqrt(count));
+            const rows = Math.ceil(count / columns);
+            
+            // Get viewport dimensions
+            const toolbar = document.querySelector('.toolbar');
+            const toolbarHeight = toolbar ? toolbar.offsetHeight : 60;
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight - toolbarHeight - 40;
+            
+            // Calculate panel dimensions
+            const panelWidth = Math.floor(viewportWidth / columns) - 20;
+            const panelHeight = Math.floor(viewportHeight / rows) - 20;
+            
+            // Position panels
+            panels.forEach((panel, index) => {
+                const row = Math.floor(index / columns);
+                const col = index % columns;
+                
+                panel.style.left = (col * (panelWidth + 20) + 10) + 'px';
+                panel.style.top = (toolbarHeight + row * (panelHeight + 20) + 10) + 'px';
+                panel.style.width = panelWidth + 'px';
+                panel.style.height = panelHeight + 'px';
+            });
+            
+            showNotification('Panels organized in grid layout', 'success');
+        }
+        
+        function fitPanelsToWindow() {
+            console.log('Running local fitPanelsToWindow function');
+            
+            // Get all panels
+            const panels = document.querySelectorAll('.panel, div[role="region"]');
+            if (panels.length === 0) {
+                showNotification('No panels to fit', 'info');
+                return;
+            }
+            
+            // Get viewport dimensions
+            const toolbar = document.querySelector('.toolbar');
+            const toolbarHeight = toolbar ? toolbar.offsetHeight : 60;
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight - toolbarHeight - 40;
+            
+            // Group panels by type using data-panel attribute
+            const types = {};
+            panels.forEach(panel => {
+                const type = panel.getAttribute('data-panel') || 'unknown';
+                if (!types[type]) types[type] = [];
+                types[type].push(panel);
+            });
+            
+            const typeCount = Object.keys(types).length;
+            let rows, cols;
+            
+            // Calculate grid based on type count
+            if (typeCount <= 2) {
+                rows = 1;
+                cols = typeCount;
+            } else if (typeCount <= 6) {
+                rows = 2;
+                cols = Math.ceil(typeCount / 2);
+            } else {
+                rows = 3;
+                cols = Math.ceil(typeCount / 3);
+            }
+            
+            // Calculate cell dimensions
+            const cellWidth = Math.floor(viewportWidth / cols);
+            const cellHeight = Math.floor(viewportHeight / rows);
+            
+            // Position panels by type
+            let typeIndex = 0;
+            for (const type in types) {
+                const row = Math.floor(typeIndex / cols);
+                const col = typeIndex % cols;
+                const typePanels = types[type];
+                
+                if (typePanels.length === 1) {
+                    // Single panel of this type
+                    const panel = typePanels[0];
+                    panel.style.left = (col * cellWidth + 10) + 'px';
+                    panel.style.top = (toolbarHeight + row * cellHeight + 10) + 'px';
+                    panel.style.width = (cellWidth - 20) + 'px';
+                    panel.style.height = (cellHeight - 20) + 'px';
+                } else {
+                    // Multiple panels of this type
+                    const subCols = Math.ceil(Math.sqrt(typePanels.length));
+                    const subRows = Math.ceil(typePanels.length / subCols);
+                    
+                    const subWidth = cellWidth / subCols;
+                    const subHeight = cellHeight / subRows;
+                    
+                    typePanels.forEach((panel, i) => {
+                        const subRow = Math.floor(i / subCols);
+                        const subCol = i % subCols;
+                        
+                        panel.style.left = (col * cellWidth + subCol * subWidth + 5) + 'px';
+                        panel.style.top = (toolbarHeight + row * cellHeight + subRow * subHeight + 5) + 'px';
+                        panel.style.width = (subWidth - 10) + 'px';
+                        panel.style.height = (subHeight - 10) + 'px';
+                    });
+                }
+                
+                typeIndex++;
+            }
+            
+            showNotification('Panels fitted to window by type', 'success');
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Check if layout module is available
             if (window.CyberpunkGM && window.CyberpunkGM.Layout) {
