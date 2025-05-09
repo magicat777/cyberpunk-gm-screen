@@ -139,8 +139,8 @@
             background-color: var(--theme-header-bg, rgba(20, 20, 35, 0.9));
             color: var(--theme-text, #e0e0e0);
             cursor: move;
+            -webkit-user-select: none; /* Safari compatibility */
             user-select: none;
-            -webkit-user-select: none;
             border-bottom: 1px solid var(--theme-accent, #00ccff);
         }
         
@@ -1679,7 +1679,9 @@
     
     <!-- Load layout-save-improved.js for layout functionality -->
     <script src="js/layout-save-improved.js"></script>
-
+    
+    <!-- Define global layout functions -->
+    <script>
         /**
          * Global layout functions for accessibility and compatibility
          * These functions are defined in the global scope for direct access
