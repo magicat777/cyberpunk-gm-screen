@@ -7,11 +7,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="An accessible GM screen for Cyberpunk RED tabletop RPG with responsive design and keyboard navigation">
     
+    <!-- Fix for notes panel save/load functionality -->
+    <script>
+        // Define consistent storage keys
+        window.CYBERPUNK_STORAGE_KEYS = {
+            notesContent: 'cyberpunk-notes-content',
+            notesBackup: 'cyberpunk-notes-backup',
+            layoutAutoSave: 'cyberpunk-layout-autosave',
+            layoutDefault: 'cyberpunk-layout-default'
+        };
+        
+        // Helper function to safely interact with localStorage
+        window.safeStorage = {
+            get: function(key, defaultValue = null) {
+                try {
+                    const item = localStorage.getItem(key);
+                    return item !== null ? JSON.parse(item) : defaultValue;
+                } catch (error) {
+                    console.error(`Error retrieving ${key} from localStorage:`, error);
+                    return defaultValue;
+                }
+            },
+            
+            set: function(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                    return true;
+                } catch (error) {
+                    console.error(`Error saving ${key} to localStorage:`, error);
+                    return false;
+                }
+            },
+            
+            // Special methods for HTML content that shouldn't be JSON-stringified
+            getHTML: function(key, defaultValue = '') {
+                try {
+                    const item = localStorage.getItem(key);
+                    return item !== null ? item : defaultValue;
+                } catch (error) {
+                    console.error(`Error retrieving HTML from ${key}:`, error);
+                    return defaultValue;
+                }
+            },
+            
+            setHTML: function(key, htmlContent) {
+                try {
+                    localStorage.setItem(key, htmlContent);
+                    return true;
+                } catch (error) {
+                    console.error(`Error saving HTML to ${key}:`, error);
+                    return false;
+                }
+            },
+            
+            remove: function(key) {
+                try {
+                    localStorage.removeItem(key);
+                    return true;
+                } catch (error) {
+                    console.error(`Error removing ${key} from localStorage:`, error);
+                    return false;
+                }
+            }
+        };
+    </script>
+    
     <!-- Ensure panel functions are always available -->
     <script>
         // Pre-define key functions to ensure they're available
         window.createNotesPanel = window.createNotesPanel || function() {
-            console.log('Using proper createNotesPanel fallback');
+            // Creating notes panel with fallback
             
             // Get createPanel function from window if available
             const createPanelFunc = typeof window.createPanel === 'function' ? 
@@ -110,8 +175,10 @@
             const panel = createPanelFunc('Notes (Emergency Fallback)');
             const content = panel.querySelector('.panel-content');
             
-            // Storage key for saving notes content
-            const storageKey = 'cyberpunk-emergency-notes-' + Date.now();
+            // Storage key for saving notes content - use consistent key from CYBERPUNK_STORAGE_KEYS
+            const storageKey = window.CYBERPUNK_STORAGE_KEYS ? 
+                window.CYBERPUNK_STORAGE_KEYS.notesContent : 
+                'cyberpunk-notes-content';
             
             // Add a simple rich text editor with more formatting options
             content.innerHTML = `
@@ -182,14 +249,28 @@
             });
             
             content.querySelector('#btn-save').addEventListener('click', function() {
-                try {
-                    localStorage.setItem(storageKey, editor.innerHTML);
-                    statusEl.textContent = 'Saved!';
-                    setTimeout(() => { statusEl.textContent = 'Ready'; }, 2000);
-                } catch (err) {
-                    statusEl.textContent = 'Error saving';
-                    console.error('Error saving notes:', err);
+                // Use safeStorage if available, with fallback
+                if (window.safeStorage && typeof window.safeStorage.setHTML === 'function') {
+                    const success = window.safeStorage.setHTML(storageKey, editor.innerHTML);
+                    
+                    // Also save to backup key
+                    if (success && window.CYBERPUNK_STORAGE_KEYS) {
+                        window.safeStorage.setHTML(window.CYBERPUNK_STORAGE_KEYS.notesBackup, editor.innerHTML);
+                    }
+                    
+                    statusEl.textContent = success ? 'Saved!' : 'Error saving';
+                    if (!success) console.error('Error saving notes with safeStorage');
+                } else {
+                    try {
+                        localStorage.setItem(storageKey, editor.innerHTML);
+                        statusEl.textContent = 'Saved!';
+                    } catch (err) {
+                        statusEl.textContent = 'Error saving';
+                        console.error('Error saving notes:', err);
+                    }
                 }
+                
+                setTimeout(() => { statusEl.textContent = 'Ready'; }, 2000);
             });
             
             // Auto-save functionality
@@ -197,25 +278,73 @@
                 statusEl.textContent = 'Typing...';
                 clearTimeout(editor.saveTimeout);
                 editor.saveTimeout = setTimeout(function() {
-                    try {
-                        localStorage.setItem(storageKey, editor.innerHTML);
-                        statusEl.textContent = 'Auto-saved';
-                        setTimeout(() => { statusEl.textContent = 'Ready'; }, 2000);
-                    } catch (err) {
-                        statusEl.textContent = 'Auto-save failed';
-                        console.error('Error auto-saving notes:', err);
+                    // Use safeStorage if available, with fallback
+                    if (window.safeStorage && typeof window.safeStorage.setHTML === 'function') {
+                        const success = window.safeStorage.setHTML(storageKey, editor.innerHTML);
+                        statusEl.textContent = success ? 'Auto-saved' : 'Auto-save failed';
+                        if (!success) console.error('Error auto-saving notes with safeStorage');
+                    } else {
+                        try {
+                            localStorage.setItem(storageKey, editor.innerHTML);
+                            statusEl.textContent = 'Auto-saved';
+                        } catch (err) {
+                            statusEl.textContent = 'Auto-save failed';
+                            console.error('Error auto-saving notes:', err);
+                        }
                     }
+                    
+                    setTimeout(() => { statusEl.textContent = 'Ready'; }, 2000);
                 }, 3000);
             });
             
-            // Load any previously saved content
-            try {
-                const savedContent = localStorage.getItem(storageKey);
+            // Load any previously saved content with improved error handling and fallbacks
+            let savedContent = null;
+            let loadSuccess = false;
+            
+            // First try using safeStorage
+            if (window.safeStorage && typeof window.safeStorage.getHTML === 'function') {
+                savedContent = window.safeStorage.getHTML(storageKey);
                 if (savedContent) {
-                    editor.innerHTML = savedContent;
+                    loadSuccess = true;
+                } else if (window.CYBERPUNK_STORAGE_KEYS) {
+                    // Try backup key
+                    savedContent = window.safeStorage.getHTML(window.CYBERPUNK_STORAGE_KEYS.notesBackup);
+                    if (savedContent) loadSuccess = true;
                 }
-            } catch (err) {
-                console.error('Error loading saved notes:', err);
+            }
+            
+            // Fall back to direct localStorage if needed
+            if (!loadSuccess) {
+                try {
+                    savedContent = localStorage.getItem(storageKey);
+                    if (savedContent) {
+                        loadSuccess = true;
+                    } else {
+                        // Try legacy keys as fallback
+                        const legacyKeys = [
+                            'cyberpunk-emergency-notes',
+                            'cyberpunk-notes-content',
+                            'cyberpunk-notes-backup'
+                        ];
+                        
+                        for (const key of legacyKeys) {
+                            savedContent = localStorage.getItem(key);
+                            if (savedContent) {
+                                console.log(`Found notes in legacy storage key: ${key}`);
+                                loadSuccess = true;
+                                break;
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error loading saved notes:', err);
+                }
+            }
+            
+            // Apply content if found
+            if (loadSuccess && savedContent) {
+                editor.innerHTML = savedContent;
+                console.log('Successfully loaded saved notes content');
             }
             
             // Focus the editor
@@ -1914,7 +2043,7 @@
 </head>
 <body class="theme-neon-synthwave">
     <!-- Skip to content link -->
-    <a href="#main-content" class="skip-link">Skip to content</a>
+    <a href="#main-content" class="skip-link" tabindex="0">Skip to content</a>
     
     <!-- Toolbar with dropdown menus -->
     <div class="toolbar" role="navigation" aria-label="Main Navigation">

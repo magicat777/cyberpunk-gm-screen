@@ -77,6 +77,27 @@
                 console.warn('CyberpunkGM API missing! Using standalone panel implementation.');
                 showNotification('Panel system running in standalone mode', 'info', 5000);
             }
+            
+            // Define createPanel function if not already defined
+            if (typeof window.createPanel !== 'function') {
+                console.log('Creating and exposing createPanel function');
+                window.createPanel = function(title) {
+                    return window.createAccessiblePanel(title);
+                };
+            }
+            
+            // Define safeCreatePanel helper if not already defined
+            if (typeof window.safeCreatePanel !== 'function') {
+                console.log('Creating and exposing safeCreatePanel function');
+                window.safeCreatePanel = function(factory) {
+                    try {
+                        return factory();
+                    } catch (error) {
+                        console.error('Error in safeCreatePanel:', error);
+                        return null;
+                    }
+                };
+            }
         } catch (error) {
             console.error('Error during initialization:', error);
             showNotification('Error initializing panel system. Some features may not work correctly.', 'error', 8000);
@@ -743,6 +764,9 @@
                     break;
                 case 'calculator':
                     initializeCalculator(contentElement);
+                    break;
+                case 'character':
+                    initializeCharacterSheet(contentElement);
                     break;
                 // Add more cases for other panel types
             }
@@ -3468,63 +3492,951 @@
             console.log('Netrunning panel initialized');
         }
         
+        // Global state and constants for character sheet
+        const CHARACTER_SETTINGS = {
+            storageKeyPrefix: 'cyberpunk-character-'
+        };
+            
         function createCharacterSheetContent() {
+            // Generate a unique ID for this instance
+            const id = `char-${Date.now()}`;
+            
+            // Save ID to window for later access in initialization
+            window._lastCharacterSheetId = id;
+            
+            // Character data state for persistence
+            const characterState = {
+                id: id,
+                name: '',
+                role: 'Solo',
+                imageData: null, // Base64 image data
+                stats: {
+                    int: 5,
+                    ref: 5,
+                    dex: 5,
+                    tech: 5,
+                    cool: 5,
+                    will: 5,
+                    luck: 5,
+                    move: 5,
+                    body: 5,
+                    emp: 5
+                },
+                derived: {
+                    hp: 35,
+                    currentHp: 35,
+                    armor: 11,
+                    humanity: 50
+                },
+                skills: 'Handgun +5, Stealth +3, Athletics +4, Perception +4, Conversation +3, Brawling +2, Education +2, Streetwise +4',
+                weapons: 'Medium Pistol (2d6), Combat Knife (1d6), Heavy Pistol (3d6)',
+                cyberware: 'Cybereye (Infrared), Light Armorjack (SP11), Agent (Pocket AI), Medscanner'
+            };
+            
+            // Try to load from localStorage if available
+            if (typeof localStorage !== 'undefined') {
+                try {
+                    const savedData = localStorage.getItem(`${CHARACTER_SETTINGS.storageKeyPrefix}${id}`);
+                    if (savedData) {
+                        const parsedData = JSON.parse(savedData);
+                        if (parsedData) {
+                            Object.assign(characterState, parsedData);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading saved character data:', e);
+                }
+            }
+            
+            // Save the current state to window for initialization
+            window._characterState = characterState;
+
+            // Create full character sheet HTML
             return `
                 <div class="character-sheet">
                     <div class="character-header">
-                        <input type="text" placeholder="Character Name" class="character-name">
-                        <input type="text" placeholder="Role" class="character-role">
-                    </div>
-                    <div class="character-stats">
-                        <div class="stat-block">
-                            <label>INT</label>
-                            <input type="number" class="stat-input" min="1" max="10" value="5">
-                        </div>
-                        <div class="stat-block">
-                            <label>REF</label>
-                            <input type="number" class="stat-input" min="1" max="10" value="5">
-                        </div>
-                        <div class="stat-block">
-                            <label>DEX</label>
-                            <input type="number" class="stat-input" min="1" max="10" value="5">
-                        </div>
-                        <div class="stat-block">
-                            <label>TECH</label>
-                            <input type="number" class="stat-input" min="1" max="10" value="5">
-                        </div>
-                        <div class="stat-block">
-                            <label>COOL</label>
-                            <input type="number" class="stat-input" min="1" max="10" value="5">
-                        </div>
-                        <div class="stat-block">
-                            <label>WILL</label>
-                            <input type="number" class="stat-input" min="1" max="10" value="5">
-                        </div>
-                        <div class="stat-block">
-                            <label>LUCK</label>
-                            <input type="number" class="stat-input" min="1" max="10" value="5">
-                        </div>
-                        <div class="stat-block">
-                            <label>MOVE</label>
-                            <input type="number" class="stat-input" min="1" max="10" value="5">
-                        </div>
-                        <div class="stat-block">
-                            <label>BODY</label>
-                            <input type="number" class="stat-input" min="1" max="10" value="5">
-                        </div>
-                        <div class="stat-block">
-                            <label>EMP</label>
-                            <input type="number" class="stat-input" min="1" max="10" value="5">
+                        <input type="text" id="${id}-name" placeholder="Character Name" class="character-name" value="${characterState.name}">
+                        <div id="${id}-image-container" class="character-image-container" role="button" tabindex="0" aria-label="Click to upload character image">
+                            ${characterState.imageData ? 
+                                `<img src="${characterState.imageData}" class="character-image" alt="Character Portrait">` : 
+                                `<div class="character-image-placeholder">Click to<br>Upload Image</div>`
+                            }
+                            <input type="file" id="${id}-image-input" class="character-file-input" accept="image/*">
                         </div>
                     </div>
-                    <div class="character-health">
-                        <label>Hit Points:</label>
-                        <input type="number" class="hp-input" min="0" value="25">
-                        <label>Max:</label>
-                        <input type="number" class="maxhp-input" min="1" value="25">
+                    
+                    <div class="character-stats-grid">
+                        <div class="character-stats-section">
+                            <div class="character-section-title">Stats</div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">INT</span>
+                                <input type="number" id="${id}-stat-int" class="character-stat-input" min="1" max="10" value="${characterState.stats.int}">
+                            </div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">REF</span>
+                                <input type="number" id="${id}-stat-ref" class="character-stat-input" min="1" max="10" value="${characterState.stats.ref}">
+                            </div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">DEX</span>
+                                <input type="number" id="${id}-stat-dex" class="character-stat-input" min="1" max="10" value="${characterState.stats.dex}">
+                            </div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">TECH</span>
+                                <input type="number" id="${id}-stat-tech" class="character-stat-input" min="1" max="10" value="${characterState.stats.tech}">
+                            </div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">COOL</span>
+                                <input type="number" id="${id}-stat-cool" class="character-stat-input" min="1" max="10" value="${characterState.stats.cool}">
+                            </div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">WILL</span>
+                                <input type="number" id="${id}-stat-will" class="character-stat-input" min="1" max="10" value="${characterState.stats.will}">
+                            </div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">LUCK</span>
+                                <input type="number" id="${id}-stat-luck" class="character-stat-input" min="1" max="10" value="${characterState.stats.luck}">
+                            </div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">MOVE</span>
+                                <input type="number" id="${id}-stat-move" class="character-stat-input" min="1" max="10" value="${characterState.stats.move}">
+                            </div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">BODY</span>
+                                <input type="number" id="${id}-stat-body" class="character-stat-input" min="1" max="10" value="${characterState.stats.body}">
+                            </div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">EMP</span>
+                                <input type="number" id="${id}-stat-emp" class="character-stat-input" min="1" max="10" value="${characterState.stats.emp}">
+                            </div>
+                        </div>
+                        
+                        <div class="character-derived-section">
+                            <div class="character-section-title">Derived Stats</div>
+                            <div class="character-derived-item">
+                                <span class="character-stat-label">Max HP</span>
+                                <span id="${id}-derived-hp" class="character-stat-value">${characterState.derived.hp}</span>
+                            </div>
+                            <div class="character-derived-item">
+                                <span class="character-stat-label">Humanity</span>
+                                <span id="${id}-derived-humanity" class="character-stat-value">${characterState.derived.humanity}</span>
+                            </div>
+                            
+                            <div class="character-section-title" style="margin-top: 15px;">Current Status</div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">Current HP</span>
+                                <input type="number" id="${id}-current-hp" class="character-stat-input" min="0" value="${characterState.derived.currentHp}">
+                            </div>
+                            <div class="character-stat-item">
+                                <span class="character-stat-label">Armor SP</span>
+                                <input type="number" id="${id}-armor-sp" class="character-stat-input" min="0" value="${characterState.derived.armor}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="character-section-title">Skills</div>
+                    <textarea id="${id}-skills" class="character-textarea" placeholder="Add comma-separated list of skills (e.g. Handgun +5, Stealth +3)">${characterState.skills}</textarea>
+                    
+                    <div class="character-section-title">Weapons</div>
+                    <textarea id="${id}-weapons" class="character-textarea" placeholder="Add comma-separated list of weapons (e.g. Medium Pistol (2d6), Combat Knife (1d6))">${characterState.weapons}</textarea>
+                    
+                    <div class="character-section-title">Cyberware & Gear</div>
+                    <textarea id="${id}-cyberware" class="character-textarea" placeholder="Add comma-separated list of cyberware and gear (e.g. Cybereye (Infrared), Light Armorjack (SP11))">${characterState.cyberware}</textarea>
+                    
+                    <div class="character-actions">
+                        <button id="${id}-apply" class="character-action-button primary">Apply</button>
+                        <button id="${id}-save" class="character-action-button">Save</button>
+                        <button id="${id}-load" class="character-action-button">Load</button>
+                        <button id="${id}-reset" class="character-action-button">Reset</button>
+                        <button id="${id}-print" class="character-action-button">Print</button>
                     </div>
                 </div>
             `;
+        }
+        
+        // Initialize Character Sheet panel functionality
+        function initializeCharacterSheet(contentElement) {
+            // Get the ID from the window variable set during creation
+            const id = window._lastCharacterSheetId;
+            if (!id) {
+                console.error('Character sheet ID not found');
+                return;
+            }
+            
+            // Get the state or create a new one
+            const characterState = window._characterState || {
+                id: id,
+                name: '',
+                role: 'Solo',
+                imageData: null,
+                stats: { int: 5, ref: 5, dex: 5, tech: 5, cool: 5, will: 5, luck: 5, move: 5, body: 5, emp: 5 },
+                derived: { hp: 35, currentHp: 35, armor: 11, humanity: 50 },
+                skills: 'Handgun +5, Stealth +3, Athletics +4, Perception +4, Conversation +3, Brawling +2, Education +2, Streetwise +4',
+                weapons: 'Medium Pistol (2d6), Combat Knife (1d6), Heavy Pistol (3d6)',
+                cyberware: 'Cybereye (Infrared), Light Armorjack (SP11), Agent (Pocket AI), Medscanner'
+            };
+            
+            // Function to calculate derived stats
+            function calculateHP(bodyValue) {
+                return 10 + (bodyValue * 5);
+            }
+            
+            // Create notification function to improve UI feedback
+            function showNotification(message, type = 'info', duration = 3000) {
+                // Create container if it doesn't exist
+                let container = document.querySelector('.character-notifications');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.className = 'character-notifications';
+                    document.body.appendChild(container);
+                }
+                
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `character-notification ${type}`;
+                notification.innerHTML = `
+                    <div class="character-notification-message">${message}</div>
+                    <button class="character-notification-close" aria-label="Close notification">&times;</button>
+                `;
+                
+                // Add close functionality
+                const closeButton = notification.querySelector('.character-notification-close');
+                closeButton.addEventListener('click', function() {
+                    notification.classList.add('exiting');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                });
+                
+                // Add to container
+                container.appendChild(notification);
+                
+                // Auto-remove after duration
+                if (duration > 0) {
+                    setTimeout(() => {
+                        if (document.body.contains(notification)) {
+                            notification.classList.add('exiting');
+                            setTimeout(() => {
+                                if (notification.parentNode) {
+                                    notification.parentNode.removeChild(notification);
+                                }
+                            }, 300);
+                        }
+                    }, duration);
+                }
+            }
+            
+            // Function to gather character data from all inputs
+            function gatherCharacterData() {
+                characterState.name = contentElement.querySelector(`#${id}-name`).value;
+                characterState.stats.int = parseInt(contentElement.querySelector(`#${id}-stat-int`).value) || 5;
+                characterState.stats.ref = parseInt(contentElement.querySelector(`#${id}-stat-ref`).value) || 5;
+                characterState.stats.dex = parseInt(contentElement.querySelector(`#${id}-stat-dex`).value) || 5;
+                characterState.stats.tech = parseInt(contentElement.querySelector(`#${id}-stat-tech`).value) || 5;
+                characterState.stats.cool = parseInt(contentElement.querySelector(`#${id}-stat-cool`).value) || 5;
+                characterState.stats.will = parseInt(contentElement.querySelector(`#${id}-stat-will`).value) || 5;
+                characterState.stats.luck = parseInt(contentElement.querySelector(`#${id}-stat-luck`).value) || 5;
+                characterState.stats.move = parseInt(contentElement.querySelector(`#${id}-stat-move`).value) || 5;
+                characterState.stats.body = parseInt(contentElement.querySelector(`#${id}-stat-body`).value) || 5;
+                characterState.stats.emp = parseInt(contentElement.querySelector(`#${id}-stat-emp`).value) || 5;
+                characterState.derived.currentHp = parseInt(contentElement.querySelector(`#${id}-current-hp`).value) || 35;
+                characterState.derived.armor = parseInt(contentElement.querySelector(`#${id}-armor-sp`).value) || 11;
+                characterState.skills = contentElement.querySelector(`#${id}-skills`).value;
+                characterState.weapons = contentElement.querySelector(`#${id}-weapons`).value;
+                characterState.cyberware = contentElement.querySelector(`#${id}-cyberware`).value;
+                
+                // Recalculate derived stats
+                characterState.derived.hp = calculateHP(characterState.stats.body);
+                
+                return characterState;
+            }
+            
+            // Function to save character to localStorage
+            function saveToLocalStorage() {
+                if (typeof localStorage !== 'undefined') {
+                    const storageKey = `${CHARACTER_SETTINGS.storageKeyPrefix}${id}`;
+                    try {
+                        localStorage.setItem(storageKey, JSON.stringify(characterState));
+                        return true;
+                    } catch (e) {
+                        console.error('Error saving character data:', e);
+                        return false;
+                    }
+                }
+                return false;
+            }
+            
+            // Function to update UI with current state
+            function updateCharacterUI() {
+                // Update name field
+                contentElement.querySelector(`#${id}-name`).value = characterState.name;
+                
+                // Update image
+                const imageContainer = contentElement.querySelector(`#${id}-image-container`);
+                if (characterState.imageData) {
+                    imageContainer.innerHTML = `
+                        <img src="${characterState.imageData}" class="character-image" alt="Character Portrait">
+                        <input type="file" id="${id}-image-input" class="character-file-input" accept="image/*">
+                    `;
+                } else {
+                    imageContainer.innerHTML = `
+                        <div class="character-image-placeholder">Click to<br>Upload Image</div>
+                        <input type="file" id="${id}-image-input" class="character-file-input" accept="image/*">
+                    `;
+                }
+                
+                // Re-add click event
+                setupImageUploadHandler();
+                
+                // Update stat inputs
+                contentElement.querySelector(`#${id}-stat-int`).value = characterState.stats.int;
+                contentElement.querySelector(`#${id}-stat-ref`).value = characterState.stats.ref;
+                contentElement.querySelector(`#${id}-stat-dex`).value = characterState.stats.dex;
+                contentElement.querySelector(`#${id}-stat-tech`).value = characterState.stats.tech;
+                contentElement.querySelector(`#${id}-stat-cool`).value = characterState.stats.cool;
+                contentElement.querySelector(`#${id}-stat-will`).value = characterState.stats.will;
+                contentElement.querySelector(`#${id}-stat-luck`).value = characterState.stats.luck;
+                contentElement.querySelector(`#${id}-stat-move`).value = characterState.stats.move;
+                contentElement.querySelector(`#${id}-stat-body`).value = characterState.stats.body;
+                contentElement.querySelector(`#${id}-stat-emp`).value = characterState.stats.emp;
+                
+                // Update derived stats
+                contentElement.querySelector(`#${id}-derived-hp`).textContent = characterState.derived.hp;
+                contentElement.querySelector(`#${id}-derived-humanity`).textContent = characterState.derived.humanity;
+                contentElement.querySelector(`#${id}-current-hp`).value = characterState.derived.currentHp;
+                contentElement.querySelector(`#${id}-armor-sp`).value = characterState.derived.armor;
+                
+                // Update textareas
+                contentElement.querySelector(`#${id}-skills`).value = characterState.skills;
+                contentElement.querySelector(`#${id}-weapons`).value = characterState.weapons;
+                contentElement.querySelector(`#${id}-cyberware`).value = characterState.cyberware;
+            }
+            
+            // Setup event handlers
+            
+            // Image upload handling
+            function setupImageUploadHandler() {
+                const imageContainer = contentElement.querySelector(`#${id}-image-container`);
+                const imageInput = contentElement.querySelector(`#${id}-image-input`);
+                
+                imageContainer.addEventListener('click', function() {
+                    imageInput.click();
+                });
+                
+                imageInput.addEventListener('change', function(e) {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            const imageData = e.target.result;
+                            
+                            // Update the UI
+                            imageContainer.innerHTML = `
+                                <img src="${imageData}" class="character-image" alt="Character Portrait">
+                                <input type="file" id="${id}-image-input" class="character-file-input" accept="image/*">
+                            `;
+                            
+                            // Re-add the event listener
+                            setupImageUploadHandler();
+                            
+                            // Update the state
+                            characterState.imageData = imageData;
+                        };
+                        
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
+            
+            // Initialize image upload
+            setupImageUploadHandler();
+            
+            // Body stat change handler for HP calculation
+            const bodyInput = contentElement.querySelector(`#${id}-stat-body`);
+            const hpSpan = contentElement.querySelector(`#${id}-derived-hp`);
+            const currentHpInput = contentElement.querySelector(`#${id}-current-hp`);
+            
+            bodyInput.addEventListener('change', function() {
+                const bodyValue = parseInt(this.value) || 5;
+                const newHp = calculateHP(bodyValue);
+                
+                // Update derived HP
+                hpSpan.textContent = newHp;
+                
+                // Also update current HP if it was at max before
+                if (parseInt(currentHpInput.value) === characterState.derived.hp) {
+                    currentHpInput.value = newHp;
+                }
+                
+                // Update state
+                characterState.stats.body = bodyValue;
+                characterState.derived.hp = newHp;
+            });
+            
+            // Apply button handler
+            const applyButton = contentElement.querySelector(`#${id}-apply`);
+            applyButton.addEventListener('click', function() {
+                // Gather all inputs
+                gatherCharacterData();
+                
+                // Save to localStorage if available
+                if (saveToLocalStorage()) {
+                    showNotification('Character data applied and saved locally', 'success');
+                } else {
+                    showNotification('Character data applied (storage unavailable)', 'info');
+                }
+                
+                // Apply a visual feedback effect to the button
+                this.classList.add('character-button-flash');
+                setTimeout(() => {
+                    this.classList.remove('character-button-flash');
+                }, 500);
+            });
+            
+            // Save button handler - exports character data as JSON file
+            const saveButton = contentElement.querySelector(`#${id}-save`);
+            saveButton.addEventListener('click', function() {
+                // First apply changes to ensure latest data
+                gatherCharacterData();
+                saveToLocalStorage();
+                
+                // Add timestamp to metadata
+                const exportData = {
+                    ...characterState,
+                    meta: {
+                        version: '2.0',
+                        exportedAt: new Date().toISOString(),
+                        exportType: 'cyberpunk-character'
+                    }
+                };
+                
+                // Convert to pretty JSON
+                const jsonData = JSON.stringify(exportData, null, 2);
+                
+                // Create blob and download link
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                // Create a meaningful filename with date
+                const dateStr = new Date().toISOString().slice(0, 10);
+                const filename = characterState.name ? 
+                    `${characterState.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${dateStr}.json` : 
+                    `cyberpunk-character_${dateStr}.json`;
+                
+                // Create and trigger download link
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+                
+                showNotification(`Character saved to ${filename}`, 'success');
+                
+                // Apply visual feedback
+                this.classList.add('character-button-flash');
+                setTimeout(() => {
+                    this.classList.remove('character-button-flash');
+                }, 500);
+            });
+            
+            // Load button handler - imports character data from JSON file
+            const loadButton = contentElement.querySelector(`#${id}-load`);
+            loadButton.addEventListener('click', function() {
+                // Create a file input
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = '.json';
+                fileInput.style.display = 'none';
+                
+                fileInput.addEventListener('change', function(e) {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            try {
+                                // Parse the JSON data
+                                const importedData = JSON.parse(e.target.result);
+                                
+                                // Validate basic structure
+                                if (!importedData.stats || !importedData.derived) {
+                                    throw new Error('Invalid character file format');
+                                }
+                                
+                                // Apply imported data to state
+                                characterState.name = importedData.name || '';
+                                characterState.imageData = importedData.imageData;
+                                characterState.stats = {...characterState.stats, ...importedData.stats};
+                                characterState.derived = {...characterState.derived, ...importedData.derived};
+                                characterState.skills = importedData.skills || '';
+                                characterState.weapons = importedData.weapons || '';
+                                characterState.cyberware = importedData.cyberware || '';
+                                
+                                // Update UI with imported data
+                                updateCharacterUI();
+                                
+                                // Also save to local storage
+                                saveToLocalStorage();
+                                
+                                showNotification('Character data loaded successfully', 'success');
+                            } catch (error) {
+                                console.error('Error parsing character file:', error);
+                                showNotification(`Error loading character data: ${error.message}`, 'error');
+                            }
+                        };
+                        
+                        reader.readAsText(this.files[0]);
+                    }
+                });
+                
+                // Trigger the file input
+                document.body.appendChild(fileInput);
+                fileInput.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(fileInput);
+                }, 100);
+            });
+            
+            // Reset button handler
+            const resetButton = contentElement.querySelector(`#${id}-reset`);
+            resetButton.addEventListener('click', function() {
+                if (confirm('Reset all character data to defaults?')) {
+                    // Reset to default state
+                    characterState.name = '';
+                    characterState.imageData = null;
+                    characterState.stats = {
+                        int: 5, ref: 5, dex: 5, tech: 5,
+                        cool: 5, will: 5, luck: 5, move: 5,
+                        body: 5, emp: 5
+                    };
+                    characterState.derived = {
+                        hp: 35,
+                        currentHp: 35,
+                        armor: 11,
+                        humanity: 50
+                    };
+                    characterState.skills = 'Handgun +5, Stealth +3, Athletics +4, Perception +4, Conversation +3, Brawling +2, Education +2, Streetwise +4';
+                    characterState.weapons = 'Medium Pistol (2d6), Combat Knife (1d6), Heavy Pistol (3d6)';
+                    characterState.cyberware = 'Cybereye (Infrared), Light Armorjack (SP11), Agent (Pocket AI), Medscanner';
+                    
+                    // Update UI
+                    updateCharacterUI();
+                    
+                    // Update localStorage
+                    saveToLocalStorage();
+                    
+                    showNotification('Character reset to defaults', 'info');
+                }
+            });
+            
+            // Print button handler with enhanced styling
+            const printButton = contentElement.querySelector(`#${id}-print`);
+            printButton.addEventListener('click', function() {
+                // First apply changes to ensure latest data
+                gatherCharacterData();
+                saveToLocalStorage();
+                
+                // Create a printable version of the character sheet
+                const printWindow = window.open('', '_blank');
+                
+                if (!printWindow) {
+                    showNotification('Pop-up blocked. Please allow pop-ups for this site.', 'error');
+                    return;
+                }
+                
+                // Print-friendly CSS with Cyberpunk styling that still prints well
+                const printCSS = `
+                    @page {
+                        size: letter portrait;
+                        margin: 0.5in;
+                    }
+                    
+                    body {
+                        font-family: 'Segoe UI', Arial, sans-serif;
+                        line-height: 1.5;
+                        margin: 0;
+                        padding: 20px;
+                        color: #111;
+                        background: #fff;
+                        position: relative;
+                    }
+                    
+                    /* For screen preview */
+                    @media screen {
+                        body {
+                            background: #0a0a14;
+                            color: #e0e0e0;
+                        }
+                        
+                        body::before {
+                            content: '';
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background: linear-gradient(135deg, rgba(0, 12, 24, 0.95), rgba(0, 36, 60, 0.9));
+                            z-index: -1;
+                        }
+                        
+                        .print-wrapper {
+                            max-width: 8.5in;
+                            margin: 0 auto;
+                            background: #fff;
+                            color: #111;
+                            padding: 0.5in;
+                            box-shadow: 0 0 30px rgba(0, 255, 196, 0.3);
+                            border-radius: 4px;
+                            position: relative;
+                            overflow: hidden;
+                        }
+                        
+                        .print-wrapper::before {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            height: 4px;
+                            background: linear-gradient(90deg, 
+                                rgba(0, 255, 196, 0), 
+                                rgba(0, 255, 196, 0.8), 
+                                rgba(0, 255, 196, 0));
+                        }
+                    }
+                    
+                    /* Header styles */
+                    .print-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 2px solid #333;
+                        padding-bottom: 15px;
+                        margin-bottom: 20px;
+                        position: relative;
+                    }
+                    
+                    .print-title {
+                        font-size: 28px;
+                        font-weight: bold;
+                        letter-spacing: 1px;
+                        text-transform: uppercase;
+                    }
+                    
+                    .print-character-name {
+                        font-size: 24px;
+                        font-weight: bold;
+                    }
+                    
+                    .print-grid {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 20px;
+                        margin-bottom: 20px;
+                    }
+                    
+                    .print-section {
+                        border: 1px solid #333;
+                        border-radius: 5px;
+                        padding: 15px;
+                        margin-bottom: 20px;
+                        page-break-inside: avoid;
+                    }
+                    
+                    .print-section-title {
+                        font-weight: bold;
+                        font-size: 18px;
+                        margin-bottom: 12px;
+                        border-bottom: 1px solid #333;
+                        padding-bottom: 5px;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                    }
+                    
+                    .print-stat-item {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 8px;
+                        padding: 4px 0;
+                        border-bottom: 1px dotted #ccc;
+                    }
+                    
+                    .print-stat-label {
+                        font-weight: bold;
+                        letter-spacing: 0.5px;
+                    }
+                    
+                    .print-stat-value {
+                        font-family: 'Courier New', monospace;
+                        font-weight: bold;
+                    }
+                    
+                    img.print-character-image {
+                        max-width: 150px;
+                        max-height: 150px;
+                        object-fit: contain;
+                        border: 1px solid #333;
+                        padding: 2px;
+                        background-color: #fff;
+                    }
+                    
+                    .print-skills, .print-weapons, .print-cyberware {
+                        line-height: 1.6;
+                    }
+                    
+                    .print-footer {
+                        margin-top: 30px;
+                        text-align: center;
+                        font-size: 12px;
+                        color: #777;
+                        border-top: 1px solid #ccc;
+                        padding-top: 10px;
+                    }
+                    
+                    .print-logo {
+                        display: block;
+                        margin: 0 auto 10px;
+                        max-width: 100px;
+                        opacity: 0.8;
+                    }
+                    
+                    .print-watermark {
+                        position: absolute;
+                        bottom: 0.5in;
+                        right: 0.5in;
+                        opacity: 0.05;
+                        pointer-events: none;
+                        font-size: 80px;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        transform: rotate(-45deg);
+                    }
+                    
+                    .print-button {
+                        display: inline-block;
+                        margin-top: 20px;
+                        padding: 10px 20px;
+                        background-color: #00ccff;
+                        color: #000;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .print-button:hover {
+                        background-color: #00a3cc;
+                        box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+                    }
+                    
+                    /* Print media specific styles */
+                    @media print {
+                        body {
+                            font-size: 12pt;
+                            background: #fff !important;
+                            color: #000 !important;
+                        }
+                        
+                        .print-wrapper {
+                            box-shadow: none;
+                            padding: 0;
+                            max-width: none;
+                        }
+                        
+                        .no-print, .print-button {
+                            display: none !important;
+                        }
+                        
+                        a {
+                            text-decoration: none;
+                            color: #000;
+                        }
+                        
+                        .print-section {
+                            border: 1px solid #000;
+                            break-inside: avoid;
+                        }
+                        
+                        .print-watermark {
+                            opacity: 0.03;
+                        }
+                    }
+                `;
+                
+                // Generate the content
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Cyberpunk RED Character Sheet - ${characterState.name || 'Unnamed'}</title>
+                        <style>${printCSS}</style>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    </head>
+                    <body>
+                        <div class="print-wrapper">
+                            <div class="print-watermark">CYBERPUNK</div>
+                            
+                            <div class="print-header">
+                                <div class="print-title">CYBERPUNK RED CHARACTER</div>
+                                <div class="print-character-name">${characterState.name || 'Unnamed Character'}</div>
+                            </div>
+                            
+                            <div class="print-grid">
+                                <div class="print-section">
+                                    <div class="print-section-title">Core Statistics</div>
+                                    <div class="print-stat-item">
+                                        <span class="print-stat-label">INTELLIGENCE (INT)</span>
+                                        <span class="print-stat-value">${characterState.stats.int}</span>
+                                    </div>
+                                    <div class="print-stat-item">
+                                        <span class="print-stat-label">REFLEXES (REF)</span>
+                                        <span class="print-stat-value">${characterState.stats.ref}</span>
+                                    </div>
+                                    <div class="print-stat-item">
+                                        <span class="print-stat-label">DEXTERITY (DEX)</span>
+                                        <span class="print-stat-value">${characterState.stats.dex}</span>
+                                    </div>
+                                    <div class="print-stat-item">
+                                        <span class="print-stat-label">TECHNIQUE (TECH)</span>
+                                        <span class="print-stat-value">${characterState.stats.tech}</span>
+                                    </div>
+                                    <div class="print-stat-item">
+                                        <span class="print-stat-label">COOL</span>
+                                        <span class="print-stat-value">${characterState.stats.cool}</span>
+                                    </div>
+                                    <div class="print-stat-item">
+                                        <span class="print-stat-label">WILLPOWER (WILL)</span>
+                                        <span class="print-stat-value">${characterState.stats.will}</span>
+                                    </div>
+                                    <div class="print-stat-item">
+                                        <span class="print-stat-label">LUCK</span>
+                                        <span class="print-stat-value">${characterState.stats.luck}</span>
+                                    </div>
+                                    <div class="print-stat-item">
+                                        <span class="print-stat-label">MOVEMENT (MOVE)</span>
+                                        <span class="print-stat-value">${characterState.stats.move}</span>
+                                    </div>
+                                    <div class="print-stat-item">
+                                        <span class="print-stat-label">BODY</span>
+                                        <span class="print-stat-value">${characterState.stats.body}</span>
+                                    </div>
+                                    <div class="print-stat-item">
+                                        <span class="print-stat-label">EMPATHY (EMP)</span>
+                                        <span class="print-stat-value">${characterState.stats.emp}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="print-section">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                        <div style="flex: 1">
+                                            <div class="print-section-title">Status & Derived</div>
+                                            <div class="print-stat-item">
+                                                <span class="print-stat-label">MAXIMUM HP</span>
+                                                <span class="print-stat-value">${characterState.derived.hp}</span>
+                                            </div>
+                                            <div class="print-stat-item">
+                                                <span class="print-stat-label">CURRENT HP</span>
+                                                <span class="print-stat-value">${characterState.derived.currentHp}</span>
+                                            </div>
+                                            <div class="print-stat-item">
+                                                <span class="print-stat-label">ARMOR SP</span>
+                                                <span class="print-stat-value">${characterState.derived.armor}</span>
+                                            </div>
+                                            <div class="print-stat-item">
+                                                <span class="print-stat-label">HUMANITY</span>
+                                                <span class="print-stat-value">${characterState.derived.humanity}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="flex: 1; text-align: center; padding-left: 15px;">
+                                            ${characterState.imageData ? 
+                                                `<img src="${characterState.imageData}" class="print-character-image" alt="Character Portrait">` : 
+                                                `<div style="border: 1px dashed #777; width: 130px; height: 130px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+                                                    <div style="text-align: center; color: #777; font-style: italic;">No Image</div>
+                                                </div>`
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="print-section">
+                                <div class="print-section-title">Skills</div>
+                                <div class="print-skills">
+                                    ${characterState.skills
+                                        .split(',')
+                                        .map(skill => skill.trim())
+                                        .filter(skill => skill.length > 0)
+                                        .map(skill => `<span style="display: inline-block; margin-right: 15px; padding: 2px 5px;">${skill}</span>`)
+                                        .join('')}
+                                </div>
+                            </div>
+                            
+                            <div class="print-section">
+                                <div class="print-section-title">Weapons & Combat</div>
+                                <div class="print-weapons">
+                                    ${characterState.weapons
+                                        .split(',')
+                                        .map(weapon => weapon.trim())
+                                        .filter(weapon => weapon.length > 0)
+                                        .map(weapon => `<span style="display: inline-block; margin-right: 15px; padding: 2px 5px;">${weapon}</span>`)
+                                        .join('')}
+                                </div>
+                            </div>
+                            
+                            <div class="print-section">
+                                <div class="print-section-title">Cyberware & Gear</div>
+                                <div class="print-cyberware">
+                                    ${characterState.cyberware
+                                        .split(',')
+                                        .map(item => item.trim())
+                                        .filter(item => item.length > 0)
+                                        .map(item => `<span style="display: inline-block; margin-right: 15px; padding: 2px 5px;">${item}</span>`)
+                                        .join('')}
+                                </div>
+                            </div>
+                            
+                            <div class="print-footer">
+                                <div>Generated: ${new Date().toLocaleDateString()} | Cyberpunk RED Character Sheet</div>
+                                <div>© R. Talsorian Games, Inc. | For personal use only.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="no-print" style="margin: 20px 0; text-align: center;">
+                            <button class="print-button" onclick="window.print();return false;">Print as PDF</button>
+                        </div>
+                        
+                        <script>
+                            // Auto-trigger print dialog after a short delay to ensure everything loads
+                            setTimeout(() => {
+                                window.print();
+                            }, 500);
+                        </script>
+                    </body>
+                    </html>
+                `);
+                
+                printWindow.document.close();
+                
+                // Add visual feedback to button
+                this.classList.add('character-button-flash');
+                setTimeout(() => {
+                    this.classList.remove('character-button-flash');
+                }, 500);
+            });
+            
+            console.log('Character sheet panel initialized');
         }
         
         function createNPCGeneratorContent() {

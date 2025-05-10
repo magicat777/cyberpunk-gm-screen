@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk RED GM Screen - Test Harness</title>
+    
+    <!-- CSS Architecture -->
+    <link rel="stylesheet" href="css/cyberpunk-variables.css">
+    <link rel="stylesheet" href="css/cyberpunk-reset.css">
+    <link rel="stylesheet" href="css/cyberpunk-typography.css">
+    <link rel="stylesheet" href="css/cyberpunk-neon-synthwave.css">
+    <link rel="stylesheet" href="css/cyberpunk-tech-noir.css">
+    
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+        }
+        .test-container {
+            margin-bottom: 20px;
+            border: 1px solid #444;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .test-description {
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #666;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #444;
+        }
+        .results {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #222;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #4caf50;
+        }
+        .error {
+            color: #f44336;
+        }
+        .info {
+            color: #2196f3;
+        }
+        .device-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 4px;
+        }
+        iframe {
+            border: none;
+            width: 100%;
+            height: 600px;
+            margin-top: 20px;
+            border-radius: 4px;
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cyberpunk RED GM Screen - Test Harness</h1>
+    
+    <div class="device-info" id="deviceInfo">Loading device info...</div>
+    
+    <div class="test-container">
+        <div class="test-title">Load Implementation</div>
+        <div class="test-description">Load the app-modern-updated.html implementation in an iframe for testing</div>
+        <div class="test-buttons">
+            <button id="loadApp">Load Application</button>
+            <button id="reloadApp">Reload</button>
+            <button id="fullscreenApp">Fullscreen</button>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">Panel Tests</div>
+        <div class="test-description">Tests for panel creation, dragging, and resizing</div>
+        <div class="test-buttons">
+            <button id="createNotes">Create Notes</button>
+            <button id="createDice">Create Dice Roller</button>
+            <button id="createRules">Create Rules</button>
+            <button id="createInitiative">Create Initiative</button>
+            <button id="clearPanels">Clear All Panels</button>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">Layout Tests</div>
+        <div class="test-description">Tests for layout saving, loading, and organization</div>
+        <div class="test-buttons">
+            <button id="saveLayout">Save Layout</button>
+            <button id="loadLayout">Load Layout</button>
+            <button id="resetLayout">Reset Layout</button>
+            <button id="autoOrganize">Auto-Organize</button>
+            <button id="fitToWindow">Fit to Window</button>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">Theme Tests</div>
+        <div class="test-description">Tests for theme switching and font settings</div>
+        <div class="test-buttons">
+            <button id="defaultTheme">Default Theme</button>
+            <button id="neonTheme">Neon Theme</button>
+            <button id="noirTheme">Noir Theme</button>
+            <button id="toggleAnimations">Toggle Animations</button>
+            <button id="showFontSettings">Font Settings</button>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">Accessibility Tests</div>
+        <div class="test-description">Tests for keyboard accessibility and ARIA</div>
+        <div class="test-buttons">
+            <button id="testTabIndex">Test Tab Navigation</button>
+            <button id="testAriaLabels">Check ARIA Labels</button>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">Error Handling Tests</div>
+        <div class="test-description">Tests for error handling capabilities</div>
+        <div class="test-buttons">
+            <button id="testInvalidPanel">Create Invalid Panel</button>
+            <button id="testInvalidLayout">Load Invalid Layout</button>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">Automated Tests</div>
+        <div class="test-description">Run automated test suites</div>
+        <div class="test-buttons">
+            <button id="testPanelCreation">Test Panel Creation</button>
+            <button id="testInteractions">Test Interactions</button>
+            <button id="testStorage">Test Storage</button>
+            <button id="runAllTests">Run All Tests</button>
+        </div>
+    </div>
+    
+    <div class="results" id="testResults">
+        <div class="info">Test results will appear here...</div>
+    </div>
+    
+    <iframe id="appFrame" src="about:blank"></iframe>
+    
+    <script>
+        // Device info detection
+        function updateDeviceInfo() {
+            const info = document.getElementById('deviceInfo');
+            info.innerHTML = `
+                <strong>Browser:</strong> ${navigator.userAgent}<br>
+                <strong>Viewport:</strong> ${window.innerWidth} x ${window.innerHeight}<br>
+                <strong>Touch enabled:</strong> ${('ontouchstart' in window) ? 'Yes' : 'No'}<br>
+                <strong>Device pixel ratio:</strong> ${window.devicePixelRatio}<br>
+                <strong>Local storage available:</strong> ${typeof localStorage !== 'undefined' ? 'Yes' : 'No'}
+            `;
+        }
+        
+        updateDeviceInfo();
+        window.addEventListener('resize', updateDeviceInfo);
+        
+        // Results logging
+        function logResult(message, type = 'info') {
+            const results = document.getElementById('testResults');
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = message;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        // Clear results
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+        }
+        
+        // Frame access
+        function getAppFrame() {
+            return document.getElementById('appFrame').contentWindow;
+        }
+        
+        // Load the application
+        document.getElementById('loadApp').addEventListener('click', function() {
+            const frame = document.getElementById('appFrame');
+            frame.src = 'app-modern-updated.html';
+            logResult('Loading application...', 'info');
+            
+            frame.onload = function() {
+                logResult('Application loaded successfully', 'success');
+            };
+            
+            frame.onerror = function() {
+                logResult('Error loading application', 'error');
+            };
+        });
+        
+        // Reload the application
+        document.getElementById('reloadApp').addEventListener('click', function() {
+            const frame = document.getElementById('appFrame');
+            frame.src = 'app-modern-updated.html';
+            logResult('Reloading application...', 'info');
+        });
+        
+        // Fullscreen
+        document.getElementById('fullscreenApp').addEventListener('click', function() {
+            const frame = document.getElementById('appFrame');
+            if (frame.requestFullscreen) {
+                frame.requestFullscreen();
+            } else if (frame.mozRequestFullScreen) {
+                frame.mozRequestFullScreen();
+            } else if (frame.webkitRequestFullscreen) {
+                frame.webkitRequestFullscreen();
+            } else if (frame.msRequestFullscreen) {
+                frame.msRequestFullscreen();
+            }
+            logResult('Entering fullscreen mode', 'info');
+        });
+        
+        // Panel creation tests
+        document.getElementById('createNotes').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                // Find and click the Notes panel creation link
+                const notesPanelLinks = Array.from(app.document.querySelectorAll('[data-panel="notes"]'));
+                if (notesPanelLinks.length > 0) {
+                    notesPanelLinks[0].click();
+                    logResult('Notes panel created', 'success');
+                } else {
+                    logResult('Could not find Notes panel creation link', 'error');
+                }
+            } catch (error) {
+                logResult(`Error creating Notes panel: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('createDice').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const dicePanelLinks = Array.from(app.document.querySelectorAll('[data-panel="dice"]'));
+                if (dicePanelLinks.length > 0) {
+                    dicePanelLinks[0].click();
+                    logResult('Dice Roller panel created', 'success');
+                } else {
+                    logResult('Could not find Dice Roller panel creation link', 'error');
+                }
+            } catch (error) {
+                logResult(`Error creating Dice Roller panel: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('createRules').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const rulesPanelLinks = Array.from(app.document.querySelectorAll('[data-panel="rules"]'));
+                if (rulesPanelLinks.length > 0) {
+                    rulesPanelLinks[0].click();
+                    logResult('Rules panel created', 'success');
+                } else {
+                    logResult('Could not find Rules panel creation link', 'error');
+                }
+            } catch (error) {
+                logResult(`Error creating Rules panel: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('createInitiative').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const initiativePanelLinks = Array.from(app.document.querySelectorAll('[data-panel="initiative"]'));
+                if (initiativePanelLinks.length > 0) {
+                    initiativePanelLinks[0].click();
+                    logResult('Initiative panel created', 'success');
+                } else {
+                    logResult('Could not find Initiative panel creation link', 'error');
+                }
+            } catch (error) {
+                logResult(`Error creating Initiative panel: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('clearPanels').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const clearLayoutLinks = Array.from(app.document.querySelectorAll('[data-action="clear-layout"]'));
+                if (clearLayoutLinks.length > 0) {
+                    clearLayoutLinks[0].click();
+                    logResult('Clearing all panels', 'info');
+                } else {
+                    logResult('Could not find Clear Layout action', 'error');
+                }
+            } catch (error) {
+                logResult(`Error clearing panels: ${error.message}`, 'error');
+            }
+        });
+        
+        // Layout tests
+        document.getElementById('saveLayout').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const saveLayoutLinks = Array.from(app.document.querySelectorAll('[data-action="save-layout"]'));
+                if (saveLayoutLinks.length > 0) {
+                    saveLayoutLinks[0].click();
+                    logResult('Layout saved', 'success');
+                } else {
+                    logResult('Could not find Save Layout action', 'error');
+                }
+            } catch (error) {
+                logResult(`Error saving layout: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('loadLayout').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const loadLayoutLinks = Array.from(app.document.querySelectorAll('[data-action="load-layout"]'));
+                if (loadLayoutLinks.length > 0) {
+                    loadLayoutLinks[0].click();
+                    logResult('Layout loaded', 'success');
+                } else {
+                    logResult('Could not find Load Layout action', 'error');
+                }
+            } catch (error) {
+                logResult(`Error loading layout: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('resetLayout').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const resetLayoutLinks = Array.from(app.document.querySelectorAll('[data-action="reset-layout"]'));
+                if (resetLayoutLinks.length > 0) {
+                    resetLayoutLinks[0].click();
+                    logResult('Layout reset', 'success');
+                } else {
+                    logResult('Could not find Reset Layout action', 'error');
+                }
+            } catch (error) {
+                logResult(`Error resetting layout: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('autoOrganize').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const autoOrganizeLinks = Array.from(app.document.querySelectorAll('[data-action="auto-organize"]'));
+                if (autoOrganizeLinks.length > 0) {
+                    autoOrganizeLinks[0].click();
+                    logResult('Panels auto-organized', 'success');
+                } else {
+                    logResult('Could not find Auto-Organize action', 'error');
+                }
+            } catch (error) {
+                logResult(`Error auto-organizing panels: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('fitToWindow').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const fitToWindowLinks = Array.from(app.document.querySelectorAll('[data-action="fit-to-window"]'));
+                if (fitToWindowLinks.length > 0) {
+                    fitToWindowLinks[0].click();
+                    logResult('Panels fit to window', 'success');
+                } else {
+                    logResult('Could not find Fit to Window action', 'error');
+                }
+            } catch (error) {
+                logResult(`Error fitting panels to window: ${error.message}`, 'error');
+            }
+        });
+        
+        // Theme tests
+        document.getElementById('defaultTheme').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const defaultThemeBtn = Array.from(app.document.querySelectorAll('.cp-theme-btn')).find(btn => btn.getAttribute('data-theme') === '');
+                if (defaultThemeBtn) {
+                    defaultThemeBtn.click();
+                    logResult('Default theme applied', 'success');
+                } else {
+                    logResult('Could not find Default theme button', 'error');
+                }
+            } catch (error) {
+                logResult(`Error applying Default theme: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('neonTheme').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const neonThemeBtn = Array.from(app.document.querySelectorAll('.cp-theme-btn')).find(btn => btn.getAttribute('data-theme') === 'neon-synthwave');
+                if (neonThemeBtn) {
+                    neonThemeBtn.click();
+                    logResult('Neon theme applied', 'success');
+                } else {
+                    logResult('Could not find Neon theme button', 'error');
+                }
+            } catch (error) {
+                logResult(`Error applying Neon theme: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('noirTheme').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const noirThemeBtn = Array.from(app.document.querySelectorAll('.cp-theme-btn')).find(btn => btn.getAttribute('data-theme') === 'tech-noir');
+                if (noirThemeBtn) {
+                    noirThemeBtn.click();
+                    logResult('Noir theme applied', 'success');
+                } else {
+                    logResult('Could not find Noir theme button', 'error');
+                }
+            } catch (error) {
+                logResult(`Error applying Noir theme: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('toggleAnimations').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const toggleAnimationsLinks = Array.from(app.document.querySelectorAll('[data-action="toggle-animations"]'));
+                if (toggleAnimationsLinks.length > 0) {
+                    toggleAnimationsLinks[0].click();
+                    logResult('Animations toggled', 'success');
+                } else {
+                    logResult('Could not find Toggle Animations action', 'error');
+                }
+            } catch (error) {
+                logResult(`Error toggling animations: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('showFontSettings').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const fontSettingsLinks = Array.from(app.document.querySelectorAll('[data-action="font-settings"]'));
+                if (fontSettingsLinks.length > 0) {
+                    fontSettingsLinks[0].click();
+                    logResult('Font settings shown', 'success');
+                } else {
+                    logResult('Could not find Font Settings action', 'error');
+                }
+            } catch (error) {
+                logResult(`Error showing font settings: ${error.message}`, 'error');
+            }
+        });
+        
+        // Accessibility tests
+        document.getElementById('testTabIndex').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const focusableElements = app.document.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                logResult(`Found ${focusableElements.length} focusable elements`, 'info');
+                
+                // Check if panels can receive focus
+                const panels = app.document.querySelectorAll('.cp-panel');
+                logResult(`Found ${panels.length} panels, ${Array.from(panels).filter(p => p.getAttribute('tabindex') !== '-1').length} are focusable`, 'info');
+                
+                // Check if resize handles can receive focus
+                const resizeHandles = app.document.querySelectorAll('.cp-resize-handle');
+                logResult(`Found ${resizeHandles.length} resize handles, ${Array.from(resizeHandles).filter(h => h.getAttribute('tabindex') !== '-1').length} are focusable`, 'info');
+            } catch (error) {
+                logResult(`Error testing tab navigation: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('testAriaLabels').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                const elementsWithAria = app.document.querySelectorAll('[aria-label], [aria-labelledby], [aria-describedby], [role]');
+                logResult(`Found ${elementsWithAria.length} elements with ARIA attributes`, 'info');
+                
+                // Check dropdown menus
+                const dropdowns = app.document.querySelectorAll('.cp-dropdown-button');
+                let correctDropdowns = 0;
+                dropdowns.forEach(dropdown => {
+                    if (dropdown.hasAttribute('aria-haspopup') && dropdown.hasAttribute('aria-expanded')) {
+                        correctDropdowns++;
+                    }
+                });
+                logResult(`${correctDropdowns} of ${dropdowns.length} dropdowns have correct ARIA attributes`, correctDropdowns === dropdowns.length ? 'success' : 'error');
+                
+                // Check panels
+                const panels = app.document.querySelectorAll('.cp-panel');
+                let correctPanels = 0;
+                panels.forEach(panel => {
+                    if (panel.hasAttribute('aria-labelledby') && panel.getAttribute('role') === 'region') {
+                        correctPanels++;
+                    }
+                });
+                logResult(`${correctPanels} of ${panels.length} panels have correct ARIA attributes`, correctPanels === panels.length ? 'success' : 'error');
+            } catch (error) {
+                logResult(`Error testing ARIA labels: ${error.message}`, 'error');
+            }
+        });
+        
+        // Error handling tests
+        document.getElementById('testInvalidPanel').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                // Try to create a panel type that doesn't exist
+                logResult('Attempting to create an invalid panel type...', 'info');
+                if (app.PanelFactory && app.PanelFactory.create) {
+                    app.PanelFactory.create('invalid-panel-type');
+                    logResult('Invalid panel creation attempt completed', 'info');
+                } else {
+                    // Try direct console execution
+                    app.console.log('Testing invalid panel creation via console');
+                    logResult('PanelFactory not directly accessible, check console in the iframe', 'info');
+                }
+            } catch (error) {
+                logResult(`Error during invalid panel test: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('testInvalidLayout').addEventListener('click', function() {
+            try {
+                const app = getAppFrame();
+                // Set invalid layout data in localStorage
+                app.localStorage.setItem('cp-layout', 'this-is-not-valid-json');
+                logResult('Invalid layout data set in localStorage', 'info');
+                
+                // Try to load it
+                const loadLayoutLinks = Array.from(app.document.querySelectorAll('[data-action="load-layout"]'));
+                if (loadLayoutLinks.length > 0) {
+                    loadLayoutLinks[0].click();
+                    logResult('Load layout with invalid data attempted', 'info');
+                } else {
+                    logResult('Could not find Load Layout action', 'error');
+                }
+            } catch (error) {
+                logResult(`Error testing invalid layout: ${error.message}`, 'error');
+            }
+        });
+        
+        // Automated tests
+        document.getElementById('testPanelCreation').addEventListener('click', function() {
+            clearResults();
+            logResult('Starting automated panel creation tests...', 'info');
+            
+            // Create an array of panel types to test
+            const panelTypes = ['notes', 'dice', 'rules', 'initiative'];
+            let successCount = 0;
+            
+            const app = getAppFrame();
+            
+            // Test each panel type
+            panelTypes.forEach(type => {
+                try {
+                    const panelLinks = Array.from(app.document.querySelectorAll(`[data-panel="${type}"]`));
+                    if (panelLinks.length > 0) {
+                        panelLinks[0].click();
+                        // Check if panel was created
+                        setTimeout(() => {
+                            const panels = app.document.querySelectorAll('.cp-panel');
+                            const lastPanel = panels[panels.length - 1];
+                            if (lastPanel) {
+                                const title = lastPanel.querySelector('.cp-panel-title');
+                                if (title) {
+                                    logResult(`✓ Created ${title.textContent} panel`, 'success');
+                                    successCount++;
+                                }
+                            }
+                        }, 100);
+                    } else {
+                        logResult(`Could not find ${type} panel creation link`, 'error');
+                    }
+                } catch (error) {
+                    logResult(`Error creating ${type} panel: ${error.message}`, 'error');
+                }
+            });
+            
+            // Report final results
+            setTimeout(() => {
+                logResult(`Panel creation test completed: ${successCount}/${panelTypes.length} panels created successfully`, successCount === panelTypes.length ? 'success' : 'error');
+            }, 500);
+        });
+        
+        document.getElementById('testInteractions').addEventListener('click', function() {
+            clearResults();
+            logResult('Starting automated interaction tests...', 'info');
+            
+            const app = getAppFrame();
+            
+            // Test dropdown menu opening
+            try {
+                const dropdownButtons = app.document.querySelectorAll('.cp-dropdown-button');
+                if (dropdownButtons.length > 0) {
+                    dropdownButtons[0].click();
+                    setTimeout(() => {
+                        const dropdownContent = app.document.querySelector('.cp-dropdown-content.active');
+                        if (dropdownContent) {
+                            logResult('✓ Dropdown menu opens correctly', 'success');
+                        } else {
+                            logResult('✗ Dropdown menu did not open', 'error');
+                        }
+                        
+                        // Close the dropdown
+                        app.document.body.click();
+                    }, 100);
+                } else {
+                    logResult('No dropdown buttons found', 'error');
+                }
+            } catch (error) {
+                logResult(`Error testing dropdown: ${error.message}`, 'error');
+            }
+            
+            // Create a test panel for interaction tests
+            try {
+                const notesLinks = Array.from(app.document.querySelectorAll('[data-panel="notes"]'));
+                if (notesLinks.length > 0) {
+                    notesLinks[0].click();
+                    setTimeout(() => {
+                        const panels = app.document.querySelectorAll('.cp-panel');
+                        if (panels.length > 0) {
+                            const testPanel = panels[panels.length - 1];
+                            
+                            // Test panel focus
+                            testPanel.click();
+                            setTimeout(() => {
+                                if (testPanel.classList.contains('active')) {
+                                    logResult('✓ Panel activation works', 'success');
+                                } else {
+                                    logResult('✗ Panel activation failed', 'error');
+                                }
+                                
+                                // Test panel close
+                                const closeButton = testPanel.querySelector('.cp-close-button');
+                                if (closeButton) {
+                                    closeButton.click();
+                                    setTimeout(() => {
+                                        if (!app.document.body.contains(testPanel)) {
+                                            logResult('✓ Panel close works', 'success');
+                                        } else {
+                                            logResult('✗ Panel close failed', 'error');
+                                        }
+                                    }, 100);
+                                } else {
+                                    logResult('Close button not found', 'error');
+                                }
+                            }, 100);
+                        } else {
+                            logResult('No panels created for interaction test', 'error');
+                        }
+                    }, 100);
+                } else {
+                    logResult('Could not find notes panel link', 'error');
+                }
+            } catch (error) {
+                logResult(`Error in panel interaction test: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('testStorage').addEventListener('click', function() {
+            clearResults();
+            logResult('Starting storage tests...', 'info');
+            
+            const app = getAppFrame();
+            
+            // Test localStorage availability
+            try {
+                if (app.localStorage) {
+                    logResult('✓ localStorage is available', 'success');
+                    
+                    // Test settings storage
+                    try {
+                        // Change theme
+                        const neonThemeBtn = Array.from(app.document.querySelectorAll('.cp-theme-btn')).find(btn => btn.getAttribute('data-theme') === 'neon-synthwave');
+                        if (neonThemeBtn) {
+                            neonThemeBtn.click();
+                            setTimeout(() => {
+                                const savedSettings = JSON.parse(app.localStorage.getItem('cp-settings'));
+                                if (savedSettings && savedSettings.theme === 'neon-synthwave') {
+                                    logResult('✓ Theme setting is saved to localStorage', 'success');
+                                } else {
+                                    logResult('✗ Theme setting not saved correctly', 'error');
+                                }
+                                
+                                // Revert to default theme
+                                const defaultThemeBtn = Array.from(app.document.querySelectorAll('.cp-theme-btn')).find(btn => btn.getAttribute('data-theme') === '');
+                                if (defaultThemeBtn) {
+                                    defaultThemeBtn.click();
+                                }
+                            }, 100);
+                        } else {
+                            logResult('Neon theme button not found', 'error');
+                        }
+                    } catch (error) {
+                        logResult(`Error testing theme storage: ${error.message}`, 'error');
+                    }
+                    
+                    // Test layout storage
+                    try {
+                        // Create a simple layout
+                        logResult('Creating test layout...', 'info');
+                        
+                        // Clear existing panels
+                        const clearLayoutLinks = Array.from(app.document.querySelectorAll('[data-action="clear-layout"]'));
+                        if (clearLayoutLinks.length > 0) {
+                            clearLayoutLinks[0].click();
+                            
+                            // Create two panels
+                            setTimeout(() => {
+                                const notesLinks = Array.from(app.document.querySelectorAll('[data-panel="notes"]'));
+                                const diceLinks = Array.from(app.document.querySelectorAll('[data-panel="dice"]'));
+                                
+                                if (notesLinks.length > 0 && diceLinks.length > 0) {
+                                    notesLinks[0].click();
+                                    diceLinks[0].click();
+                                    
+                                    // Save the layout
+                                    setTimeout(() => {
+                                        const saveLayoutLinks = Array.from(app.document.querySelectorAll('[data-action="save-layout"]'));
+                                        if (saveLayoutLinks.length > 0) {
+                                            saveLayoutLinks[0].click();
+                                            
+                                            // Check if layout was saved
+                                            setTimeout(() => {
+                                                const savedLayout = app.localStorage.getItem('cp-layout');
+                                                if (savedLayout) {
+                                                    try {
+                                                        const layoutObj = JSON.parse(savedLayout);
+                                                        if (Array.isArray(layoutObj) && layoutObj.length === 2) {
+                                                            logResult('✓ Layout saved correctly to localStorage', 'success');
+                                                        } else {
+                                                            logResult('✗ Layout not saved with correct structure', 'error');
+                                                        }
+                                                    } catch (error) {
+                                                        logResult(`Error parsing saved layout: ${error.message}`, 'error');
+                                                    }
+                                                } else {
+                                                    logResult('✗ Layout not saved to localStorage', 'error');
+                                                }
+                                            }, 100);
+                                        } else {
+                                            logResult('Save layout button not found', 'error');
+                                        }
+                                    }, 100);
+                                } else {
+                                    logResult('Panel links not found', 'error');
+                                }
+                            }, 100);
+                        } else {
+                            logResult('Clear layout button not found', 'error');
+                        }
+                    } catch (error) {
+                        logResult(`Error testing layout storage: ${error.message}`, 'error');
+                    }
+                } else {
+                    logResult('✗ localStorage is not available', 'error');
+                }
+            } catch (error) {
+                logResult(`Error accessing localStorage: ${error.message}`, 'error');
+            }
+        });
+        
+        document.getElementById('runAllTests').addEventListener('click', function() {
+            clearResults();
+            logResult('Running all automated tests...', 'info');
+            
+            // Create a delay between test sections
+            const runTest = (testFunction, delay) => {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        testFunction.click();
+                        resolve();
+                    }, delay);
+                });
+            };
+            
+            // Run tests in sequence with delays
+            runTest(document.getElementById('testPanelCreation'), 0)
+                .then(() => runTest(document.getElementById('testInteractions'), 1000))
+                .then(() => runTest(document.getElementById('testStorage'), 2000))
+                .then(() => {
+                    setTimeout(() => {
+                        logResult('All automated tests completed', 'success');
+                    }, 3000);
+                });
+        });
+    </script>
+</body>
+</html>
