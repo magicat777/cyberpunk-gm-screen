@@ -531,8 +531,10 @@ body.theme-tech-noir button::after {
 .panel {
     /* Positioning and dimensions */
     position: absolute;
-    width: 400px;
-    height: 300px;
+    width: min(400px, 90vw); /* Responsive width - at most 90% of viewport on small screens */
+    height: min(300px, 70vh); /* Responsive height */
+    max-width: 90vw;
+    max-height: 80vh;
     
     /* Layout */
     display: flex;
@@ -546,7 +548,27 @@ body.theme-tech-noir button::after {
     box-shadow: var(--theme-shadow, 0 0 10px rgba(0, 204, 255, 0.3));
     
     /* Animation */
-    transition: box-shadow 0.3s ease, transform 0.2s ease;
+    transition: box-shadow 0.3s ease, transform 0.2s ease, opacity 0.3s ease;
+    
+    /* Accessibility */
+    scroll-margin: 1rem; /* Ensures better focus scrolling */
+    outline: none; /* Remove default outline, we'll use focus-visible */
+}
+
+/* Panel states during interaction */
+.panel-dragging {
+    opacity: 0.9; /* Subtle transparency during drag */
+    box-shadow: 0 0 15px rgba(0, 204, 255, 0.5); /* Enhanced shadow for visual feedback */
+    transition: none; /* Disable transitions during drag for smoother movement */
+    /* Add subtle transform effect */
+    transform: scale(1.01);
+    z-index: 1000 !important; /* Ensure dragged panel is on top */
+}
+
+.panel-resizing {
+    opacity: 0.95;
+    transition: none; /* Disable transitions during resize for smoother resizing */
+    outline: 1px dashed var(--theme-accent, #00ccff); /* Visual indicator that resize is happening */
 }
 
 .panel:hover {
@@ -564,6 +586,7 @@ body.theme-tech-noir button::after {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: nowrap; /* Prevent wrapping on small screens */
     
     /* Visual */
     background-color: var(--theme-secondary, #1e1e2d);
@@ -577,10 +600,27 @@ body.theme-tech-noir button::after {
     /* Behavior */
     cursor: move;
     user-select: none;
+    touch-action: none; /* Improves touch behavior */
     
     /* Rounded corners matching parent */
     border-top-left-radius: calc(var(--cp-border-radius-md, 4px) - 1px);
     border-top-right-radius: calc(var(--cp-border-radius-md, 4px) - 1px);
+    
+    /* Accessibility */
+    outline-offset: -2px; /* Inside outline for better visibility */
+}
+
+.panel-title {
+    /* Typography */
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0;
+    color: var(--theme-primary, #00ccff);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 70%; /* Ensure room for controls */
 }
 
 .panel-content {
@@ -588,40 +628,107 @@ body.theme-tech-noir button::after {
     padding: var(--cp-spacing-md, 1rem);
     overflow: auto;
     background-color: inherit;
+    
+    /* Smooth scrolling for better UX */
+    scroll-behavior: smooth;
+    
+    /* Better handling of overflow text */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
-.close-button {
+/* Improved form elements within panels */
+.panel-textarea {
+    width: 100%;
+    height: 100%;
+    min-height: 100px;
+    resize: none; /* Panel itself is resizable */
+    
+    /* Typography */
+    font-family: var(--cp-font-family-mono, monospace);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    
+    /* Visual */
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--theme-text, #e0e0e0);
+    border: 1px solid rgba(0, 204, 255, 0.3);
+    border-radius: 4px;
+    padding: 8px;
+    
+    /* Transitions */
+    transition: border-color 0.2s ease;
+}
+
+.panel-textarea:focus {
+    outline: none;
+    border-color: var(--theme-primary, #00ccff);
+    box-shadow: 0 0 5px rgba(0, 204, 255, 0.5);
+}
+
+.panel-textarea::placeholder {
+    color: rgba(224, 224, 224, 0.5);
+}
+
+.panel-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Base button styles for all panel buttons */
+.panel-controls button {
     /* Reset button styles */
     background: none;
-    border: none;
-    outline: none;
+    border: 1px solid transparent; /* For focus state */
     
     /* Visual */
     color: var(--theme-primary, #00ccff);
+    border-radius: 3px;
     
     /* Layout */
     margin: 0;
-    padding: 0 var(--cp-spacing-xs, 0.25rem);
+    padding: 4px;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     
     /* Typography */
     font-weight: bold;
-    font-size: 1.25rem;
+    font-size: 1rem;
     line-height: 1;
     
     /* Behavior */
     cursor: pointer;
-    transition: color 0.2s ease, transform 0.2s ease;
+    transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.panel-controls button:hover {
+    color: var(--theme-accent, #ff5555);
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.panel-controls button:focus-visible {
+    outline: 2px solid var(--theme-accent, #ff5555);
+    outline-offset: 1px;
+}
+
+/* Specific styles for each button type if needed */
+.close-button {
+    font-size: 1.25rem; /* Slightly larger X symbol */
 }
 
 .close-button:hover {
     color: var(--theme-accent, #ff5555);
-    background: none;
-    transform: scale(1.2);
 }
 
-.close-button:focus {
-    outline: 2px solid var(--theme-accent, #ff5555);
-    outline-offset: 2px;
+.panel-save-button:hover, 
+.panel-load-button:hover {
+    color: var(--theme-primary, #00ccff);
+    background-color: rgba(0, 204, 255, 0.2);
 }
 
 /* Theme-specific panel styling for Neon Synthwave */
@@ -629,6 +736,7 @@ body.theme-neon-synthwave .panel {
     background-color: rgba(30, 15, 51, 0.85);
     border: 2px solid var(--accent-magenta, #ff00ff);
     box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    -webkit-backdrop-filter: blur(5px); /* Safari compatibility */
     backdrop-filter: blur(5px);
     border-radius: 6px;
 }
@@ -798,13 +906,40 @@ select {
 /* Resize handle */
 .resize-handle {
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: 16px;
+    height: 16px;
     right: 0;
     bottom: 0;
     cursor: nwse-resize;
     background-color: var(--theme-primary);
     border-bottom-right-radius: var(--cp-border-radius-sm);
+    
+    /* Better touch target */
+    touch-action: none;
+    
+    /* Visual cue for resize functionality */
+    background-image: linear-gradient(
+        135deg, 
+        transparent 0%, 
+        transparent 50%, 
+        var(--theme-panel-border, #00ccff) 50%, 
+        transparent 60%, 
+        transparent 100%
+    );
+    
+    /* Animation */
+    transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+}
+
+.resize-handle:hover {
+    width: 20px;
+    height: 20px;
+    opacity: 0.9;
+}
+
+.resize-handle:focus-visible {
+    outline: 2px solid var(--theme-accent, #ff5555);
+    outline-offset: -2px;
 }
 
 /* Animation toggles */
