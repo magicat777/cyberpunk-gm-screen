@@ -7,7 +7,258 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="An accessible GM screen for Cyberpunk RED tabletop RPG with responsive design and keyboard navigation">
     
+    <!-- Ensure panel functions are always available -->
+    <script>
+        // Pre-define key functions to ensure they're available
+        window.createNotesPanel = window.createNotesPanel || function() {
+            console.log('Using proper createNotesPanel fallback');
+            
+            // Get createPanel function from window if available
+            const createPanelFunc = typeof window.createPanel === 'function' ? 
+                window.createPanel : 
+                function(title) {
+                    // Create a proper panel
+                    const panel = document.createElement('div');
+                    panel.className = 'panel';
+                    panel.style.width = '400px';
+                    panel.style.height = '300px';
+                    panel.style.position = 'absolute';
+                    panel.style.left = '100px';
+                    panel.style.top = '100px';
+                    panel.style.zIndex = '1000';
+                    panel.style.backgroundColor = 'rgba(30, 30, 45, 0.85)';
+                    panel.style.border = '1px solid #00ccff';
+                    panel.style.borderRadius = '4px';
+                    panel.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.3)';
+                    panel.style.overflow = 'hidden';
+                    panel.style.display = 'flex';
+                    panel.style.flexDirection = 'column';
+                    
+                    // Add HTML structure for panel
+                    panel.innerHTML = `
+                        <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; 
+                             padding: 8px; background-color: rgba(10, 10, 20, 0.8); cursor: move; border-bottom: 1px solid #00ccff;">
+                            <div>${title}</div>
+                            <button class="close-button" style="background: none; border: none; color: #e0e0e0; 
+                                    font-size: 18px; cursor: pointer;">&times;</button>
+                        </div>
+                        <div class="panel-content" style="flex: 1; overflow: auto; padding: 10px;"></div>
+                        <div class="resize-handle" style="position: absolute; bottom: 0; right: 0; width: 15px; 
+                             height: 15px; cursor: nwse-resize; background: transparent;"></div>
+                    `;
+                    
+                    // Add panel to document body
+                    document.body.appendChild(panel);
+                    
+                    // Add minimal dragging functionality
+                    const header = panel.querySelector('.panel-header');
+                    header.addEventListener('mousedown', function(e) {
+                        e.preventDefault();
+                        let startX = e.clientX;
+                        let startY = e.clientY;
+                        let startLeft = parseInt(panel.style.left) || 0;
+                        let startTop = parseInt(panel.style.top) || 0;
+                        
+                        function movePanel(e) {
+                            panel.style.left = (startLeft + e.clientX - startX) + 'px';
+                            panel.style.top = (startTop + e.clientY - startY) + 'px';
+                        }
+                        
+                        function stopMoving() {
+                            document.removeEventListener('mousemove', movePanel);
+                            document.removeEventListener('mouseup', stopMoving);
+                        }
+                        
+                        document.addEventListener('mousemove', movePanel);
+                        document.addEventListener('mouseup', stopMoving);
+                    });
+                    
+                    // Add resize functionality
+                    const resizeHandle = panel.querySelector('.resize-handle');
+                    resizeHandle.addEventListener('mousedown', function(e) {
+                        e.preventDefault();
+                        let startX = e.clientX;
+                        let startY = e.clientY;
+                        let startWidth = parseInt(panel.style.width) || 400;
+                        let startHeight = parseInt(panel.style.height) || 300;
+                        
+                        function resizePanel(e) {
+                            panel.style.width = (startWidth + e.clientX - startX) + 'px';
+                            panel.style.height = (startHeight + e.clientY - startY) + 'px';
+                        }
+                        
+                        function stopResizing() {
+                            document.removeEventListener('mousemove', resizePanel);
+                            document.removeEventListener('mouseup', stopResizing);
+                            panel.classList.remove('resizing');
+                        }
+                        
+                        panel.classList.add('resizing');
+                        document.addEventListener('mousemove', resizePanel);
+                        document.addEventListener('mouseup', stopResizing);
+                    });
+                    
+                    // Add close functionality
+                    panel.querySelector('.close-button').addEventListener('click', function() {
+                        panel.remove();
+                    });
+                    
+                    return panel;
+                };
+            
+            // Now create the actual panel
+            const panel = createPanelFunc('Notes (Emergency Fallback)');
+            const content = panel.querySelector('.panel-content');
+            
+            // Storage key for saving notes content
+            const storageKey = 'cyberpunk-emergency-notes-' + Date.now();
+            
+            // Add a simple rich text editor with more formatting options
+            content.innerHTML = `
+                <div style="display: flex; flex-direction: column; height: 100%;">
+                    <div style="padding: 5px; border-bottom: 1px solid rgba(0, 204, 255, 0.3); display: flex; gap: 5px; flex-wrap: wrap;">
+                        <button id="btn-bold" style="padding: 3px; background: rgba(40,40,60,0.9); border: 1px solid #00ccff; color: #e0e0e0;">
+                            <strong>B</strong>
+                        </button>
+                        <button id="btn-italic" style="padding: 3px; background: rgba(40,40,60,0.9); border: 1px solid #00ccff; color: #e0e0e0;">
+                            <em>I</em>
+                        </button>
+                        <button id="btn-underline" style="padding: 3px; background: rgba(40,40,60,0.9); border: 1px solid #00ccff; color: #e0e0e0;">
+                            <u>U</u>
+                        </button>
+                        <button id="btn-h1" style="padding: 3px; background: rgba(40,40,60,0.9); border: 1px solid #00ccff; color: #e0e0e0;">
+                            H1
+                        </button>
+                        <button id="btn-h2" style="padding: 3px; background: rgba(40,40,60,0.9); border: 1px solid #00ccff; color: #e0e0e0;">
+                            H2
+                        </button>
+                        <button id="btn-list" style="padding: 3px; background: rgba(40,40,60,0.9); border: 1px solid #00ccff; color: #e0e0e0;">
+                            • List
+                        </button>
+                        <button id="btn-save" style="padding: 3px; background: rgba(40,40,60,0.9); border: 1px solid #00ccff; color: #e0e0e0;">
+                            Save
+                        </button>
+                    </div>
+                    <div id="editor-content" contenteditable="true" style="flex: 1; padding: 10px; background: rgba(20,20,35,0.8); color: #e0e0e0; 
+                                                        outline: none; overflow-y: auto; min-height: 200px;"></div>
+                    <div style="padding: 3px; text-align: right; font-size: 12px; color: rgba(200, 200, 255, 0.7); border-top: 1px solid rgba(0, 204, 255, 0.2);">
+                        <span id="notes-status">Ready</span>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners to buttons
+            const editor = content.querySelector('#editor-content');
+            const statusEl = content.querySelector('#notes-status');
+            
+            content.querySelector('#btn-bold').addEventListener('click', function() {
+                document.execCommand('bold', false, null);
+                editor.focus();
+            });
+            
+            content.querySelector('#btn-italic').addEventListener('click', function() {
+                document.execCommand('italic', false, null);
+                editor.focus();
+            });
+            
+            content.querySelector('#btn-underline').addEventListener('click', function() {
+                document.execCommand('underline', false, null);
+                editor.focus();
+            });
+            
+            content.querySelector('#btn-h1').addEventListener('click', function() {
+                document.execCommand('formatBlock', false, '<h1>');
+                editor.focus();
+            });
+            
+            content.querySelector('#btn-h2').addEventListener('click', function() {
+                document.execCommand('formatBlock', false, '<h2>');
+                editor.focus();
+            });
+            
+            content.querySelector('#btn-list').addEventListener('click', function() {
+                document.execCommand('insertUnorderedList', false, null);
+                editor.focus();
+            });
+            
+            content.querySelector('#btn-save').addEventListener('click', function() {
+                try {
+                    localStorage.setItem(storageKey, editor.innerHTML);
+                    statusEl.textContent = 'Saved!';
+                    setTimeout(() => { statusEl.textContent = 'Ready'; }, 2000);
+                } catch (err) {
+                    statusEl.textContent = 'Error saving';
+                    console.error('Error saving notes:', err);
+                }
+            });
+            
+            // Auto-save functionality
+            editor.addEventListener('input', function() {
+                statusEl.textContent = 'Typing...';
+                clearTimeout(editor.saveTimeout);
+                editor.saveTimeout = setTimeout(function() {
+                    try {
+                        localStorage.setItem(storageKey, editor.innerHTML);
+                        statusEl.textContent = 'Auto-saved';
+                        setTimeout(() => { statusEl.textContent = 'Ready'; }, 2000);
+                    } catch (err) {
+                        statusEl.textContent = 'Auto-save failed';
+                        console.error('Error auto-saving notes:', err);
+                    }
+                }, 3000);
+            });
+            
+            // Load any previously saved content
+            try {
+                const savedContent = localStorage.getItem(storageKey);
+                if (savedContent) {
+                    editor.innerHTML = savedContent;
+                }
+            } catch (err) {
+                console.error('Error loading saved notes:', err);
+            }
+            
+            // Focus the editor
+            setTimeout(() => editor.focus(), 100);
+            
+            return panel;
+        };
+        
+        // Debug functionality
+        window.debugNotesPanel = window.debugNotesPanel || function() {
+            console.log('Notes Panel Debug Info (emergency fallback):');
+            console.log('- createNotesPanel function exists:', typeof window.createNotesPanel === 'function');
+            console.log('- document.readyState:', document.readyState);
+            return 'Debug info logged to console';
+        };
+    </script>
+    
     <style>
+        /* Font declarations for Display and Cyberpunk fonts */
+        @font-face {
+            font-family: 'Cyberpunk';
+            src: url('fonts/Cyberpunk.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: 'BladeRunner';
+            src: url('fonts/Acquire.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: 'Display';
+            src: url('fonts/VeniteAdoremus.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
         /* Fix for dropdown menus to appear on top of panels */
         /* Ensure toolbar is always on top */
         .toolbar {
@@ -72,6 +323,109 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             animation: cp-notification-fade 0.3s ease-out;
             margin-top: 5px;
+        }
+        
+        /* Rich Text Editor for Notes Panel */
+        .notes-editor-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            font-family: var(--font-content, sans-serif);
+        }
+        .notes-toolbar {
+            background-color: rgba(30, 30, 45, 0.9);
+            border-bottom: 1px solid var(--theme-primary, #00ccff);
+            padding: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .notes-toolbar button {
+            background-color: rgba(40, 40, 60, 0.9);
+            color: var(--theme-text-primary, #e0e0e0);
+            border: 1px solid var(--theme-primary, #00ccff);
+            border-radius: 3px;
+            padding: 3px 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+        .notes-toolbar button:hover {
+            background-color: rgba(60, 60, 80, 0.9);
+        }
+        .notes-toolbar button.active {
+            background-color: rgba(0, 150, 200, 0.5);
+        }
+        .notes-toolbar .separator {
+            width: 1px;
+            height: 20px;
+            background-color: rgba(200, 200, 255, 0.3);
+            margin: 0 5px;
+        }
+        .notes-editor {
+            flex: 1;
+            background-color: rgba(20, 20, 35, 0.8);
+            border: none;
+            color: var(--theme-text-primary, #e0e0e0);
+            resize: none;
+            padding: 10px;
+            font-size: 14px;
+            outline: none;
+            overflow-y: auto;
+            min-height: 200px;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        .notes-editor[contenteditable="true"] {
+            cursor: text;
+        }
+        .notes-footer {
+            padding: 5px;
+            font-size: 12px;
+            color: rgba(200, 200, 255, 0.7);
+            text-align: right;
+            border-top: 1px solid rgba(200, 200, 255, 0.2);
+        }
+        /* Custom styling for formatted text */
+        .notes-editor b, .notes-editor strong {
+            color: var(--theme-primary, #00ccff);
+        }
+        .notes-editor i, .notes-editor em {
+            color: #ffcc00;
+        }
+        .notes-editor u {
+            text-decoration-color: var(--theme-primary, #00ccff);
+        }
+        .notes-editor h1, .notes-editor h2, .notes-editor h3 {
+            color: var(--theme-primary, #00ccff);
+            border-bottom: 1px solid rgba(0, 204, 255, 0.3);
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        .notes-editor h1 { font-size: 1.4em; }
+        .notes-editor h2 { font-size: 1.2em; }
+        .notes-editor h3 { font-size: 1.1em; }
+        .notes-editor code {
+            font-family: monospace;
+            background-color: rgba(30, 30, 45, 0.9);
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #ff5555;
+        }
+        .notes-editor pre {
+            font-family: monospace;
+            background-color: rgba(30, 30, 45, 0.9);
+            padding: 5px;
+            border-radius: 3px;
+            color: #ff5555;
+            white-space: pre-wrap;
+        }
+        .notes-editor a {
+            color: #55aaff;
+            text-decoration: underline;
+        }
+        .notes-editor ol, .notes-editor ul {
+            padding-left: 20px;
         }
         
         .cp-notification-success {
@@ -1634,28 +1988,43 @@
     </div>
     
     <!-- Font controls -->
-    <div class="controls" style="display: none;" role="dialog" aria-labelledby="font-settings-title">
+    <div class="font-settings-panel" role="dialog" aria-labelledby="font-settings-title">
         <div class="font-controls-header">
             <span id="font-settings-title">Font Settings</span>
             <button class="close-button" id="close-font-controls" aria-label="Close font settings">&times;</button>
         </div>
+        
         <div class="font-options">
             <label id="font-size-label" for="font-size-group">Font Size</label>
             <div class="font-buttons" id="font-size-group" role="radiogroup" aria-labelledby="font-size-label">
-                <button class="font-size-btn" id="font-size-small" data-size="12" role="radio" aria-checked="false">Small</button>
+                <button class="font-size-btn" id="font-size-tiny" data-size="10" role="radio" aria-checked="false">Tiny</button>
+                <button class="font-size-btn" id="font-size-small" data-size="14" role="radio" aria-checked="false">Small</button>
                 <button class="font-size-btn active" id="font-size-medium" data-size="16" role="radio" aria-checked="true">Medium</button>
                 <button class="font-size-btn" id="font-size-large" data-size="20" role="radio" aria-checked="false">Large</button>
             </div>
         </div>
+        
         <div class="font-options">
             <label id="font-family-label" for="font-family">Font Family</label>
             <select id="font-family" name="font-family">
-                <option value="var(--font-family-mono)">Monospace</option>
-                <option value="var(--font-family-base)">Sans-serif</option>
-                <option value="var(--font-family-display)">Display</option>
+                <option value="monospace, 'Consolas', 'Courier New'">Monospace</option>
+                <option value="'Segoe UI', 'Roboto', sans-serif">Sans-serif</option>
+                <option value="'Display', 'VeniteAdoremus', serif">Display</option>
+                <option value="'Cyberpunk', 'BladeRunner', sans-serif">Cyberpunk</option>
             </select>
         </div>
-        <button id="apply-font">Apply Font</button>
+        
+        <div class="font-actions">
+            <button id="apply-font" class="action-button primary-button">Apply</button>
+            <button id="save-font" class="action-button">Save</button>
+            <button id="load-font" class="action-button">Load</button>
+            <button id="reset-font" class="action-button">Reset</button>
+        </div>
+        
+        <div class="font-preview">
+            <h3>Preview</h3>
+            <p id="font-preview-text">The quick brown fox jumps over the lazy dog.</p>
+        </div>
     </div>
 
     <!-- Main content area - panels will be dynamically added here -->
@@ -1665,6 +2034,129 @@
 
     <!-- Notification container -->
     <div class="cp-notifications" aria-live="polite"></div>
+    
+    <!-- Debug Tools (hidden in production) -->
+    <div id="debug-tools" style="position: fixed; bottom: 10px; left: 10px; z-index: 9999; background: rgba(0,0,0,0.7); padding: 10px; border: 1px solid #00ccff; border-radius: 4px;" role="region" aria-labelledby="debug-tools-title">
+        <h4 id="debug-tools-title" style="color: #00ccff; margin: 0 0 10px 0; font-size: 14px;">Debug Tools</h4>
+        <div class="debug-buttons">
+            <button id="debug-notes-panel" style="background: #333; color: #fff; border: 1px solid #00ccff; padding: 5px; cursor: pointer; margin-right: 5px;">Debug Notes Panel</button>
+            <button id="create-notes-panel" style="background: #333; color: #fff; border: 1px solid #00ccff; padding: 5px; cursor: pointer; margin-right: 5px;">Create Notes Panel</button>
+            <button id="check-dependencies" style="background: #333; color: #fff; border: 1px solid #00ccff; padding: 5px; cursor: pointer;">Check Dependencies</button>
+        </div>
+        <div id="debug-output" style="margin-top: 10px; color: #fff; font-size: 12px; max-height: 100px; overflow-y: auto;" aria-live="polite"></div>
+    </div>
+    
+    <!-- Debug script for troubleshooting -->
+    <script>
+        // Add event listeners when document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Debug tools initialized');
+            
+            // Debug Notes Panel button
+            document.getElementById('debug-notes-panel').addEventListener('click', function() {
+                try {
+                    // Define a debug function directly in case the one in the JS file isn't available
+                    const debugFunc = function() {
+                        console.log('Notes Panel Debug Info (inline):');
+                        console.log('- createNotesPanel function exists:', typeof window.createNotesPanel === 'function');
+                        console.log('- createPanel function exists:', typeof window.createPanel === 'function');
+                        console.log('- safeCreatePanel function exists:', typeof window.safeCreatePanel === 'function');
+                        console.log('- document.readyState:', document.readyState);
+                        
+                        // Check for HTML element with id="add-notes"
+                        const addNotesLink = document.getElementById('add-notes');
+                        console.log('- add-notes link exists:', !!addNotesLink);
+                        if (addNotesLink) {
+                            console.log('  - add-notes link text:', addNotesLink.textContent);
+                        }
+                        
+                        // Check script loading
+                        const scripts = Array.from(document.querySelectorAll('script'));
+                        console.log('- Loaded scripts:', scripts.map(s => s.src).filter(src => src));
+                        
+                        return 'Debug info logged to console';
+                    };
+                    
+                    // Try window function first, fall back to inline function
+                    const result = (typeof window.debugNotesPanel === 'function') ? 
+                        window.debugNotesPanel() : debugFunc();
+                    
+                    document.getElementById('debug-output').textContent = 'Debug info logged to console';
+                } catch (e) {
+                    document.getElementById('debug-output').textContent = 'Error: ' + e.message;
+                    console.error('Debug error:', e);
+                }
+            });
+            
+            // Create Notes Panel button
+            document.getElementById('create-notes-panel').addEventListener('click', function() {
+                try {
+                    // Create an inline version of createNotesPanel as fallback
+                    const createNotesPanelFallback = function() {
+                        console.log('Creating notes panel with fallback function');
+                        
+                        // Get panel creation functions, checking all possible locations
+                        const createPanelFunc = 
+                            (typeof window.createPanel === 'function') ? window.createPanel : 
+                            (typeof createPanel === 'function') ? createPanel : 
+                            function(title) {
+                                // Super basic fallback
+                                const div = document.createElement('div');
+                                div.className = 'panel';
+                                div.innerHTML = `
+                                    <div class="panel-header">${title}</div>
+                                    <div class="panel-content">
+                                        <textarea style="width: 100%; height: 200px;"></textarea>
+                                    </div>
+                                `;
+                                return div;
+                            };
+                        
+                        // Create the panel
+                        const panel = createPanelFunc('Notes (Manual)');
+                        return panel;
+                    };
+                    
+                    // Try the window function first, fall back to our inline version
+                    const panel = (typeof window.createNotesPanel === 'function') ? 
+                        window.createNotesPanel() : createNotesPanelFallback();
+                    
+                    document.getElementById('main-content').appendChild(panel);
+                    document.getElementById('debug-output').textContent = 'Notes panel created manually';
+                    console.log('Notes panel created manually:', panel);
+                } catch (e) {
+                    document.getElementById('debug-output').textContent = 'Error: ' + e.message;
+                    console.error('Error creating notes panel:', e);
+                }
+            });
+            
+            // Check Dependencies button
+            document.getElementById('check-dependencies').addEventListener('click', function() {
+                const output = document.getElementById('debug-output');
+                output.innerHTML = '';
+                
+                // Check for key functions
+                const functions = ['createPanel', 'safeCreatePanel', 'createNotesPanel'];
+                functions.forEach(func => {
+                    const li = document.createElement('div');
+                    li.textContent = `${func}: ${typeof window[func] === 'function' ? '✓' : '✗'}`;
+                    li.style.color = typeof window[func] === 'function' ? '#5f5' : '#f55';
+                    output.appendChild(li);
+                });
+                
+                // Check for script loading
+                const scripts = ['panel-implementations-fixed.js', 'ui-fix.js', 'app-modern-adapter-fixed.js'];
+                scripts.forEach(script => {
+                    const exists = Array.from(document.querySelectorAll('script')).some(s => 
+                        s.src && s.src.includes(script));
+                    const li = document.createElement('div');
+                    li.textContent = `${script}: ${exists ? '✓' : '✗'}`;
+                    li.style.color = exists ? '#5f5' : '#f55';
+                    output.appendChild(li);
+                });
+            });
+        });
+    </script>
 
     <!-- Only load our standalone adapter - no dependency on app-modern.js -->
     <!-- Initialize CyberpunkGM namespace -->
@@ -1676,6 +2168,21 @@
     
     <!-- Load adapter script first -->
     <script src="js/app-modern-adapter-fixed.js"></script>
+    
+    <!-- Load panel implementations -->
+    <script src="js/panel-implementations-fixed.js"></script>
+    
+    <!-- Load UI fixes and panel menu configuration -->
+    <script src="js/ui-fix.js"></script>
+    
+    <!-- 
+    Notes Panel Feature Implementation:
+    The Notes Panel includes a rich text editor with:
+    - Formatting toolbar (bold, italic, underline, headings, lists)
+    - Keyboard shortcuts (Ctrl+B, Ctrl+I, Ctrl+U, Ctrl+S)
+    - Auto-save functionality
+    - Persistent storage using localStorage
+    -->
     
     <!-- Load layout-save-improved.js for layout functionality -->
     <script src="js/layout-save-improved.js"></script>
@@ -1791,7 +2298,7 @@
                         type = titleElem.textContent.trim().toLowerCase().replace(/\s+/g, '-');
                     }
                     
-                    if (\!panelTypes[type]) {
+                    if (!panelTypes[type]) {
                         panelTypes[type] = [];
                     }
                     panelTypes[type].push(panel);
@@ -2791,6 +3298,437 @@
             showNotification('Panels fitted to window by type', 'success');
         }
 
+        // Font Settings System
+        // Global settings object to store user preferences
+        let userSettings = {
+            fontSize: 16,
+            fontFamily: "monospace, 'Consolas', 'Courier New'",  // Direct font family instead of CSS variable
+            savedFonts: []
+        };
+
+        // Function to toggle font settings panel visibility
+        function toggleFontSettings() {
+            const fontPanel = document.querySelector('.font-settings-panel');
+            if (fontPanel) {
+                console.log('Toggling font settings panel visibility');
+                const isVisible = fontPanel.classList.toggle('active');
+                
+                // If making visible, update the preview
+                if (isVisible) {
+                    console.log('Font settings panel is now visible');
+                    updateFontPreview();
+                } else {
+                    console.log('Font settings panel is now hidden');
+                }
+            } else {
+                console.error('Font settings panel not found with class: font-settings-panel');
+            }
+        }
+
+        // Function to apply font settings to all panels
+        function applyFontSettings() {
+            const previewText = document.getElementById('font-preview-text');
+            
+            console.log('Applying font settings:', userSettings);
+            
+            // Create or update a style element to apply font settings globally to panel content
+            let styleElement = document.getElementById('panel-font-styles');
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                styleElement.id = 'panel-font-styles';
+                document.head.appendChild(styleElement);
+            }
+            
+            // Define a comprehensive CSS rule that targets only content (not headers)
+            const cssRules = `
+                /* Apply font settings to all panel content but not headers */
+                .panel-content, 
+                .panel-content div:not(.panel-header),
+                .panel-content p, 
+                .panel-content span,
+                .panel-content li,
+                .panel-content td,
+                .panel-content th,
+                .panel-content ul,
+                .panel-content ol,
+                .dice-result,
+                .text-content,
+                textarea {
+                    font-family: ${userSettings.fontFamily} !important;
+                    font-size: ${userSettings.fontSize}px !important;
+                }
+                
+                /* Make sure we don't affect panel headers */
+                .panel-header,
+                .panel-header *,
+                .panel-title,
+                .close-button {
+                    font-family: 'Display', 'VeniteAdoremus', serif !important;
+                }
+            `;
+            
+            styleElement.innerHTML = cssRules;
+            console.log('Added CSS rules for font settings:', cssRules);
+            
+            // Also directly apply to panel content elements for immediate feedback
+            // Target only panel content, not headers
+            const panelContents = document.querySelectorAll('.panel-content');
+            console.log('Found panel content elements:', panelContents.length);
+            
+            panelContents.forEach(content => {
+                content.style.fontSize = userSettings.fontSize + 'px';
+                content.style.fontFamily = userSettings.fontFamily;
+                console.log('Applied to panel content:', content);
+            });
+            
+            // Target textareas specifically (for notes panels)
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                textarea.style.fontSize = userSettings.fontSize + 'px';
+                textarea.style.fontFamily = userSettings.fontFamily;
+                console.log('Applied to textarea:', textarea);
+            });
+            
+            // Apply to preview text
+            if (previewText) {
+                previewText.style.fontSize = userSettings.fontSize + 'px';
+                previewText.style.fontFamily = userSettings.fontFamily;
+            }
+            
+            // Add font injector div to force browser to load fonts
+            let fontInjector = document.getElementById('font-injector');
+            if (!fontInjector) {
+                fontInjector = document.createElement('div');
+                fontInjector.id = 'font-injector';
+                fontInjector.style.position = 'absolute';
+                fontInjector.style.left = '-9999px';
+                fontInjector.style.visibility = 'hidden';
+                document.body.appendChild(fontInjector);
+            }
+            
+            // Force font loading by creating samples of each font
+            fontInjector.innerHTML = `
+                <span style="font-family: monospace, 'Consolas', 'Courier New'">Font Mono Test</span>
+                <span style="font-family: 'Segoe UI', 'Roboto', sans-serif">Font Primary Test</span>
+                <span style="font-family: 'Display', 'VeniteAdoremus', serif">Font Display Test</span>
+                <span style="font-family: 'Cyberpunk', 'BladeRunner', sans-serif">Cyberpunk Font Test</span>
+            `;
+            
+            // Save the settings
+            saveSettings();
+            
+            // Show notification
+            showNotification('Font settings applied', 'success');
+        }
+
+        // Function to save current font settings as a preset
+        function saveFontSettings() {
+            try {
+                // Create a new font setting
+                const fontSetting = {
+                    name: `Font Setting ${userSettings.savedFonts ? userSettings.savedFonts.length + 1 : 1}`,
+                    fontSize: userSettings.fontSize,
+                    fontFamily: userSettings.fontFamily,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Initialize the savedFonts array if it doesn't exist
+                if (!userSettings.savedFonts) {
+                    userSettings.savedFonts = [];
+                }
+
+                // Add to saved fonts
+                userSettings.savedFonts.push(fontSetting);
+                
+                console.log('Saving font setting:', fontSetting);
+                console.log('Updated savedFonts:', userSettings.savedFonts);
+                
+                // Save to localStorage
+                saveSettings();
+                
+                showNotification('Font settings saved as preset', 'success');
+            } catch (error) {
+                console.error("Error saving font settings:", error);
+                showNotification('Error saving font settings', 'error');
+            }
+        }
+        
+        // Function to load font settings from saved preset
+        function loadFontSettings() {
+            try {
+                console.log('Loading font settings, current state:', userSettings);
+                
+                // Check if we have any saved font settings
+                if (!userSettings.savedFonts || userSettings.savedFonts.length === 0) {
+                    console.log('No saved font settings found');
+                    showNotification('No saved font settings found', 'info');
+                    return;
+                }
+                
+                // Get the most recent saved setting
+                const savedSetting = userSettings.savedFonts[
+                    userSettings.savedFonts.length - 1
+                ];
+                console.log('Loading saved font setting:', savedSetting);
+                
+                // Apply the saved settings
+                userSettings.fontSize = savedSetting.fontSize;
+                userSettings.fontFamily = savedSetting.fontFamily;
+                console.log('Applied saved settings to userSettings', userSettings);
+                
+                // Update UI to reflect the loaded settings
+                updateFontSettingsUI();
+                
+                // Apply the settings
+                applyFontSettings();
+                
+                showNotification('Font settings loaded from preset', 'success');
+            } catch (error) {
+                console.error("Error loading font settings:", error);
+                showNotification('Error loading font settings', 'error');
+            }
+        }
+        
+        // Function to reset font settings to defaults
+        function resetFontSettings() {
+            if (confirm("Reset font settings to defaults?")) {
+                // Set default values
+                userSettings.fontSize = 16;
+                userSettings.fontFamily = "monospace, 'Consolas', 'Courier New'";  // Direct font family
+                
+                // Update UI
+                updateFontSettingsUI();
+                
+                // Apply settings
+                applyFontSettings();
+                
+                showNotification('Font settings reset to defaults', 'info');
+            }
+        }
+        
+        // Function to update the UI to reflect current font settings
+        function updateFontSettingsUI() {
+            // Update font size buttons
+            document.querySelectorAll('.font-size-btn').forEach(btn => {
+                const size = parseInt(btn.getAttribute('data-size'));
+                const isActive = size === userSettings.fontSize;
+                
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-checked', isActive ? 'true' : 'false');
+            });
+            
+            // Update font family select
+            const fontSelect = document.getElementById('font-family');
+            if (fontSelect) {
+                if (fontSelect.value !== userSettings.fontFamily) {
+                    console.log('Updating font family select to:', userSettings.fontFamily);
+                    // Try to find the option with this value
+                    let found = false;
+                    for (let i = 0; i < fontSelect.options.length; i++) {
+                        if (fontSelect.options[i].value === userSettings.fontFamily) {
+                            fontSelect.selectedIndex = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        console.warn('Could not find font family option with value:', userSettings.fontFamily);
+                        fontSelect.value = userSettings.fontFamily;
+                    }
+                }
+            }
+            
+            // Update preview text
+            updateFontPreview();
+        }
+        
+        // Function to update the font preview
+        function updateFontPreview() {
+            const previewText = document.getElementById('font-preview-text');
+            if (previewText) {
+                console.log('Updating font preview with:', userSettings.fontSize + 'px', userSettings.fontFamily);
+                previewText.style.fontSize = userSettings.fontSize + 'px';
+                previewText.style.fontFamily = userSettings.fontFamily;
+                
+                // Let's be extra certain by setting it with !important
+                previewText.setAttribute('style', 
+                    `font-size: ${userSettings.fontSize}px !important; 
+                     font-family: ${userSettings.fontFamily} !important;`
+                );
+                
+                // Validate what was applied
+                const computedStyle = window.getComputedStyle(previewText);
+                console.log('Computed style after update:', 
+                    computedStyle.getPropertyValue('font-size'),
+                    computedStyle.getPropertyValue('font-family')
+                );
+            } else {
+                console.error('Preview text element not found with ID: font-preview-text');
+            }
+        }
+        
+        // Function to save settings to localStorage
+        function saveSettings() {
+            try {
+                console.log('Saving settings to localStorage:', userSettings);
+                localStorage.setItem('cyberpunk-gm-settings', JSON.stringify(userSettings));
+            } catch (error) {
+                console.error('Error saving settings to localStorage:', error);
+            }
+        }
+        
+        // Function to load settings from localStorage
+        function loadSettings() {
+            try {
+                console.log('Loading settings from localStorage');
+                const saved = localStorage.getItem('cyberpunk-gm-settings');
+                if (saved) {
+                    console.log('Found saved settings:', saved);
+                    const parsed = JSON.parse(saved);
+                    console.log('Parsed settings:', parsed);
+                    
+                    // Merge saved settings with defaults
+                    userSettings = {...userSettings, ...parsed};
+                    console.log('Merged settings:', userSettings);
+                    
+                    // Update UI if font settings panel exists
+                    if (document.querySelector('.font-settings-panel')) {
+                        console.log('Updating font settings UI');
+                        updateFontSettingsUI();
+                    }
+                } else {
+                    console.log('No saved settings found in localStorage');
+                }
+            } catch (error) {
+                console.error('Error loading settings from localStorage:', error);
+            }
+        }
+        
+        // Function to set up font controls event handlers
+        function setupFontControls() {
+            // Show font settings button
+            const showFontSettingsBtn = document.getElementById('show-font-settings');
+            if (showFontSettingsBtn) {
+                showFontSettingsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleFontSettings();
+                });
+            }
+            
+            // Close font settings button
+            const closeFontControlsBtn = document.getElementById('close-font-controls');
+            if (closeFontControlsBtn) {
+                closeFontControlsBtn.addEventListener('click', function() {
+                    toggleFontSettings();
+                });
+            }
+            
+            // Font size buttons
+            document.querySelectorAll('.font-size-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.font-size-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-checked', 'false');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    this.setAttribute('aria-checked', 'true');
+                    
+                    // Update font size setting
+                    userSettings.fontSize = parseInt(this.getAttribute('data-size'));
+                    
+                    // Update preview
+                    updateFontPreview();
+                });
+            });
+            
+            // Font family select - add a direct test
+            console.log('Looking for font-family select element:');
+            console.log('By ID:', document.getElementById('font-family'));
+            console.log('By name:', document.querySelector('select[name="font-family"]'));
+            console.log('By query all selects:', document.querySelectorAll('select'));
+            
+            // Font family select - try all methods to find it
+            const fontFamilySelect = document.getElementById('font-family') || 
+                                 document.querySelector('select[name="font-family"]') ||
+                                 document.querySelector('.font-options select');
+                                 
+            if (fontFamilySelect) {
+                console.log('Found font family select:', fontFamilySelect);
+                
+                // Check initial value
+                console.log('Initial font family select value:', fontFamilySelect.value);
+                
+                // Check options
+                console.log('Font family select options:');
+                Array.from(fontFamilySelect.options).forEach((option, index) => {
+                    console.log(`Option ${index}:`, option.value, option.text);
+                });
+                
+                // Add event listener
+                fontFamilySelect.addEventListener('change', function(e) {
+                    console.log('Font family select changed event:', e);
+                    console.log('New value:', this.value);
+                    console.log('Selected option text:', this.options[this.selectedIndex].text);
+                    
+                    userSettings.fontFamily = this.value;
+                    
+                    // Update preview immediately
+                    updateFontPreview();
+                    
+                    // Apply immediately to see changes
+                    applyFontSettings();
+                });
+                
+                // Also try adding an onchange property
+                fontFamilySelect.onchange = function() {
+                    console.log('Font family onchange triggered with value:', this.value);
+                    userSettings.fontFamily = this.value;
+                    updateFontPreview();
+                    applyFontSettings();
+                };
+            } else {
+                console.error('CRITICAL: Font family select not found with any selector!');
+            }
+            
+            // Apply font button
+            const applyFontBtn = document.getElementById('apply-font');
+            if (applyFontBtn) {
+                applyFontBtn.addEventListener('click', function() {
+                    applyFontSettings();
+                });
+            }
+            
+            // Save font button
+            const saveFontBtn = document.getElementById('save-font');
+            if (saveFontBtn) {
+                saveFontBtn.addEventListener('click', function() {
+                    saveFontSettings();
+                });
+            }
+            
+            // Load font button
+            const loadFontBtn = document.getElementById('load-font');
+            if (loadFontBtn) {
+                loadFontBtn.addEventListener('click', function() {
+                    loadFontSettings();
+                });
+            }
+            
+            // Reset font button
+            const resetFontBtn = document.getElementById('reset-font');
+            if (resetFontBtn) {
+                resetFontBtn.addEventListener('click', function() {
+                    resetFontSettings();
+                });
+            }
+            
+            // Initialize preview with current settings
+            updateFontPreview();
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Check if layout module is available
             if (window.CyberpunkGM && window.CyberpunkGM.Layout) {
@@ -3242,6 +4180,46 @@
             // Initialize accessibility for elements
             initAccessibility();
             
+            // Preload fonts
+            function preloadFonts() {
+                console.log('Preloading fonts...');
+                const fontFamilies = [
+                    "monospace, 'Consolas', 'Courier New'",
+                    "'Segoe UI', 'Roboto', sans-serif",
+                    "'Display', 'VeniteAdoremus', serif",
+                    "'Cyberpunk', 'BladeRunner', sans-serif"
+                ];
+                
+                // Create a temporary div to force font loading
+                const tempDiv = document.createElement('div');
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                tempDiv.style.visibility = 'hidden';
+                
+                // Create spans with each font
+                fontFamilies.forEach(fontFamily => {
+                    const span = document.createElement('span');
+                    span.style.fontFamily = fontFamily;
+                    span.textContent = 'Font Preload Test';
+                    tempDiv.appendChild(span);
+                });
+                
+                document.body.appendChild(tempDiv);
+                
+                // Clean up after a delay to ensure fonts are loaded
+                setTimeout(() => {
+                    document.body.removeChild(tempDiv);
+                    console.log('Font preloading complete');
+                }, 1000);
+            }
+            
+            // Preload fonts before initializing settings
+            preloadFonts();
+            
+            // Initialize font settings
+            loadSettings();
+            setupFontControls();
+            
             // Create a welcome panel
             setTimeout(function() {
                 // Create initial notes panel with instructions
@@ -3279,5 +4257,189 @@
         
         // Function initAccessibility moved to app-modern-adapter-fixed.js
     </script>
+<!-- Debug tools for quick testing -->
+<div id="debug-tools-container-fixed" style="position: fixed; bottom: 20px; right: 20px; background: rgba(30, 30, 45, 0.9); border: 1px solid #00ccff; padding: 10px; z-index: 10000; border-radius: 5px;">
+    <h4 style="margin-top: 0; color: #00ccff;">Emergency Debug Tools</h4>
+    <button id="create-notes-panel-fixed" style="padding: 5px; background: rgba(40,40,60,0.9); border: 1px solid #00ccff; color: #e0e0e0; cursor: pointer; margin-right: 5px;">Create Emergency Notes</button>
+    <button id="check-notes-functions-fixed" style="padding: 5px; background: rgba(40,40,60,0.9); border: 1px solid #00ccff; color: #e0e0e0; cursor: pointer;">Check Functions</button>
+    <div id="debug-output-fixed" style="margin-top: 10px; color: #e0e0e0; max-width: 300px; max-height: 150px; overflow-y: auto;"></div>
+</div>
+
+<script>
+    // Add functionality to emergency debug buttons 
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Setting up emergency debug tools');
+        
+        // Function to log to debug output
+        function logToDebug(message) {
+            const debugOutput = document.getElementById('debug-output-fixed');
+            if (debugOutput) {
+                debugOutput.innerHTML += message + '<br>';
+                debugOutput.scrollTop = debugOutput.scrollHeight;
+            }
+            console.log('[Emergency Debug]', message);
+        }
+        
+        // Check notes panel functions
+        const checkButton = document.getElementById('check-notes-functions-fixed');
+        if (checkButton) {
+            checkButton.addEventListener('click', function() {
+                logToDebug('Checking Panel Functions (Emergency Check):');
+                try {
+                    logToDebug('- window.createNotesPanel exists: ' + (typeof window.createNotesPanel === 'function'));
+                    logToDebug('- window.createPanel exists: ' + (typeof window.createPanel === 'function'));
+                    
+                    // Check for important variables
+                    logToDebug('- Document readyState: ' + document.readyState);
+                    
+                    // Check for CyberpunkGM namespace
+                    logToDebug('- CyberpunkGM exists: ' + (typeof window.CyberpunkGM !== 'undefined'));
+                    if (typeof window.CyberpunkGM !== 'undefined') {
+                        logToDebug('- CyberpunkGM.createPanel exists: ' + (typeof window.CyberpunkGM.createPanel === 'function'));
+                    }
+                    
+                    // Check loaded scripts for debugging
+                    const scripts = document.getElementsByTagName('script');
+                    logToDebug(`- ${scripts.length} scripts loaded`);
+                    for (let i = 0; i < Math.min(scripts.length, 5); i++) {
+                        if (scripts[i].src) {
+                            logToDebug(`  - Script ${i+1}: ${scripts[i].src.split('/').pop()}`);
+                        }
+                    }
+                } catch (err) {
+                    logToDebug('Error checking functions: ' + err.message);
+                }
+            });
+        } else {
+            console.warn('Check button not found');
+        }
+        
+        // Create standalone emergency notes panel
+        const createButton = document.getElementById('create-notes-panel-fixed');
+        if (createButton) {
+            createButton.addEventListener('click', function() {
+                logToDebug('Creating Ultra-Emergency Notes Panel (Zero Dependencies)...');
+                
+                // No try-catch, just step-by-step code with checks
+                // Create a basic panel div
+                var panel = document.createElement('div');
+                var panelId = 'emergency-notes-' + Date.now();
+                panel.id = panelId;
+                
+                // Style the panel
+                panel.style.position = 'absolute';
+                panel.style.zIndex = '9000';
+                panel.style.left = '150px';
+                panel.style.top = '100px';
+                panel.style.width = '400px';
+                panel.style.height = '300px';
+                panel.style.backgroundColor = 'rgba(30, 30, 45, 0.85)';
+                panel.style.border = '2px solid #ff3333'; // Red border to distinguish as emergency
+                panel.style.borderRadius = '4px';
+                panel.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.5)';
+                
+                // Insert the HTML content
+                var htmlContent = '';
+                
+                // Header
+                htmlContent += '<div id="' + panelId + '-header" style="display: flex; justify-content: space-between; align-items: center; background-color: rgba(10, 10, 20, 0.9); color: #e0e0e0; padding: 8px; border-bottom: 1px solid #ff3333; cursor: move;">';
+                htmlContent += '<span style="font-weight: bold;">100% ZERO DEPENDENCY Notes Panel</span>';
+                htmlContent += '<button id="' + panelId + '-close" style="background: none; border: none; color: #e0e0e0; font-size: 18px; cursor: pointer;">&times;</button>';
+                htmlContent += '</div>';
+                
+                // Toolbar
+                htmlContent += '<div style="display: flex; padding: 5px; gap: 5px; border-bottom: 1px solid rgba(255, 51, 51, 0.3); background-color: rgba(20, 20, 30, 0.9);">';
+                htmlContent += '<button id="' + panelId + '-bold" style="padding: 4px 8px; background: rgba(40,40,60,0.9); border: 1px solid #ff3333; color: #e0e0e0;"><strong>B</strong></button>';
+                htmlContent += '<button id="' + panelId + '-italic" style="padding: 4px 8px; background: rgba(40,40,60,0.9); border: 1px solid #ff3333; color: #e0e0e0;"><em>I</em></button>';
+                htmlContent += '<button id="' + panelId + '-underline" style="padding: 4px 8px; background: rgba(40,40,60,0.9); border: 1px solid #ff3333; color: #e0e0e0;"><u>U</u></button>';
+                htmlContent += '</div>';
+                
+                // Editor
+                htmlContent += '<div id="' + panelId + '-editor" style="flex: 1; padding: 10px; height: 225px; background: rgba(20,20,35,0.9); color: #e0e0e0; outline: none; overflow-y: auto;" contenteditable="true"></div>';
+                
+                // Set the HTML content
+                panel.innerHTML = htmlContent;
+                
+                // Add the panel to the document
+                document.body.appendChild(panel);
+                logToDebug('Panel created and added to document');
+                
+                // Get references to the elements we need
+                var closeBtn = document.getElementById(panelId + '-close');
+                var header = document.getElementById(panelId + '-header');
+                var editor = document.getElementById(panelId + '-editor');
+                var boldBtn = document.getElementById(panelId + '-bold');
+                var italicBtn = document.getElementById(panelId + '-italic');
+                var underlineBtn = document.getElementById(panelId + '-underline');
+                
+                // Make it closeable if we have the button
+                if (closeBtn) {
+                    closeBtn.onclick = function() {
+                        panel.parentNode.removeChild(panel);
+                        logToDebug('Panel removed');
+                    };
+                }
+                
+                // Make it draggable if we have the header
+                if (header) {
+                    header.onmousedown = function(e) {
+                        e.preventDefault();
+                        
+                        var startX = e.clientX;
+                        var startY = e.clientY;
+                        var startLeft = parseInt(panel.style.left) || 150;
+                        var startTop = parseInt(panel.style.top) || 100;
+                        
+                        function movePanel(e) {
+                            panel.style.left = (startLeft + e.clientX - startX) + 'px';
+                            panel.style.top = (startTop + e.clientY - startY) + 'px';
+                        }
+                        
+                        function stopMoving() {
+                            document.removeEventListener('mousemove', movePanel);
+                            document.removeEventListener('mouseup', stopMoving);
+                        }
+                        
+                        document.addEventListener('mousemove', movePanel);
+                        document.addEventListener('mouseup', stopMoving);
+                    };
+                }
+                
+                // Add formatting buttons functionality if available
+                if (editor && boldBtn) {
+                    boldBtn.onclick = function() {
+                        document.execCommand('bold', false, null);
+                        if (editor) editor.focus();
+                    };
+                }
+                
+                if (editor && italicBtn) {
+                    italicBtn.onclick = function() {
+                        document.execCommand('italic', false, null);
+                        if (editor) editor.focus();
+                    };
+                }
+                
+                if (editor && underlineBtn) {
+                    underlineBtn.onclick = function() {
+                        document.execCommand('underline', false, null);
+                        if (editor) editor.focus();
+                    };
+                }
+                
+                // Focus the editor
+                if (editor) {
+                    setTimeout(function() {
+                        editor.focus();
+                    }, 100);
+                }
+                
+                logToDebug('Ultra-emergency notes panel ready to use!');
+            });
+        } else {
+            console.warn('Create button not found');
+        }
+    });
+</script>
 </body>
 </html>
