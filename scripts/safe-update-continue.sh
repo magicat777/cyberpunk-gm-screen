@@ -22,6 +22,9 @@ fi
 
 # 2. Copy files to docs
 echo -e "${YELLOW}Copying files from src/frontend to docs...${NC}"
+# Get directory of this script
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPT_DIR/.." # Move to project root
 ./scripts/copy-assets-to-docs.sh
 
 # 3. Show what changed
