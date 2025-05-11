@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cyberpunk RED - Accessibility Test</title>
+    <link rel="stylesheet" href="css/styles-enhanced.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Test page for accessibility improvements to the Cyberpunk RED GM Screen">
+    
+    <style>
+        /* Testing-specific styles */
+        .test-section {
+            padding: 1rem;
+            margin: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        .test-title {
+            color: var(--accent-color);
+            margin-top: 0;
+        }
+        
+        .instruction {
+            background-color: rgba(0, 204, 255, 0.1);
+            padding: 0.5rem;
+            border-left: 3px solid var(--accent-color);
+            margin-bottom: 1rem;
+        }
+        
+        kbd {
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            padding: 2px 5px;
+            font-family: var(--font-family-mono);
+            font-size: 0.9em;
+        }
+    </style>
+    
+    <script src="js/accessibility.js"></script>
+</head>
+<body>
+    <div class="toolbar" role="navigation" aria-label="Main Navigation">
+        <div class="title">Accessibility Test - Cyberpunk RED GM Screen</div>
+        
+        <!-- Skip to content link will be added by JS -->
+    </div>
+    
+    <main id="main-content" role="main">
+        <div class="test-section">
+            <h1 class="test-title">Accessibility Improvements Test</h1>
+            <p>This page demonstrates the accessibility improvements made to the Cyberpunk RED GM Screen.</p>
+            
+            <div class="instruction">
+                Try navigating this page using only your keyboard (using <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd>, <kbd>Enter</kbd>, and arrow keys).
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">1. Accessible Dropdown Menus</h2>
+            <p>These dropdowns can be activated with mouse, touch, or keyboard. They have proper ARIA attributes and keyboard navigation.</p>
+            
+            <div class="instruction">
+                To use with keyboard: Focus the button with <kbd>Tab</kbd>, press <kbd>Enter</kbd> or <kbd>Space</kbd> to open the menu, use <kbd>↑</kbd>/<kbd>↓</kbd> to navigate, <kbd>Enter</kbd> to select, and <kbd>Esc</kbd> to close.
+            </div>
+            
+            <div class="flex-row flex-wrap">
+                <div class="dropdown">
+                    <button class="dropbtn">File Menu</button>
+                    <div class="dropdown-content">
+                        <a href="#new">New</a>
+                        <a href="#open">Open</a>
+                        <a href="#save">Save</a>
+                        <a href="#export">Export</a>
+                    </div>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="dropbtn">Edit Menu</button>
+                    <div class="dropdown-content">
+                        <a href="#cut">Cut</a>
+                        <a href="#copy">Copy</a>
+                        <a href="#paste">Paste</a>
+                        <a href="#undo">Undo</a>
+                    </div>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="dropbtn">View Menu</button>
+                    <div class="dropdown-content">
+                        <div class="menu-category">Layout</div>
+                        <a href="#grid">Grid View</a>
+                        <a href="#list">List View</a>
+                        <div class="menu-category">Zoom</div>
+                        <a href="#zoom-in">Zoom In</a>
+                        <a href="#zoom-out">Zoom Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">2. Focus States for Keyboard Users</h2>
+            <p>All interactive elements now have visible focus indicators.</p>
+            
+            <div class="instruction">
+                Tab through these buttons to see the focus indicators.
+            </div>
+            
+            <div class="flex-row flex-wrap">
+                <button>Standard Button</button>
+                <button>Another Button</button>
+                <button>Third Button</button>
+            </div>
+            
+            <div class="margin-top">
+                <div class="flex-row flex-wrap">
+                    <a href="#" class="button">Link Button</a>
+                    <input type="text" placeholder="Text input">
+                    <select>
+                        <option>Select option</option>
+                        <option>Another option</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">3. Responsive Design Test</h2>
+            <p>Elements now use responsive units and adapt to different screen sizes.</p>
+            
+            <div class="instruction">
+                Resize your browser window to see how elements adapt to different viewport sizes.
+            </div>
+            
+            <div class="panel" style="position: static; width: auto; height: auto; margin-bottom: 1rem;">
+                <header class="panel-header">
+                    <h2 class="panel-title">Responsive Panel</h2>
+                    <div class="panel-controls">
+                        <button class="panel-save-button" title="Save panel to file">💾</button>
+                        <button class="panel-load-button" title="Load panel from file">📂</button>
+                        <button class="close-button" title="Close panel">&times;</button>
+                    </div>
+                </header>
+                <div class="panel-content">
+                    <p>This panel demonstrates the responsive styling. It adapts to different screen sizes and provides better touch targets on mobile devices.</p>
+                    
+                    <textarea class="panel-textarea" placeholder="This textarea has improved styling for better usability"></textarea>
+                </div>
+            </div>
+            
+            <div class="flex-row flex-wrap">
+                <div style="flex: 1; min-width: 200px;">
+                    <h3>Small Screen View</h3>
+                    <p>On mobile devices, elements stack vertically and have larger touch targets.</p>
+                </div>
+                
+                <div style="flex: 1; min-width: 200px;">
+                    <h3>Large Screen View</h3>
+                    <p>On larger screens, elements maintain their horizontal layout.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">4. Motion Preference Support</h2>
+            <p>Animations and transitions now respect the user's prefers-reduced-motion setting.</p>
+            
+            <div class="instruction">
+                You can toggle animations using the button below, or through your operating system's reduced motion setting.
+            </div>
+            
+            <button id="toggle-animations-test">Toggle Animations</button>
+            
+            <div class="margin-top">
+                <div class="panel-content" style="border: 1px solid var(--border-color); border-radius: var(--border-radius-md);">
+                    <p>Elements with animations/transitions:</p>
+                    <ul>
+                        <li>Dropdown menus (slide animation)</li>
+                        <li>Buttons (hover effect)</li>
+                        <li>Panels (dragging and resizing)</li>
+                        <li>Notifications (fade in/out)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">5. Keyboard-accessible Panel Controls</h2>
+            <p>Panel resize handles can now be used with keyboard (demonstration only - not fully functional)</p>
+            
+            <div class="instruction">
+                Tab to the resize handle, press Enter to activate resize mode, then use arrow keys to resize. Press Escape when done.
+            </div>
+            
+            <div class="panel" style="position: relative; width: 300px; height: 200px;">
+                <header class="panel-header">
+                    <h2 class="panel-title">Keyboard Resize Demo</h2>
+                    <div class="panel-controls">
+                        <button class="panel-save-button" title="Save panel to file">💾</button>
+                        <button class="panel-load-button" title="Load panel from file">📂</button>
+                        <button class="close-button" title="Close panel">&times;</button>
+                    </div>
+                </header>
+                <div class="panel-content">
+                    <p>This is a demonstration of keyboard-accessible panel controls.</p>
+                    <p>When you reach the resize handle with Tab, press Enter to activate resize mode.</p>
+                </div>
+                <div class="resize-handle" tabindex="0" role="button" aria-label="Resize panel"></div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2 class="test-title">Notification System Test</h2>
+            <button id="show-notification">Show Test Notification</button>
+        </div>
+    </main>
+    
+    <!-- For demo notifications -->
+    <div class="cp-notifications" aria-live="polite"></div>
+    
+    <script>
+        // Simple notification function for demo
+        function showNotification(message, type = 'info', duration = 3000) {
+            // Create container if it doesn't exist
+            let container = document.querySelector('.cp-notifications');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'cp-notifications';
+                document.body.appendChild(container);
+            }
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `cp-notification cp-notification-${type}`;
+            notification.textContent = message;
+            
+            // Add to container
+            container.appendChild(notification);
+            
+            // Remove after duration
+            setTimeout(() => {
+                notification.classList.add('cp-notification-hiding');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, duration);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize accessibility features
+            initAccessibility();
+            
+            // Toggle animations button
+            const toggleAnimationsBtn = document.getElementById('toggle-animations-test');
+            toggleAnimationsBtn.addEventListener('click', function() {
+                document.body.classList.toggle('no-animations');
+                const state = document.body.classList.contains('no-animations') ? 'disabled' : 'enabled';
+                showNotification(`Animations ${state}`, 'info');
+            });
+            
+            // Test notification button
+            const showNotificationBtn = document.getElementById('show-notification');
+            showNotificationBtn.addEventListener('click', function() {
+                const types = ['info', 'success', 'error'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                const messages = [
+                    'This is a test notification',
+                    'Notification with accessible features',
+                    'Screen readers can read this notification',
+                    'Notifications auto-dismiss after a timeout'
+                ];
+                const message = messages[Math.floor(Math.random() * messages.length)];
+                showNotification(message, type);
+            });
+        });
+    </script>
+</body>
+</html>
