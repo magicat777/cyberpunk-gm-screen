@@ -1,4 +1,4 @@
-#!/bin/bash
+#\!/bin/bash
 # Script to ensure proper workflow from src to docs to GitHub
 
 # Define colors for output

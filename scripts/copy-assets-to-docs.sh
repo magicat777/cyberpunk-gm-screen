@@ -1,4 +1,4 @@
-#!/bin/bash
+#\!/bin/bash
 # Copy frontend assets to docs folder
 mkdir -p docs/{css,js,images,fonts,pages}
 cp -r src/frontend/css/* docs/css/ 2>/dev/null || echo "No CSS files to copy"
