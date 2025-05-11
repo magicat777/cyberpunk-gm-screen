@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Panel Consolidation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #00ccff;
+        }
+        .card {
+            background-color: rgba(30, 30, 45, 0.8);
+            border: 1px solid #00ccff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #00ccff;
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0099cc;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .success {
+            background-color: rgba(0, 128, 0, 0.2);
+            border: 1px solid #00cc66;
+        }
+        .error {
+            background-color: rgba(128, 0, 0, 0.2);
+            border: 1px solid #ff3366;
+        }
+        code {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .log-container {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 3px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Panel Consolidation Test</h1>
+    <p>This page tests the fix for issue CP-009: Duplicate debug tool panels.</p>
+    
+    <div class="card">
+        <h2>Test: Debug Panel Functions</h2>
+        <p>Test that different debug panel creation functions all produce only one panel:</p>
+        <div>
+            <button id="test-debug-panel">Test createDebugPanel()</button>
+            <button id="test-emergency-debug">Test createEmergencyDebugTools()</button>
+            <button id="test-emergency-panel">Test createEmergencyDebugPanel()</button>
+        </div>
+        <div id="function-test-result" class="test-result"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Test: Multiple Debug Panels</h2>
+        <p>Test that multiple calls only create one panel:</p>
+        <div>
+            <button id="test-multiple-panels">Create Multiple Panels</button>
+            <button id="count-panels">Count Debug Panels</button>
+        </div>
+        <div id="multiple-test-result" class="test-result"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Test: Debug Button</h2>
+        <p>Test that the debug button correctly opens a single panel:</p>
+        <div>
+            <button id="test-debug-button">Test Debug Button</button>
+        </div>
+        <div id="button-test-result" class="test-result"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Console Log</h2>
+        <div class="log-container" id="log-output"></div>
+    </div>
+
+    <!-- Include the debug panel scripts -->
+    <script src="js/debug-panel-consolidated.js"></script>
+    <script src="js/debug-init.js"></script>
+    
+    <!-- Test script -->
+    <script>
+        // Console log override to display in the page
+        const originalConsoleLog = console.log;
+        const originalConsoleWarn = console.warn;
+        const originalConsoleError = console.error;
+        
+        function logToPage(message, type = 'log') {
+            // Log to browser console
+            if (type === 'log') originalConsoleLog(message);
+            else if (type === 'warn') originalConsoleWarn(message);
+            else if (type === 'error') originalConsoleError(message);
+            
+            // Create log entry
+            const logOutput = document.getElementById('log-output');
+            const logEntry = document.createElement('div');
+            
+            // Convert objects to strings if needed
+            let formattedMessage = message;
+            if (typeof message === 'object') {
+                try {
+                    formattedMessage = JSON.stringify(message);
+                } catch(e) {
+                    formattedMessage = String(message);
+                }
+            }
+            
+            logEntry.textContent = `[${type.toUpperCase()}] ${formattedMessage}`;
+            
+            // Style based on log type
+            if (type === 'warn') {
+                logEntry.style.color = '#ffcc00';
+            } else if (type === 'error') {
+                logEntry.style.color = '#ff3366';
+            } else {
+                logEntry.style.color = '#00ccff';
+            }
+            
+            // Add to log container and scroll to bottom
+            logOutput.appendChild(logEntry);
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+        
+        // Override console methods
+        console.log = function(message) {
+            logToPage(message, 'log');
+        };
+        
+        console.warn = function(message) {
+            logToPage(message, 'warn');
+        };
+        
+        console.error = function(message) {
+            logToPage(message, 'error');
+        };
+        
+        // Test functions
+        function countDebugPanels() {
+            // Count panels with 'debug' in title or id
+            const allPanels = document.querySelectorAll('.panel');
+            let debugPanels = 0;
+            
+            allPanels.forEach(panel => {
+                const panelId = panel.id || '';
+                const headerText = panel.querySelector('.panel-header') ? 
+                    panel.querySelector('.panel-header').textContent || '' : '';
+                
+                if (panelId.includes('debug') || headerText.includes('Debug') || headerText.includes('Emergency')) {
+                    debugPanels++;
+                }
+            });
+            
+            return debugPanels;
+        }
+        
+        function updateTestResult(elementId, result, message) {
+            const resultElement = document.getElementById(elementId);
+            resultElement.innerHTML = '';
+            resultElement.className = 'test-result ' + (result ? 'success' : 'error');
+            
+            const statusElement = document.createElement('div');
+            statusElement.innerHTML = `<strong>Status:</strong> ${result ? 'PASS' : 'FAIL'}`;
+            resultElement.appendChild(statusElement);
+            
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<strong>Details:</strong> ${message}`;
+            resultElement.appendChild(messageElement);
+        }
+        
+        // Set up event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Test createDebugPanel
+            document.getElementById('test-debug-panel').addEventListener('click', function() {
+                console.log('Testing window.createDebugPanel()...');
+                
+                // First close any open panels
+                document.querySelectorAll('.panel').forEach(panel => panel.remove());
+                
+                if (typeof window.createDebugPanel === 'function') {
+                    window.createDebugPanel();
+                    
+                    // Check after a short delay
+                    setTimeout(() => {
+                        const panelCount = countDebugPanels();
+                        updateTestResult(
+                            'function-test-result', 
+                            panelCount === 1, 
+                            `Found ${panelCount} debug panel(s). Expected: 1.`
+                        );
+                    }, 500);
+                } else {
+                    updateTestResult(
+                        'function-test-result', 
+                        false, 
+                        'window.createDebugPanel is not a function'
+                    );
+                }
+            });
+            
+            // Test createEmergencyDebugTools
+            document.getElementById('test-emergency-debug').addEventListener('click', function() {
+                console.log('Testing window.createEmergencyDebugTools()...');
+                
+                // First close any open panels
+                document.querySelectorAll('.panel').forEach(panel => panel.remove());
+                
+                if (typeof window.createEmergencyDebugTools === 'function') {
+                    window.createEmergencyDebugTools();
+                    
+                    // Check after a short delay
+                    setTimeout(() => {
+                        const panelCount = countDebugPanels();
+                        updateTestResult(
+                            'function-test-result', 
+                            panelCount === 1, 
+                            `Found ${panelCount} debug panel(s). Expected: 1.`
+                        );
+                    }, 500);
+                } else {
+                    updateTestResult(
+                        'function-test-result', 
+                        false, 
+                        'window.createEmergencyDebugTools is not a function'
+                    );
+                }
+            });
+            
+            // Test createEmergencyDebugPanel
+            document.getElementById('test-emergency-panel').addEventListener('click', function() {
+                console.log('Testing window.createEmergencyDebugPanel()...');
+                
+                // First close any open panels
+                document.querySelectorAll('.panel').forEach(panel => panel.remove());
+                
+                if (typeof window.createEmergencyDebugPanel === 'function') {
+                    window.createEmergencyDebugPanel();
+                    
+                    // Check after a short delay
+                    setTimeout(() => {
+                        const panelCount = countDebugPanels();
+                        updateTestResult(
+                            'function-test-result', 
+                            panelCount === 1, 
+                            `Found ${panelCount} debug panel(s). Expected: 1.`
+                        );
+                    }, 500);
+                } else {
+                    updateTestResult(
+                        'function-test-result', 
+                        false, 
+                        'window.createEmergencyDebugPanel is not a function'
+                    );
+                }
+            });
+            
+            // Test multiple panels
+            document.getElementById('test-multiple-panels').addEventListener('click', function() {
+                console.log('Testing multiple debug panel creation...');
+                
+                // First close any open panels
+                document.querySelectorAll('.panel').forEach(panel => panel.remove());
+                
+                // Try to create multiple panels
+                if (typeof window.createDebugPanel === 'function') {
+                    window.createDebugPanel();
+                    window.createDebugPanel();
+                    
+                    if (typeof window.createEmergencyDebugTools === 'function') {
+                        window.createEmergencyDebugTools();
+                    }
+                    
+                    // Check after a short delay
+                    setTimeout(() => {
+                        const panelCount = countDebugPanels();
+                        updateTestResult(
+                            'multiple-test-result', 
+                            panelCount === 1, 
+                            `Found ${panelCount} debug panel(s) after multiple creation attempts. Expected: 1.`
+                        );
+                    }, 500);
+                } else {
+                    updateTestResult(
+                        'multiple-test-result', 
+                        false, 
+                        'window.createDebugPanel is not a function'
+                    );
+                }
+            });
+            
+            // Count panels
+            document.getElementById('count-panels').addEventListener('click', function() {
+                const panelCount = countDebugPanels();
+                updateTestResult(
+                    'multiple-test-result', 
+                    true, 
+                    `Current debug panel count: ${panelCount}`
+                );
+            });
+            
+            // Test debug button
+            document.getElementById('test-debug-button').addEventListener('click', function() {
+                console.log('Testing debug button...');
+                
+                // First close any open panels
+                document.querySelectorAll('.panel').forEach(panel => panel.remove());
+                
+                // Find debug button
+                const debugButton = document.querySelector('#open-debug-panel') || 
+                                   document.querySelector('button[aria-controls="debug-panel"]');
+                
+                if (debugButton) {
+                    console.log('Debug button found, clicking...');
+                    debugButton.click();
+                    
+                    // Check after a short delay
+                    setTimeout(() => {
+                        const panelCount = countDebugPanels();
+                        updateTestResult(
+                            'button-test-result', 
+                            panelCount === 1, 
+                            `Found ${panelCount} debug panel(s) after clicking button. Expected: 1.`
+                        );
+                    }, 500);
+                } else {
+                    updateTestResult(
+                        'button-test-result', 
+                        false, 
+                        'Debug button not found in DOM'
+                    );
+                }
+            });
+        });
+    </script>
+    
+    <!-- Add debug button for testing -->
+    <div id="debug-tools-launcher" style="position: fixed; bottom: 10px; left: 10px; z-index: 9999;">
+        <button id="open-debug-panel" style="background: rgba(0,0,0,0.7); color: #00ccff; border: 1px solid #00ccff; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px;" aria-expanded="false">Debug Tools</button>
+    </div>
+</body>
+</html>
