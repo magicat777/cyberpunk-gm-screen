@@ -1,88 +1,344 @@
 <!DOCTYPE html>
-<html lang=\en\>
+<html lang="en">
 <head>
-    <meta charset=\UTF-8\>
-    <meta name=\viewport\ content=\width=device-width, initial-scale=1.0\>
-    <title>Cyberpunk RED GM Screen - Feedback</title>
-    <link rel=\stylesheet\ href=\../css/styles-modern.css\>
+    <meta charset="UTF-8">
+    <title>Feedback - Cyberpunk RED GM Screen</title>
+    <link rel="stylesheet" href="../css/styles-modern.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Provide feedback or report issues for the Cyberpunk RED GM Screen">
+    <style>
+        .content-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: rgba(30, 30, 45, 0.7);
+            border: 1px solid var(--accent-primary, #00ccff);
+            border-radius: 5px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--accent-primary, #00ccff);
+            text-decoration: none;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        h2 {
+            color: var(--accent-primary, #00ccff);
+            border-bottom: 1px solid rgba(0, 204, 255, 0.3);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+        }
+        
+        .feedback-section {
+            margin-bottom: 2rem;
+        }
+        
+        .feedback-form {
+            margin-top: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent-primary, #00ccff);
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: rgba(20, 20, 35, 0.6);
+            border: 1px solid rgba(0, 204, 255, 0.3);
+            border-radius: 3px;
+            color: #e0e0e0;
+            font-family: var(--font-primary, sans-serif);
+            resize: vertical;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary, #00ccff);
+            box-shadow: 0 0 5px rgba(0, 204, 255, 0.5);
+        }
+        
+        textarea {
+            min-height: 150px;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: rgba(0, 204, 255, 0.2);
+            border: 1px solid var(--accent-primary, #00ccff);
+            color: var(--accent-primary, #00ccff);
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .button:hover {
+            background-color: rgba(0, 204, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+        }
+        
+        .button:active {
+            transform: translateY(1px);
+        }
+        
+        .github-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--accent-primary, #00ccff);
+            text-decoration: none;
+        }
+        
+        .github-link:hover {
+            text-decoration: underline;
+        }
+        
+        .issue-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .issue-type {
+            padding: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 204, 255, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .issue-type:hover {
+            background-color: rgba(0, 204, 255, 0.1);
+            border-color: rgba(0, 204, 255, 0.3);
+        }
+        
+        .issue-type.selected {
+            background-color: rgba(0, 204, 255, 0.2);
+            border-color: var(--accent-primary, #00ccff);
+        }
+        
+        .contact-info {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--accent-primary, #00ccff);
+        }
+    </style>
 </head>
-<body class=\theme-neon-synthwave\>
-    <div class=\toolbar\ role=\navigation\ aria-label=\Main Navigation\>
-        <div class=\title\>Cyberpunk RED GM Screen</div>
-        <a href=\../index.html\ class=\back-button\>Back to Main Screen</a>
-    </div>
-
-    <main id=\main-content\ role=\main\>
-        <div class=\page-container\>
-            <h1>Feedback</h1>
+<body class="theme-neon-synthwave">
+    <header>
+        <div class="toolbar">
+            <h1 class="title">Cyberpunk RED GM Screen</h1>
+        </div>
+    </header>
+    
+    <main id="main-content" role="main">
+        <div class="content-container">
+            <a href="../index.html" class="back-link">« Back to GM Screen</a>
             
-            <section class=\feedback-section\>
-                <h2>We Value Your Input</h2>
-                <p>The Cyberpunk RED GM Screen is constantly evolving based on user feedback. Your suggestions and reports help us improve the application for everyone in the community.</p>
+            <h1>Feedback & Issue Reporting</h1>
+            <p>We value your input! Please use this page to report bugs, suggest improvements, or share your experience with the Cyberpunk RED GM Screen.</p>
+            
+            <div class="feedback-section">
+                <h2>Report an Issue</h2>
+                <p>If you've encountered a bug or technical problem, please provide as much detail as possible to help us reproduce and fix the issue.</p>
                 
-                <div class=\feedback-options\>
-                    <div class=\feedback-card\>
-                        <h3>Bug Reports</h3>
-                        <p>Found something that doesn't work as expected? Let us know so we can fix it!</p>
-                        <p>Please include the following details:</p>
-                        <ul>
-                            <li>Description of the issue</li>
-                            <li>Steps to reproduce the problem</li>
-                            <li>Your browser and device information</li>
-                            <li>Screenshots (if possible)</li>
-                        </ul>
-                        <a href=\https://github.com/magicat777/cyberpunk-gm-screen/issues/new\ class=\button\ target=\_blank\>Submit Bug Report</a>
+                <form class="feedback-form" id="issue-form">
+                    <div class="form-group">
+                        <label for="issue-type">Issue Type:</label>
+                        <div class="issue-types">
+                            <div class="issue-type" data-value="bug">Bug</div>
+                            <div class="issue-type" data-value="crash">Crash/Freeze</div>
+                            <div class="issue-type" data-value="display">Display Problem</div>
+                            <div class="issue-type" data-value="panel">Panel Issue</div>
+                            <div class="issue-type" data-value="layout">Layout Problem</div>
+                            <div class="issue-type" data-value="data">Data Loss</div>
+                            <div class="issue-type" data-value="performance">Performance</div>
+                            <div class="issue-type" data-value="other">Other</div>
+                        </div>
+                        <input type="hidden" id="issue-type" name="issue-type" value="">
                     </div>
                     
-                    <div class=\feedback-card\>
-                        <h3>Feature Requests</h3>
-                        <p>Have an idea for a new feature or improvement? We'd love to hear it!</p>
-                        <p>When suggesting features, consider:</p>
-                        <ul>
-                            <li>How it would enhance gameplay</li>
-                            <li>Which users would benefit most</li>
-                            <li>How it fits with existing functionality</li>
-                        </ul>
-                        <a href=\https://github.com/magicat777/cyberpunk-gm-screen/issues/new\ class=\button\ target=\_blank\>Suggest Feature</a>
+                    <div class="form-group">
+                        <label for="issue-title">Issue Title:</label>
+                        <input type="text" id="issue-title" name="issue-title" placeholder="Brief description of the issue" required>
                     </div>
-                </div>
-            </section>
+                    
+                    <div class="form-group">
+                        <label for="issue-description">Detailed Description:</label>
+                        <textarea id="issue-description" name="issue-description" placeholder="Please describe what happened, what you expected to happen, and any steps to reproduce the issue..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="browser">Browser & Version:</label>
+                        <input type="text" id="browser" name="browser" placeholder="e.g., Chrome 99, Firefox 95, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="system">Operating System:</label>
+                        <input type="text" id="system" name="system" placeholder="e.g., Windows 11, macOS Monterey, Ubuntu 22.04, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email (optional):</label>
+                        <input type="email" id="email" name="email" placeholder="Your email for follow-up questions">
+                    </div>
+                    
+                    <button type="submit" class="button">Submit Issue Report</button>
+                </form>
+                
+                <p>For critical issues or to track your report status, please visit our <a href="https://github.com/example/cyberpunk-gm-screen/issues" target="_blank" rel="noopener noreferrer" class="github-link">GitHub Issues page</a>.</p>
+            </div>
             
-            <section class=\community-section\>
-                <h2>Join Our Community</h2>
-                <p>Connect with other Cyberpunk RED game masters and players:</p>
-                <div class=\community-links\>
-                    <a href=\https://discord.gg/cyberpunkred\ class=\community-link\ target=\_blank\>Discord</a>
-                    <a href=\https://reddit.com/r/cyberpunkred\ class=\community-link\ target=\_blank\>Reddit</a>
-                </div>
-                <p>Sharing your experiences and tips helps everyone in the community run better games!</p>
-            </section>
+            <div class="feedback-section">
+                <h2>Feature Requests</h2>
+                <p>Have an idea for a new feature or improvement? We'd love to hear it!</p>
+                
+                <form class="feedback-form" id="feature-form">
+                    <div class="form-group">
+                        <label for="feature-title">Feature Title:</label>
+                        <input type="text" id="feature-title" name="feature-title" placeholder="Brief description of your idea" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="feature-description">Detailed Description:</label>
+                        <textarea id="feature-description" name="feature-description" placeholder="Please describe your feature idea, why it would be useful, and how you envision it working..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="feature-priority">Priority:</label>
+                        <select id="feature-priority" name="feature-priority">
+                            <option value="low">Nice to Have</option>
+                            <option value="medium" selected>Would Improve Experience</option>
+                            <option value="high">Critical for Gameplay</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="feature-email">Email (optional):</label>
+                        <input type="email" id="feature-email" name="feature-email" placeholder="Your email for follow-up questions">
+                    </div>
+                    
+                    <button type="submit" class="button">Submit Feature Request</button>
+                </form>
+            </div>
             
-            <section class=\contact-section\>
-                <h2>Direct Contact</h2>
-                <p>For specific inquiries or private feedback, you can reach the development team at:</p>
-                <p><a href=\mailto:feedback@nightcityfixers.net\>feedback@nightcityfixers.net</a></p>
-                <p>We aim to respond to all messages within 48 hours.</p>
-            </section>
+            <div class="feedback-section">
+                <h2>General Feedback</h2>
+                <p>Share your experience, thoughts, or suggestions about the Cyberpunk RED GM Screen.</p>
+                
+                <form class="feedback-form" id="general-form">
+                    <div class="form-group">
+                        <label for="feedback-text">Your Feedback:</label>
+                        <textarea id="feedback-text" name="feedback-text" placeholder="Tell us what you think about the GM Screen..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="general-email">Email (optional):</label>
+                        <input type="email" id="general-email" name="general-email" placeholder="Your email for follow-up questions">
+                    </div>
+                    
+                    <button type="submit" class="button">Submit Feedback</button>
+                </form>
+            </div>
+            
+            <div class="contact-info">
+                <h3>Other Ways to Reach Us</h3>
+                <p>If you prefer not to use the forms above, you can reach us at:</p>
+                <ul>
+                    <li>GitHub: <a href="https://github.com/example/cyberpunk-gm-screen" target="_blank" rel="noopener noreferrer" class="github-link">github.com/example/cyberpunk-gm-screen</a></li>
+                    <li>Email: <a href="mailto:support@example.com" class="github-link">support@example.com</a></li>
+                </ul>
+            </div>
         </div>
     </main>
-
-    <footer class=\footer\ role=\contentinfo\>
-        <div class=\footer-content\>
-            <div class=\footer-links\>
-                <a href=\about.html\ class=\footer-link\>About</a>
-                <a href=\help.html\ class=\footer-link\>Help</a>
-                <a href=\feedback.html\ class=\footer-link\>Feedback</a>
-                <a href=\shortcuts.html\ class=\footer-link\>Shortcuts</a>
-                <a href=\attributions.html\ class=\footer-link\>Attributions</a>
-                <a href=\license.html\ class=\footer-link\>License</a>
-                <a href=\privacy.html\ class=\footer-link\>Privacy</a>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h2 class="footer-heading">Cyberpunk RED GM Screen</h2>
+                <p>A digital Game Master screen for Cyberpunk RED tabletop RPG.</p>
+                <p class="copyright">© 2025 | <a href="privacy.html">Privacy Policy</a></p>
             </div>
-            <div class=\footer-info\>
-                <span>Cyberpunk RED GM Screen v1.2.0</span>
-                <span>© 2025 - Built with 🔥 by Night City Fixers</span>
+            
+            <div class="footer-section">
+                <h2 class="footer-heading">Quick Links</h2>
+                <nav aria-label="Footer Navigation">
+                    <ul class="footer-links">
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="help.html">Help</a></li>
+                        <li><a href="feedback.html">Feedback</a></li>
+                        <li><a href="shortcuts.html">Keyboard Shortcuts</a></li>
+                    </ul>
+                </nav>
+            </div>
+            
+            <div class="footer-section">
+                <h2 class="footer-heading">Resources</h2>
+                <ul class="footer-links">
+                    <li><a href="https://rtalsoriangames.com/cyberpunk/" target="_blank" rel="noopener noreferrer">Cyberpunk RED Official</a></li>
+                    <li><a href="attributions.html">Attributions</a></li>
+                    <li><a href="license.html">License</a></li>
+                </ul>
             </div>
         </div>
     </footer>
+    
+    <script>
+        // Simple script to handle issue type selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const issueTypes = document.querySelectorAll('.issue-type');
+            const issueTypeInput = document.getElementById('issue-type');
+            
+            issueTypes.forEach(type => {
+                type.addEventListener('click', function() {
+                    // Remove selected class from all types
+                    issueTypes.forEach(t => t.classList.remove('selected'));
+                    // Add selected class to clicked type
+                    this.classList.add('selected');
+                    // Update hidden input value
+                    issueTypeInput.value = this.getAttribute('data-value');
+                });
+            });
+            
+            // Form submission handlers (would normally send data to server)
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    // In a real implementation, this would send data to server
+                    alert('Thank you for your feedback! In a real implementation, this would be sent to our server.');
+                    form.reset();
+                    // Clear issue type selection
+                    if (form.id === 'issue-form') {
+                        issueTypes.forEach(t => t.classList.remove('selected'));
+                        issueTypeInput.value = '';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
