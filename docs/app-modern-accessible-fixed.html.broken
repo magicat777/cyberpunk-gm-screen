@@ -2163,25 +2163,129 @@
 
     <!-- Notification container -->
     <div class="cp-notifications" aria-live="polite"></div>
-
-    <!-- Footer -->
-    <footer class="footer" role="contentinfo">
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="pages/about.html" class="footer-link">About</a>
-                <a href="pages/help.html" class="footer-link">Help</a>
-                <a href="pages/feedback.html" class="footer-link">Feedback</a>
-                <a href="pages/shortcuts.html" class="footer-link">Shortcuts</a>
-                <a href="pages/attributions.html" class="footer-link">Attributions</a>
-                <a href="pages/license.html" class="footer-link">License</a>
-                <a href="pages/privacy.html" class="footer-link">Privacy</a>
-            </div>
-            <div class="footer-info">
-                <span>Cyberpunk RED GM Screen v1.2.0</span>
-                <span>© 2025 - Built with 🔥 by Night City Fixers</span>
-            </div>
+    
+    <!-- Debug Tools (hidden in production) -->
+    <div id="debug-tools" style="position: fixed; bottom: 10px; left: 10px; z-index: 9999; background: rgba(0,0,0,0.7); padding: 10px; border: 1px solid #00ccff; border-radius: 4px;" role="region" aria-labelledby="debug-tools-title">
+        <h4 id="debug-tools-title" style="color: #00ccff; margin: 0 0 10px 0; font-size: 14px;">Debug Tools</h4>
+        <div class="debug-buttons">
+            <button id="debug-notes-panel" style="background: #333; color: #fff; border: 1px solid #00ccff; padding: 5px; cursor: pointer; margin-right: 5px;">Debug Notes Panel</button>
+            <button id="create-notes-panel" style="background: #333; color: #fff; border: 1px solid #00ccff; padding: 5px; cursor: pointer; margin-right: 5px;">Create Notes Panel</button>
+            <button id="check-dependencies" style="background: #333; color: #fff; border: 1px solid #00ccff; padding: 5px; cursor: pointer;">Check Dependencies</button>
         </div>
-    </footer>
+        <div id="debug-output" style="margin-top: 10px; color: #fff; font-size: 12px; max-height: 100px; overflow-y: auto;" aria-live="polite"></div>
+    </div>
+    
+    <!-- Debug script for troubleshooting -->
+    <script>
+        // Add event listeners when document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Debug tools initialized');
+            
+            // Debug Notes Panel button
+            document.getElementById('debug-notes-panel').addEventListener('click', function() {
+                try {
+                    // Define a debug function directly in case the one in the JS file isn't available
+                    const debugFunc = function() {
+                        console.log('Notes Panel Debug Info (inline):');
+                        console.log('- createNotesPanel function exists:', typeof window.createNotesPanel === 'function');
+                        console.log('- createPanel function exists:', typeof window.createPanel === 'function');
+                        console.log('- safeCreatePanel function exists:', typeof window.safeCreatePanel === 'function');
+                        console.log('- document.readyState:', document.readyState);
+                        
+                        // Check for HTML element with id="add-notes"
+                        const addNotesLink = document.getElementById('add-notes');
+                        console.log('- add-notes link exists:', !!addNotesLink);
+                        if (addNotesLink) {
+                            console.log('  - add-notes link text:', addNotesLink.textContent);
+                        }
+                        
+                        // Check script loading
+                        const scripts = Array.from(document.querySelectorAll('script'));
+                        console.log('- Loaded scripts:', scripts.map(s => s.src).filter(src => src));
+                        
+                        return 'Debug info logged to console';
+                    };
+                    
+                    // Try window function first, fall back to inline function
+                    const result = (typeof window.debugNotesPanel === 'function') ? 
+                        window.debugNotesPanel() : debugFunc();
+                    
+                    document.getElementById('debug-output').textContent = 'Debug info logged to console';
+                } catch (e) {
+                    document.getElementById('debug-output').textContent = 'Error: ' + e.message;
+                    console.error('Debug error:', e);
+                }
+            });
+            
+            // Create Notes Panel button
+            document.getElementById('create-notes-panel').addEventListener('click', function() {
+                try {
+                    // Create an inline version of createNotesPanel as fallback
+                    const createNotesPanelFallback = function() {
+                        console.log('Creating notes panel with fallback function');
+                        
+                        // Get panel creation functions, checking all possible locations
+                        const createPanelFunc = 
+                            (typeof window.createPanel === 'function') ? window.createPanel : 
+                            (typeof createPanel === 'function') ? createPanel : 
+                            function(title) {
+                                // Super basic fallback
+                                const div = document.createElement('div');
+                                div.className = 'panel';
+                                div.innerHTML = `
+                                    <div class="panel-header">${title}</div>
+                                    <div class="panel-content">
+                                        <textarea style="width: 100%; height: 200px;"></textarea>
+                                    </div>
+                                `;
+                                return div;
+                            };
+                        
+                        // Create the panel
+                        const panel = createPanelFunc('Notes (Manual)');
+                        return panel;
+                    };
+                    
+                    // Try the window function first, fall back to our inline version
+                    const panel = (typeof window.createNotesPanel === 'function') ? 
+                        window.createNotesPanel() : createNotesPanelFallback();
+                    
+                    document.getElementById('main-content').appendChild(panel);
+                    document.getElementById('debug-output').textContent = 'Notes panel created manually';
+                    console.log('Notes panel created manually:', panel);
+                } catch (e) {
+                    document.getElementById('debug-output').textContent = 'Error: ' + e.message;
+                    console.error('Error creating notes panel:', e);
+                }
+            });
+            
+            // Check Dependencies button
+            document.getElementById('check-dependencies').addEventListener('click', function() {
+                const output = document.getElementById('debug-output');
+                output.innerHTML = '';
+                
+                // Check for key functions
+                const functions = ['createPanel', 'safeCreatePanel', 'createNotesPanel'];
+                functions.forEach(func => {
+                    const li = document.createElement('div');
+                    li.textContent = `${func}: ${typeof window[func] === 'function' ? '✓' : '✗'}`;
+                    li.style.color = typeof window[func] === 'function' ? '#5f5' : '#f55';
+                    output.appendChild(li);
+                });
+                
+                // Check for script loading
+                const scripts = ['panel-implementations-fixed.js', 'ui-fix.js', 'app-modern-adapter-fixed.js'];
+                scripts.forEach(script => {
+                    const exists = Array.from(document.querySelectorAll('script')).some(s => 
+                        s.src && s.src.includes(script));
+                    const li = document.createElement('div');
+                    li.textContent = `${script}: ${exists ? '✓' : '✗'}`;
+                    li.style.color = exists ? '#5f5' : '#f55';
+                    output.appendChild(li);
+                });
+            });
+        });
+    </script>
 
     <!-- Only load our standalone adapter - no dependency on app-modern.js -->
     <!-- Initialize CyberpunkGM namespace -->
@@ -2211,6 +2315,11 @@
     
     <!-- Load layout-save-improved.js for layout functionality -->
     <script src="js/layout-save-improved.js"></script>
+    <!-- Load notes-text-editor.js for enhanced notes functionality -->
+    <script src="js/notes-text-editor.js"></script>
+
+    <!-- Load debug panel consolidated script for unified debug tools -->
+    <script src="js/debug-panel-consolidated.js"></script>
     
     <!-- Define global layout functions -->
     <script>
@@ -4282,47 +4391,17 @@
         
         // Function initAccessibility moved to app-modern-adapter-fixed.js
     </script>
-<!-- Debug panel launcher button -->
-<div id="debug-tools-launcher" style="position: fixed; bottom: 10px; left: 10px; z-index: 9999;">
-    <button id="open-debug-panel" style="background: rgba(0,0,0,0.7); color: #00ccff; border: 1px solid #00ccff; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px;" aria-expanded="false" aria-controls="debug-panel">Debug Tools</button>
-</div>
+    <!-- Debug Tools Button - Opens consolidated debug panel -->
+    <div id="debug-tools-launcher" style="position: fixed; bottom: 10px; left: 10px; z-index: 9999;" role="region" aria-labelledby="debug-tools-button">
+        <button id="open-debug-panel" style="background: rgba(0,0,0,0.7); color: #00ccff; border: 1px solid #00ccff; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px;" aria-expanded="false">Debug Tools</button>
+    </div>
 
-<!-- Consolidated debug panel scripts -->
-<script src="js/debug-panel-consolidated.js"></script>
-<script src="js/debug-init.js"></script>
-
-<script>
-    // Add support for debug button if it wasn't set up automatically
-    document.addEventListener('DOMContentLoaded', function() {
-        const debugButton = document.getElementById('open-debug-panel');
-        if (debugButton && !debugButton.hasAttribute('data-initialized')) {
-            console.log('Initializing debug button');
-            
-            // Mark as initialized
-            debugButton.setAttribute('data-initialized', 'true');
-            
-            // Add click handler if not already set up
-            if (!debugButton._hasClickHandler) {
-                debugButton.addEventListener('click', function() {
-                    console.log('Debug button clicked');
-                    
-                    // Try to use the consolidated debug panel system
-                    if (window.CyberpunkGM && window.CyberpunkGM.Debug && 
-                        typeof window.CyberpunkGM.Debug.createDebugPanel === 'function') {
-                        window.CyberpunkGM.Debug.createDebugPanel();
-                    } 
-                    // Fallback to global createDebugPanel
-                    else if (typeof window.createDebugPanel === 'function') {
-                        window.createDebugPanel();
-                    }
-                    // Ultimate fallback
-                    else {
-                        console.error('No debug panel system available');
-                        alert('Debug panel functionality is not available. Check console for errors.');
-                    }
-                });
-                debugButton._hasClickHandler = true;
-            }
+    <!-- Debug panel initialization -->
+    <script src="js/debug-init.js"></script>
+</body>
+</html>
+        } else {
+            console.warn('Create button not found');
         }
     });
 </script>
