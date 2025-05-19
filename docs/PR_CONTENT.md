@@ -1,44 +1,42 @@
-# Pull Request: Implement standardized navigation across primary interfaces
+# Pull Request: Resolve Footer Conflicts and Standardize Documentation Pages
 
 ## Summary
-- Adds standardized navigation component to all primary interfaces
-- Implements breadcrumb navigation for improved user orientation
-- Ensures consistent navigation UI, login/logout functions
-- Enhances mobile-responsiveness of navigation elements
+- Resolved conflicts between standardized footers and detailed content in documentation pages
+- Maintained consistent structure across all pages with standardized navigation and footers
+- Preserved detailed content for About, Attributions, Feedback, Help, License, Privacy, and Shortcuts pages
+- Implemented proper workflow scripts to prevent future synchronization issues
 
-## Features Implemented
-1. **Primary Navigation Bar**
-   - Consistent styling and positioning across all pages
-   - Responsive design that collapses to mobile view
-   - Logo/branding that links to home page
+## Implementation Details
 
-2. **Dropdown Menus**
-   - Tools menu with interface options
-   - Reference menu with game resources
-   - Documentation menu with user guides
-   - Mobile-friendly dropdown behavior
+### 1. Conflict Resolution
+- Merged the standardized footer structure from main branch with the detailed content from feature branch
+- Ensured proper semantic HTML structure throughout all pages
+- Fixed inconsistent HTML attributes and element structures
 
-3. **Breadcrumb Navigation**
-   - Context-aware path indicators
-   - Links to parent pages
-   - Current page indicator
-   - Responsive layout for mobile viewing
+### 2. Standardized Page Structure
+- Every page now follows the same consistent structure:
+  - Standardized header with navigation toolbar
+  - Content section with detailed information
+  - Standardized footer with navigation links
+  - Consistent styling and layout
 
-## Pages Updated
-- desktop-v2.0.77.html - Main stability-focused interface
-- fixed-super-minimal.html - Lightweight modular interface
-- index.html - Main entry point and home page
+### 3. Workflow Improvements
+- Enhanced copy-assets-to-docs.sh script to properly handle the pages directory
+- Created safe-update-workflow.sh to enforce the correct src → docs workflow
+- Implemented safeguards to prevent common workflow mistakes
+- Fixed line ending and path handling issues for compatibility with different environments
 
-## Test plan
-1. Verify navigation appears and functions on all pages
-2. Test dropdown menus and mobile view functionality
-3. Confirm breadcrumb navigation shows correct page path
-4. Run navigation validation script to verify HTML structure
+### 4. Content Preservation
+- Maintained all detailed content for documentation pages while ensuring consistent structure
+- Preserved styling and formatting specific to each page's content needs
+- Ensured all links between pages work correctly
 
-## Additional Documentation
-- Created comprehensive navigation testing plan
-- Added detailed implementation summary
-- Recorded manual test results
-- Added CLAUDE.md for development guidance
+## Test Plan
+- Verified all pages render correctly with proper footer display
+- Confirmed all links between pages work correctly
+- Tested accessibility features including keyboard navigation and ARIA attributes
+- Validated workflow scripts function as intended
+- Confirmed proper synchronization between src and docs directories
 
-🤖 Generated with [Claude Code](https://claude.ai/code)
+## Related Issues
+Resolves conflicts between standardized footers and detailed content in documentation pages, and establishes proper workflow to prevent future conflicts.
