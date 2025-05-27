@@ -1,0 +1,234 @@
+// Cyberpunk GM Screen Design System Variables
+
+// Breakpoints
+$breakpoint-xs: 320px;
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// Media query mixins
+@mixin xs-up {
+  @media (min-width: #{$breakpoint-xs}) {
+    @content;
+  }
+}
+
+@mixin sm-up {
+  @media (min-width: #{$breakpoint-sm}) {
+    @content;
+  }
+}
+
+@mixin md-up {
+  @media (min-width: #{$breakpoint-md}) {
+    @content;
+  }
+}
+
+@mixin lg-up {
+  @media (min-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+@mixin xl-up {
+  @media (min-width: #{$breakpoint-xl}) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: #{$breakpoint-md - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: #{$breakpoint-md}) and (max-width: #{$breakpoint-lg - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: #{$breakpoint-lg}) {
+    @content;
+  }
+}
+
+// Z-index layers
+$z-index-base: 1;
+$z-index-panel: 10;
+$z-index-panel-active: 20;
+$z-index-dropdown: 100;
+$z-index-modal-backdrop: 200;
+$z-index-modal: 210;
+$z-index-tooltip: 300;
+$z-index-notification: 400;
+
+// Animation mixins
+@mixin transition($properties...) {
+  transition-property: $properties;
+  transition-duration: var(--duration-normal);
+  transition-timing-function: var(--easing-default);
+}
+
+@mixin transition-fast($properties...) {
+  transition-property: $properties;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--easing-default);
+}
+
+@mixin glow($color: var(--glow-color), $intensity: var(--glow-intensity)) {
+  filter: drop-shadow($intensity $color);
+}
+
+@mixin glitch-effect {
+  animation: glitch var(--duration-normal) infinite;
+}
+
+@mixin neon-text($color: var(--color-accent)) {
+  color: $color;
+  text-shadow: 
+    0 0 10px $color,
+    0 0 20px $color,
+    0 0 30px $color,
+    0 0 40px $color;
+}
+
+// Layout mixins
+@mixin panel-grid {
+  display: grid;
+  gap: var(--panel-gap);
+  
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+  
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include desktop {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  }
+}
+
+@mixin touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    bottom: -10px;
+    left: -10px;
+  }
+}
+
+// Utility mixins
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+@mixin scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-neutral-700) var(--color-neutral-900);
+  
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--color-neutral-900);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-neutral-700);
+    border-radius: 4px;
+    
+    &:hover {
+      background: var(--color-neutral-600);
+    }
+  }
+}
+
+// Component mixins
+@mixin button-base {
+  @include touch-target;
+  @include focus-visible;
+  @include transition(background-color, color, transform, box-shadow);
+  
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  user-select: none;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+}
+
+@mixin panel-base {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  
+  @include mobile {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+}
+
+// Placeholder selectors
+%flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+%absolute-fill {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
