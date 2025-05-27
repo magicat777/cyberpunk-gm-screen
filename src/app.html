@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyberpunk RED - Super Minimal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Toolbar with dropdown menus -->
+    <div class="toolbar">
+        <div class="title">Cyberpunk RED GM Screen</div>
+        
+        <!-- Panel menu -->
+        <div class="dropdown">
+            <button class="dropbtn">Add Panel</button>
+            <div class="dropdown-content">
+                <div class="menu-category">GM Tools</div>
+                <a href="#" id="add-notes">Notes</a>
+                <a href="#" id="add-dice">Dice Roller</a>
+                <a href="#" id="add-initiative">Initiative Tracker</a>
+                <a href="#" id="add-timer">Game Timer</a>
+                <a href="#" id="add-calculator">Calculator</a>
+                
+                <div class="menu-category">Reference</div>
+                <a href="#" id="add-rules">Rules Reference</a>
+                <a href="#" id="add-weapons">Weapons Table</a>
+                <a href="#" id="add-armor">Armor Table</a>
+                <a href="#" id="add-critical">Critical Injuries</a>
+                <a href="#" id="add-netrunning">Netrunning</a>
+                
+                <div class="menu-category">Characters</div>
+                <a href="#" id="add-character">Character Sheet</a>
+                <a href="#" id="add-npc">NPC Generator</a>
+                <a href="#" id="add-loot">Loot Generator</a>
+                
+                <div class="menu-category">World</div>
+                <a href="#" id="add-map">Night City Map</a>
+                <a href="#" id="add-location">Location Generator</a>
+                <a href="#" id="add-encounter">Random Encounter</a>
+            </div>
+        </div>
+        
+        <!-- Layout menu -->
+        <div class="dropdown">
+            <button class="dropbtn">Layout</button>
+            <div class="dropdown-content">
+                <a href="#" id="save-layout">Save Layout</a>
+                <a href="#" id="load-layout">Load Layout</a>
+                <a href="#" id="clear-layout">Clear Layout</a>
+                <a href="#" id="reset-layout">Reset Layout</a>
+                <a href="#" id="auto-organize">Auto-Organize</a>
+                <a href="#" id="fit-to-window">Fit to Window</a>
+            </div>
+        </div>
+        
+        <!-- Settings menu -->
+        <div class="dropdown">
+            <button class="dropbtn">Settings</button>
+            <div class="dropdown-content">
+                <a href="#" id="toggle-animations">Toggle Animations</a>
+                <a href="#" id="about">About</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Font controls -->
+    <div class="controls" style="display: none;">
+        <div class="font-controls-header">
+            <span>Font Settings</span>
+            <button class="close-button" id="close-font-controls">&times;</button>
+        </div>
+        <div class="font-options">
+            <label>Font Size</label>
+            <div class="font-buttons">
+                <button class="font-size-btn" data-size="12">Small</button>
+                <button class="font-size-btn active" data-size="16">Medium</button>
+                <button class="font-size-btn" data-size="20">Large</button>
+            </div>
+        </div>
+        <div class="font-options">
+            <label>Font Family</label>
+            <select id="font-family">
+                <option value="monospace">Monospace</option>
+                <option value="sans-serif">Sans-serif</option>
+                <option value="serif">Serif</option>
+            </select>
+        </div>
+        <button id="apply-font">Apply Font</button>
+    </div>
+
+    <script>
+        // Panel counter for positioning
+        let panelCount = 0;
+        let currentFontSize = 16;
+        let currentFontFamily = "monospace";
+        
+        // Function to make an element draggable
+        function makeDraggable(element) {
+            const header = element.querySelector('.panel-header');
+            let isDragging = false;
+            let offsetX, offsetY;
+            
+            header.addEventListener('mousedown', function(e) {
+                // Prevent if clicking close button
+                if (e.target.classList.contains('close-button')) return;
+                
+                isDragging = true;
+                element.style.zIndex = ++panelCount;
+                
+                const rect = element.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                element.style.left = (e.clientX - offsetX) + 'px';
+                element.style.top = (e.clientY - offsetY) + 'px';
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+        }
+        
+        // Function to make an element resizable
+        function makeResizable(element) {
+            const handle = element.querySelector('.resize-handle');
+            let isResizing = false;
+            
+            handle.addEventListener('mousedown', function(e) {
+                isResizing = true;
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isResizing) return;
+                
+                const rect = element.getBoundingClientRect();
+                const width = e.clientX - rect.left;
+                const height = e.clientY - rect.top;
+                
+                if (width > 200 && height > 100) {
+                    element.style.width = width + 'px';
+                    element.style.height = height + 'px';
+                }
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isResizing = false;
+            });
+        }
+        
+        // Create a panel
+        function createPanel(title) {
+            panelCount++;
+            
+            // Create panel
+            const panel = document.createElement('div');
+            panel.className = 'panel';
+            panel.style.left = (20 + panelCount * 25) + 'px';
+            panel.style.top = (20 + panelCount * 25) + 'px';
+            panel.style.zIndex = panelCount;
+            
+            // Add header and content
+            panel.innerHTML = `
+                <div class="panel-header">
+                    <div>${title}</div>
+                    <button class="close-button">&times;</button>
+                </div>
+                <div class="panel-content"></div>
+                <div class="resize-handle"></div>
+            `;
+            
+            // Add panel to document
+            document.body.appendChild(panel);
+            
+            // Make panel draggable
+            makeDraggable(panel);
+            
+            // Make panel resizable
+            makeResizable(panel);
+            
+            // Add close functionality
+            panel.querySelector('.close-button').addEventListener('click', function() {
+                panel.remove();
+            });
+            
+            return panel;
+        }
+        
+        // Create a notes panel
+        function createNotesPanel() {
+            const panel = createPanel('Notes');
+            const content = panel.querySelector('.panel-content');
+            
+            content.innerHTML = '<textarea placeholder="Enter your notes here..."></textarea>';
+            
+            return panel;
+        }
+        
+        // Create a dice roller panel
+        function createDicePanel() {
+            const panel = createPanel('Dice Roller');
+            const content = panel.querySelector('.panel-content');
+            
+            content.innerHTML = `
+                <div class="dice-container">
+                    <div class="dice-controls">
+                        <select id="dice-count">
+                            <option>1</option><option>2</option><option>3</option>
+                            <option>4</option><option>5</option><option>6</option>
+                        </select>
+                        d
+                        <select id="dice-type">
+                            <option>4</option><option>6</option><option>8</option>
+                            <option>10</option><option>12</option><option>20</option>
+                            <option>100</option>
+                        </select>
+                        <button id="roll-dice">Roll</button>
+                    </div>
+                    <div id="dice-result">
+                        Result will appear here
+                    </div>
+                </div>
+            `;
+            
+            // Add roll functionality
+            content.querySelector('#roll-dice').addEventListener('click', function() {
+                const count = parseInt(content.querySelector('#dice-count').value);
+                const type = parseInt(content.querySelector('#dice-type').value);
+                let total = 0;
+                let rolls = [];
+                
+                for (let i = 0; i < count; i++) {
+                    const roll = Math.floor(Math.random() * type) + 1;
+                    rolls.push(roll);
+                    total += roll;
+                }
+                
+                content.querySelector('#dice-result').innerHTML = `
+                    <div>Rolls: ${rolls.join(', ')}</div>
+                    <div class="dice-total">${total}</div>
+                `;
+            });
+            
+            return panel;
+        }
+        
+        // Create a rules reference panel
+        function createRulesPanel() {
+            const panel = createPanel('Rules Reference');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <select id="rule-section" class="panel-rule-section">
+                    <option value="combat">Combat Basics</option>
+                    <option value="damage">Damage</option>
+                    <option value="skills">Skills</option>
+                    <option value="stats">Character Stats</option>
+                    <option value="gear">Gear</option>
+                </select>
+                <div id="rule-content" class="panel-content-section">
+                    <p><strong>Combat Basics</strong></p>
+                    <p>Combat in Cyberpunk RED is handled in Rounds (3 second increments) and Turns.</p>
+                    <p>To make an attack, roll 1d10 + STAT + SKILL + Bonus vs DV.</p>
+                    <p>Initiative = 1d10 + REF + Bonus.</p>
+                </div>
+            `;
+            
+            // Add rule selection functionality
+            const select = panel.querySelector('#rule-section');
+            const content = panel.querySelector('#rule-content');
+            
+            select.addEventListener('change', function() {
+                const value = this.value;
+                
+                if (value === 'combat') {
+                    content.innerHTML = `
+                        <p><strong>Combat Basics</strong></p>
+                        <p>Combat in Cyberpunk RED is handled in Rounds (3 second increments) and Turns.</p>
+                        <p>To make an attack, roll 1d10 + STAT + SKILL + Bonus vs DV.</p>
+                        <p>Initiative = 1d10 + REF + Bonus.</p>
+                    `;
+                } else if (value === 'damage') {
+                    content.innerHTML = `
+                        <p><strong>Damage & Health</strong></p>
+                        <p>HP = 10 + (5 × BODY).</p>
+                        <p>Stun Save = BODY + WILL (Damage > BODY = Fall Unconscious).</p>
+                        <p>Death Save = BODY x 3 (at 0 HP, fail = death).</p>
+                    `;
+                } else if (value === 'skills') {
+                    content.innerHTML = `
+                        <p><strong>Skill Checks</strong></p>
+                        <p>Roll 1d10 + STAT + SKILL vs DV.</p>
+                        <p>DV 13 = Easy, DV 15 = Average, DV 17 = Difficult, DV 21 = Very Difficult, DV 24 = Almost Impossible.</p>
+                        <p>Critical Success on Natural 10 roll, Critical Failure on Natural 1.</p>
+                    `;
+                } else if (value === 'stats') {
+                    content.innerHTML = `
+                        <p><strong>Character Stats</strong></p>
+                        <p>INT = Intelligence</p>
+                        <p>REF = Reflexes</p>
+                        <p>DEX = Dexterity</p>
+                        <p>TECH = Technical</p>
+                        <p>COOL = Cool</p>
+                        <p>WILL = Willpower</p>
+                        <p>LUCK = Luck</p>
+                        <p>MOVE = Movement</p>
+                        <p>BODY = Body</p>
+                        <p>EMP = Empathy</p>
+                    `;
+                } else if (value === 'gear') {
+                    content.innerHTML = `
+                        <p><strong>Gear & Equipment</strong></p>
+                        <p>Weapons have DMG, ROF values.</p>
+                        <p>Armor has SP (Stopping Power) for each location.</p>
+                        <p>Cyberware has Humanity Cost (HC) and requires installation.</p>
+                    `;
+                }
+            });
+            
+            return panel;
+        }
+        
+        // Create an initiative tracker panel
+        function createInitiativePanel() {
+            const panel = createPanel('Initiative Tracker');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div class="initiative-form">
+                    <input type="text" id="init-name" placeholder="Name">
+                    <input type="number" id="init-value" placeholder="Roll">
+                    <button id="init-add">Add</button>
+                </div>
+                <div id="init-list" class="initiative-table">
+                    <div class="initiative-empty">No combatants added</div>
+                </div>
+                <div class="initiative-controls">
+                    <button id="init-next">Next Turn</button>
+                    <button id="init-reset">Reset</button>
+                    <button id="init-roll">Roll For All</button>
+                </div>
+            `;
+            
+            // Initiative state
+            const initState = {
+                combatants: [],
+                currentTurn: -1
+            };
+            
+            // Add functionality
+            const addButton = panel.querySelector('#init-add');
+            const nameInput = panel.querySelector('#init-name');
+            const valueInput = panel.querySelector('#init-value');
+            const listElement = panel.querySelector('#init-list');
+            const nextButton = panel.querySelector('#init-next');
+            const resetButton = panel.querySelector('#init-reset');
+            const rollButton = panel.querySelector('#init-roll');
+            
+            // Add combatant
+            addButton.addEventListener('click', function() {
+                const name = nameInput.value.trim();
+                const initiative = parseInt(valueInput.value) || 0;
+                
+                if (!name) {
+                    alert('Please enter a name');
+                    return;
+                }
+                
+                initState.combatants.push({
+                    name: name,
+                    initiative: initiative,
+                    isNPC: name.startsWith('NPC') || name.startsWith('Enemy')
+                });
+                
+                // Sort by initiative
+                initState.combatants.sort((a, b) => b.initiative - a.initiative);
+                
+                // Reset inputs
+                nameInput.value = '';
+                valueInput.value = '';
+                nameInput.focus();
+                
+                // Refresh display
+                refreshInitiativeList();
+            });
+            
+            // Next turn
+            nextButton.addEventListener('click', function() {
+                if (initState.combatants.length === 0) return;
+                
+                initState.currentTurn = (initState.currentTurn + 1) % initState.combatants.length;
+                refreshInitiativeList();
+            });
+            
+            // Reset
+            resetButton.addEventListener('click', function() {
+                initState.currentTurn = -1;
+                refreshInitiativeList();
+            });
+            
+            // Roll for all
+            rollButton.addEventListener('click', function() {
+                initState.combatants.forEach(combatant => {
+                    // REF bonus between 2-7 for NPCs, 4-8 for PCs
+                    const refBonus = combatant.isNPC ? 
+                        Math.floor(Math.random() * 6) + 2 : 
+                        Math.floor(Math.random() * 5) + 4;
+                    
+                    combatant.initiative = Math.floor(Math.random() * 10) + 1 + refBonus;
+                });
+                
+                // Sort by initiative
+                initState.combatants.sort((a, b) => b.initiative - a.initiative);
+                
+                // Reset turn
+                initState.currentTurn = -1;
+                
+                // Refresh display
+                refreshInitiativeList();
+            });
+            
+            // Refresh initiative list
+            function refreshInitiativeList() {
+                if (initState.combatants.length === 0) {
+                    listElement.innerHTML = `<div class="initiative-empty">No combatants added</div>`;
+                    return;
+                }
+                
+                let html = '';
+                
+                initState.combatants.forEach((combatant, index) => {
+                    const isActive = index === initState.currentTurn;
+                    const itemClass = `initiative-item ${isActive ? 'initiative-active' : (combatant.isNPC ? 'initiative-npc' : 'initiative-pc')}`;
+                    
+                    html += `
+                        <div class="${itemClass}">
+                            <div>${combatant.name}</div>
+                            <div>${combatant.initiative}</div>
+                            <button class="initiative-remove" data-index="${index}">×</button>
+                        </div>
+                    `;
+                });
+                
+                listElement.innerHTML = html;
+                
+                // Add remove buttons
+                const removeButtons = listElement.querySelectorAll('.initiative-remove');
+                removeButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        
+                        // Adjust current turn if needed
+                        if (index === initState.currentTurn) {
+                            initState.currentTurn = -1;
+                        } else if (index < initState.currentTurn) {
+                            initState.currentTurn--;
+                        }
+                        
+                        // Remove combatant
+                        initState.combatants.splice(index, 1);
+                        
+                        // Refresh display
+                        refreshInitiativeList();
+                    });
+                });
+            }
+            
+            return panel;
+        }
+        
+        // Create a timer panel
+        function createTimerPanel() {
+            const panel = createPanel('Game Timer');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div class="text-centered margin-bottom">
+                    <div id="timer-display" class="timer-display">00:00:00</div>
+                    <div class="flex-row">
+                        <button id="timer-start">Start</button>
+                        <button id="timer-pause">Pause</button>
+                        <button id="timer-reset">Reset</button>
+                    </div>
+                </div>
+                <div class="margin-top">
+                    <div class="margin-bottom">Quick Add:</div>
+                    <div class="flex-row flex-wrap">
+                        <button class="timer-add" data-minutes="5">+5m</button>
+                        <button class="timer-add" data-minutes="15">+15m</button>
+                        <button class="timer-add" data-minutes="30">+30m</button>
+                        <button class="timer-add" data-minutes="60">+1h</button>
+                    </div>
+                </div>
+                <div class="margin-top">
+                    <div class="margin-bottom">Game Time:</div>
+                    <div id="game-time">Not tracked yet</div>
+                </div>
+            `;
+            
+            // Timer variables
+            let timerInterval = null;
+            let seconds = 0;
+            let gameTime = {
+                days: 0,
+                hours: 0,
+                minutes: 0
+            };
+            
+            // Get elements
+            const display = panel.querySelector('#timer-display');
+            const startBtn = panel.querySelector('#timer-start');
+            const pauseBtn = panel.querySelector('#timer-pause');
+            const resetBtn = panel.querySelector('#timer-reset');
+            const addBtns = panel.querySelectorAll('.timer-add');
+            const gameTimeDisplay = panel.querySelector('#game-time');
+            
+            // Format time
+            function formatTime(totalSeconds) {
+                const hrs = Math.floor(totalSeconds / 3600);
+                const mins = Math.floor((totalSeconds % 3600) / 60);
+                const secs = totalSeconds % 60;
+                
+                return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            // Update game time
+            function updateGameTime() {
+                gameTimeDisplay.textContent = `Day ${gameTime.days}, ${gameTime.hours.toString().padStart(2, '0')}:${gameTime.minutes.toString().padStart(2, '0')}`;
+            }
+            
+            // Start timer
+            startBtn.addEventListener('click', function() {
+                if (timerInterval) return;
+                
+                timerInterval = setInterval(function() {
+                    seconds++;
+                    display.textContent = formatTime(seconds);
+                }, 1000);
+            });
+            
+            // Pause timer
+            pauseBtn.addEventListener('click', function() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+            });
+            
+            // Reset timer
+            resetBtn.addEventListener('click', function() {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                seconds = 0;
+                display.textContent = formatTime(seconds);
+            });
+            
+            // Add time buttons
+            addBtns.forEach(button => {
+                button.addEventListener('click', function() {
+                    const minutes = parseInt(this.getAttribute('data-minutes'));
+                    
+                    // Update game time
+                    gameTime.minutes += minutes;
+                    
+                    // Adjust if needed
+                    if (gameTime.minutes >= 60) {
+                        gameTime.hours += Math.floor(gameTime.minutes / 60);
+                        gameTime.minutes %= 60;
+                    }
+                    
+                    if (gameTime.hours >= 24) {
+                        gameTime.days += Math.floor(gameTime.hours / 24);
+                        gameTime.hours %= 24;
+                    }
+                    
+                    updateGameTime();
+                });
+            });
+            
+            return panel;
+        }
+        
+        // Create a basic calculator panel
+        function createCalculatorPanel() {
+            const panel = createPanel('Calculator');
+            const content = panel.querySelector('.panel-content');
+            
+            content.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="calc-display" style="width: 100%; font-size: 20px; text-align: right;" readonly>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
+                    <button class="calc-btn" data-type="clear">C</button>
+                    <button class="calc-btn" data-type="backspace">←</button>
+                    <button class="calc-btn" data-type="operator" data-value="%">%</button>
+                    <button class="calc-btn" data-type="operator" data-value="/">÷</button>
+                    
+                    <button class="calc-btn" data-type="number" data-value="7">7</button>
+                    <button class="calc-btn" data-type="number" data-value="8">8</button>
+                    <button class="calc-btn" data-type="number" data-value="9">9</button>
+                    <button class="calc-btn" data-type="operator" data-value="*">×</button>
+                    
+                    <button class="calc-btn" data-type="number" data-value="4">4</button>
+                    <button class="calc-btn" data-type="number" data-value="5">5</button>
+                    <button class="calc-btn" data-type="number" data-value="6">6</button>
+                    <button class="calc-btn" data-type="operator" data-value="-">-</button>
+                    
+                    <button class="calc-btn" data-type="number" data-value="1">1</button>
+                    <button class="calc-btn" data-type="number" data-value="2">2</button>
+                    <button class="calc-btn" data-type="number" data-value="3">3</button>
+                    <button class="calc-btn" data-type="operator" data-value="+">+</button>
+                    
+                    <button class="calc-btn" data-type="number" data-value="0" style="grid-column: span 2;">0</button>
+                    <button class="calc-btn" data-type="number" data-value=".">.</button>
+                    <button class="calc-btn" data-type="equals">=</button>
+                </div>
+            `;
+            
+            // Add calculator functionality
+            const display = content.querySelector('#calc-display');
+            const buttons = content.querySelectorAll('.calc-btn');
+            let currentValue = '';
+            let firstOperand = null;
+            let operator = null;
+            let waitingForSecondOperand = false;
+            
+            function calculate(a, op, b) {
+                a = parseFloat(a);
+                b = parseFloat(b);
+                
+                switch (op) {
+                    case '+': return a + b;
+                    case '-': return a - b;
+                    case '*': return a * b;
+                    case '/': return a / b;
+                    case '%': return a % b;
+                    default: return b;
+                }
+            }
+            
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    
+                    if (type === 'number') {
+                        const digit = this.getAttribute('data-value');
+                        
+                        if (waitingForSecondOperand) {
+                            currentValue = digit;
+                            waitingForSecondOperand = false;
+                        } else {
+                            currentValue = currentValue === '0' ? digit : currentValue + digit;
+                        }
+                        
+                        display.value = currentValue;
+                    } else if (type === 'operator') {
+                        const nextOperator = this.getAttribute('data-value');
+                        
+                        if (firstOperand === null) {
+                            firstOperand = currentValue;
+                        } else if (operator) {
+                            const result = calculate(firstOperand, operator, currentValue);
+                            firstOperand = result;
+                            display.value = result;
+                        }
+                        
+                        waitingForSecondOperand = true;
+                        operator = nextOperator;
+                    } else if (type === 'equals') {
+                        if (operator && !waitingForSecondOperand) {
+                            const result = calculate(firstOperand, operator, currentValue);
+                            currentValue = result;
+                            display.value = result;
+                            
+                            firstOperand = result;
+                            operator = null;
+                        }
+                    } else if (type === 'clear') {
+                        currentValue = '0';
+                        firstOperand = null;
+                        operator = null;
+                        waitingForSecondOperand = false;
+                        display.value = currentValue;
+                    } else if (type === 'backspace') {
+                        if (currentValue.length > 1) {
+                            currentValue = currentValue.slice(0, -1);
+                        } else {
+                            currentValue = '0';
+                        }
+                        display.value = currentValue;
+                    }
+                });
+            });
+            
+            display.value = '0';
+            
+            return panel;
+        }
+        
+        // Create a weapons table panel
+        function createWeaponsPanel() {
+            const panel = createPanel('Weapons Table');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <table>
+                    <tr>
+                        <th>Weapon</th>
+                        <th>DMG</th>
+                        <th>ROF</th>
+                        <th>Range</th>
+                    </tr>
+                    <tr>
+                        <td>Medium Pistol</td>
+                        <td>2d6</td>
+                        <td>2</td>
+                        <td>50m</td>
+                    </tr>
+                    <tr>
+                        <td>Heavy Pistol</td>
+                        <td>3d6</td>
+                        <td>1</td>
+                        <td>50m</td>
+                    </tr>
+                    <tr>
+                        <td>Very Heavy Pistol</td>
+                        <td>4d6</td>
+                        <td>1</td>
+                        <td>50m</td>
+                    </tr>
+                    <tr>
+                        <td>SMG</td>
+                        <td>2d6</td>
+                        <td>3</td>
+                        <td>150m</td>
+                    </tr>
+                    <tr>
+                        <td>Assault Rifle</td>
+                        <td>5d6</td>
+                        <td>3</td>
+                        <td>400m</td>
+                    </tr>
+                    <tr>
+                        <td>Shotgun</td>
+                        <td>5d6</td>
+                        <td>1</td>
+                        <td>50m</td>
+                    </tr>
+                </table>
+            `;
+            
+            return panel;
+        }
+        
+        // Create an armor table panel
+        function createArmorPanel() {
+            const panel = createPanel('Armor Table');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <table>
+                    <tr>
+                        <th>Armor Type</th>
+                        <th>SP</th>
+                        <th>Covers</th>
+                    </tr>
+                    <tr>
+                        <td>Leather</td>
+                        <td>4</td>
+                        <td>Body/Arms</td>
+                    </tr>
+                    <tr>
+                        <td>Kevlar</td>
+                        <td>7</td>
+                        <td>Body/Arms</td>
+                    </tr>
+                    <tr>
+                        <td>Light Armorjack</td>
+                        <td>11</td>
+                        <td>Body/Arms</td>
+                    </tr>
+                    <tr>
+                        <td>Medium Armorjack</td>
+                        <td>12</td>
+                        <td>Body/Arms</td>
+                    </tr>
+                    <tr>
+                        <td>Heavy Armorjack</td>
+                        <td>13</td>
+                        <td>Body/Arms/Legs</td>
+                    </tr>
+                    <tr>
+                        <td>Flak</td>
+                        <td>15</td>
+                        <td>Body/Arms/Legs</td>
+                    </tr>
+                </table>
+            `;
+            
+            return panel;
+        }
+        
+        // Create a critical injury panel
+        function createCriticalInjuryPanel() {
+            const panel = createPanel('Critical Injuries');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <button id="roll-critical">Roll Critical Injury</button>
+                </div>
+                <div id="critical-result" style="border: 1px solid #00ccff; padding: 10px;">
+                    Roll to generate a critical injury
+                </div>
+            `;
+            
+            // Add roll functionality
+            const rollButton = panel.querySelector('#roll-critical');
+            const resultDiv = panel.querySelector('#critical-result');
+            
+            const criticalTable = [
+                { range: [1, 3], result: "Torn Muscle (Lose 1 REF)", dmg: 1, effect: "Lose 1 REF. If REF reaches 0, victim dies." },
+                { range: [4, 6], result: "Sprained Ankle/Wrist (Lose 1 MOVE)", dmg: 1, effect: "Lose 1 MOVE. If MOVE reaches 0, victim cannot move and may suffocate." },
+                { range: [7, 8], result: "Broken Finger/Toe (-2 on tasks using that digit)", dmg: 1, effect: "-2 to Actions using that digit."  },
+                { range: [9], result: "Broken Rib (DV 15 stun save when performing physical actions)", dmg: 2, effect: "DV 15 Stun Save when performing physical actions." },
+                { range: [10], result: "Cracked Skull (DV 15 stun save on physical actions or brain damaged)", dmg: 2, effect: "Victim must make a DV 15 Stun Save with each physical Action or become Brain Damaged, suffering -4 to all INT, REF, DEX, TECH Actions." }
+            ];
+            
+            rollButton.addEventListener('click', function() {
+                const roll = Math.floor(Math.random() * 10) + 1;
+                
+                const injury = criticalTable.find(entry => 
+                    entry.range.includes(roll) || 
+                    (entry.range.length === 2 && roll >= entry.range[0] && roll <= entry.range[1])
+                );
+                
+                if (injury) {
+                    resultDiv.innerHTML = `
+                        <p><strong>${injury.result}</strong> (Roll: ${roll})</p>
+                        <p>Damage: ${injury.dmg} Direct to HP</p>
+                        <p>Effect: ${injury.effect}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = "Error: No injury found for roll " + roll;
+                }
+            });
+            
+            return panel;
+        }
+        
+        // Create a netrunning panel
+        function createNetrunningPanel() {
+            const panel = createPanel('Netrunning');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <button id="generate-architecture">Generate Architecture</button>
+                </div>
+                <div id="architecture-result" style="border: 1px solid #00ccff; padding: 10px;">
+                    Click to generate a NET architecture
+                </div>
+            `;
+            
+            // Add generation functionality
+            const genButton = panel.querySelector('#generate-architecture');
+            const resultDiv = panel.querySelector('#architecture-result');
+            
+            const netModules = [
+                "Password (DV13)",
+                "File DV6 (Trash)",
+                "File DV8 (Generic Data)",
+                "File DV10 (Personal Data)",
+                "File DV12 (Password protected data)",
+                "File DV14 (Important Corporate data)",
+                "Control Node (Doors)",
+                "Control Node (Cameras)",
+                "Control Node (Turrets)",
+                "Control Node (Elevators)",
+                "Control Node (Lighting)",
+                "Black ICE: Hellhound (Anti-Personnel)",
+                "Black ICE: Wisp (Tracer)",
+                "Black ICE: Asp (Brain Burner)",
+                "Black ICE: Raven (Code Eater)",
+                "Black ICE: Killer (Electrocutes Netrunner)"
+            ];
+            
+            genButton.addEventListener('click', function() {
+                const length = Math.floor(Math.random() * 4) + 3; // 3-6 floors
+                let result = "<p><strong>NET Architecture:</strong></p><ul>";
+                
+                // First layer is always a password
+                result += "<li>Level 1: Password (DV13)</li>";
+                
+                // Remaining layers
+                for (let i = 2; i <= length; i++) {
+                    const moduleIndex = Math.floor(Math.random() * netModules.length);
+                    result += `<li>Level ${i}: ${netModules[moduleIndex]}</li>`;
+                }
+                
+                result += "</ul>";
+                
+                // Add a demon (main defense program)
+                const demonIndex = Math.floor(Math.random() * (netModules.length - 10)) + 10; // Only control nodes or ICE
+                result += `<p><strong>Demon:</strong> ${netModules[demonIndex]}</p>`;
+                
+                resultDiv.innerHTML = result;
+            });
+            
+            return panel;
+        }
+        
+        // Create a character sheet panel
+        function createCharacterPanel() {
+            const panel = createPanel('Character Sheet');
+            panel.style.width = "500px";
+            panel.style.height = "600px";
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="padding: 10px;">
+                    <input type="text" placeholder="Character Name" style="width: 100%; font-size: 18px; margin-bottom: 10px;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+                        <div>
+                            <div><strong>Stats</strong></div>
+                            <div>INT: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>REF: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>DEX: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>TECH: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>COOL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>WILL: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>LUCK: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>MOVE: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>BODY: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                            <div>EMP: <input type="number" min="1" max="10" value="5" style="width: 40px;"></div>
+                        </div>
+                        <div>
+                            <div><strong>Derived Stats</strong></div>
+                            <div>HP: <span id="hp-calc">35</span></div>
+                            <div>Humanity: <span id="humanity-calc">50</span></div>
+                            <div><strong>Current Status</strong></div>
+                            <div>HP: <input type="number" id="current-hp" value="35" style="width: 40px;"></div>
+                            <div>Armor: <input type="number" id="armor-sp" value="11" style="width: 40px;"></div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <div><strong>Skills</strong> (Add comma-separated list)</div>
+                        <textarea style="width: 100%; height: 80px;">Handgun +5, Stealth +3, Athletics +4, Perception +4, Conversation +3, Brawling +2, Education +2, Streetwise +4</textarea>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <div><strong>Weapons</strong> (Add comma-separated list)</div>
+                        <textarea style="width: 100%; height: 60px;">Medium Pistol (2d6), Combat Knife (1d6), Heavy Pistol (3d6)</textarea>
+                    </div>
+                    <div>
+                        <div><strong>Cyberware & Gear</strong> (Add comma-separated list)</div>
+                        <textarea style="width: 100%; height: 60px;">Cybereye (Infrared), Light Armorjack (SP11), Agent (Pocket AI), Medscanner</textarea>
+                    </div>
+                </div>
+            `;
+            
+            // Add HP calculation
+            const bodyInput = panel.querySelector('input[min="1"][max="10"]:nth-of-type(9)');
+            const hpCalc = panel.querySelector('#hp-calc');
+            const currentHP = panel.querySelector('#current-hp');
+            
+            bodyInput.addEventListener('change', function() {
+                const body = parseInt(this.value) || 5;
+                const hp = 10 + (body * 5);
+                hpCalc.textContent = hp;
+                currentHP.value = hp;
+            });
+            
+            return panel;
+        }
+        
+        // Create an NPC generator panel
+        function createNPCPanel() {
+            const panel = createPanel('NPC Generator');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <button id="generate-npc">Generate NPC</button>
+                    <select id="npc-type" style="margin-left: 10px;">
+                        <option value="ganger">Ganger</option>
+                        <option value="corp">Corporate</option>
+                        <option value="fixer">Fixer</option>
+                        <option value="nomad">Nomad</option>
+                        <option value="netrunner">Netrunner</option>
+                    </select>
+                </div>
+                <div id="npc-result" style="border: 1px solid #00ccff; padding: 10px;">
+                    Click to generate an NPC
+                </div>
+            `;
+            
+            // Add generation functionality
+            const genButton = panel.querySelector('#generate-npc');
+            const typeSelect = panel.querySelector('#npc-type');
+            const resultDiv = panel.querySelector('#npc-result');
+            
+            const firstNames = ["Johnny", "V", "Jackie", "Rogue", "Panam", "Judy", "Evelyn", "Takemura", "Kerry", "River", "Dex", "Misty", "Viktor", "Dakota", "Saul"];
+            const lastNames = ["Silverhand", "Welles", "Parker", "Palmer", "Alvarez", "Ward", "DeShawn", "Olszewski", "Vektor", "Smith", "Jenkins", "Thompson", "Arasaka", "Militech"];
+            
+            const npcTypes = {
+                ganger: {
+                    skills: ["Handgun +4", "Brawling +5", "Streetwise +4", "Intimidation +4"],
+                    gear: ["Poor quality pistol", "Kevlar vest (SP7)", "Synth-Leather jacket", "Street drugs"],
+                    stats: { REF: 6, BODY: 6, COOL: 5 }
+                },
+                corp: {
+                    skills: ["Business +5", "Human Perception +4", "Education +5", "Persuasion +4", "Handgun +2"],
+                    gear: ["Medium pistol", "Designer clothes", "Agent (high quality)", "Corporate ID"],
+                    stats: { INT: 7, COOL: 6, EMP: 5 }
+                },
+                fixer: {
+                    skills: ["Trading +6", "Streetwise +5", "Persuasion +4", "Handgun +3", "Business +3"],
+                    gear: ["Heavy pistol", "Light armorjack (SP11)", "Encrypted agent", "Credchip with 1000eb"],
+                    stats: { INT: 7, COOL: 7, LUCK: 6 }
+                },
+                nomad: {
+                    skills: ["Drive +6", "Vehicle Tech +5", "Tracking +4", "Rifle +4", "Survival +4"],
+                    gear: ["Assault rifle", "Medium armorjack (SP12)", "Vehicle toolkit", "Fieldscanner"],
+                    stats: { REF: 6, TECH: 7, WILL: 6 }
+                },
+                netrunner: {
+                    skills: ["Interface +6", "Electronics +5", "Stealth +4", "Handgun +3", "Cryptography +4"],
+                    gear: ["Cyberdeck", "Medium pistol", "Cybereye with Interface link", "Program: Sword (6d6)"],
+                    stats: { INT: 8, TECH: 7, COOL: 5 }
+                }
+            };
+            
+            genButton.addEventListener('click', function() {
+                const type = typeSelect.value;
+                const typeData = npcTypes[type];
+                
+                const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                
+                const hp = 10 + ((typeData.stats.BODY || 5) * 5);
+                
+                let result = `
+                    <p><strong>${firstName} ${lastName}</strong> (${type.charAt(0).toUpperCase() + type.slice(1)})</p>
+                    <p><strong>Key Stats:</strong> `;
+                
+                for (const [stat, value] of Object.entries(typeData.stats)) {
+                    result += `${stat} ${value}, `;
+                }
+                
+                result = result.slice(0, -2) + `</p>
+                    <p><strong>HP:</strong> ${hp}</p>
+                    <p><strong>Skills:</strong> ${typeData.skills.join(", ")}</p>
+                    <p><strong>Gear:</strong> ${typeData.gear.join(", ")}</p>
+                `;
+                
+                resultDiv.innerHTML = result;
+            });
+            
+            return panel;
+        }
+        
+        // Create a loot generator panel
+        function createLootPanel() {
+            const panel = createPanel('Loot Generator');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <button id="generate-loot">Generate Loot</button>
+                    <select id="loot-type" style="margin-left: 10px;">
+                        <option value="corpse">Corpse</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="vehicle">Vehicle</option>
+                        <option value="corporate">Corporate Office</option>
+                    </select>
+                </div>
+                <div id="loot-result" style="border: 1px solid #00ccff; padding: 10px;">
+                    Click to generate loot
+                </div>
+            `;
+            
+            // Add generation functionality
+            const genButton = panel.querySelector('#generate-loot');
+            const typeSelect = panel.querySelector('#loot-type');
+            const resultDiv = panel.querySelector('#loot-result');
+            
+            const lootTables = {
+                corpse: [
+                    "10-50 Eurodollars",
+                    "Personal Agent (locked)",
+                    "Cheap pistol (2d6 damage)",
+                    "Drugs (Stims/Black Lace/Blue Glass)",
+                    "Credchip (100-500eb, DV15 Electronics to access)",
+                    "Personal memento (photo/trinket)",
+                    "Encrypted data shard (DV17 Electronics)",
+                    "Cyberware component (100eb value)",
+                    "Gang insignia/Corporate ID",
+                    "Keys (to apartment or vehicle)"
+                ],
+                apartment: [
+                    "200-1000 Eurodollars (hidden)",
+                    "Personal computer (DV15 Electronics to access)",
+                    "Weapon stash (1d6 random weapons)",
+                    "Illegal braindance collection",
+                    "Corporate documents (DV17 Business to understand)",
+                    "Food and drink supplies (1 week)",
+                    "Drugs (dealer quantity)",
+                    "Tech parts (for crafting)",
+                    "Collectible items (500eb value)",
+                    "Hidden cyberware installation kit"
+                ],
+                vehicle: [
+                    "Dashboard mounted weapon (hidden)",
+                    "Emergency medkit",
+                    "Vehicle registration to criminal",
+                    "Smuggling compartment (with contraband)",
+                    "High-end vehicle computer",
+                    "Stolen corporate gear",
+                    "Armor-reinforced panels (extra SP)",
+                    "Tracking device (active)",
+                    "Eurodollars (300-800eb in glove box)",
+                    "Illegal vehicle mods (boosters/weapons)"
+                ],
+                corporate: [
+                    "Secure data shard (1000+eb to right buyer)",
+                    "Corporate ID badges (security access)",
+                    "Prototype device (unique effect)",
+                    "Expensive alcohol/drugs",
+                    "Corporate weapon (high quality)",
+                    "Personal data on employees (blackmail)",
+                    "Access codes to secure area",
+                    "Corporate funds credchip (1000+eb)",
+                    "Encrypted research data",
+                    "Cyberware prototype (unreleased)"
+                ]
+            };
+            
+            genButton.addEventListener('click', function() {
+                const type = typeSelect.value;
+                const table = lootTables[type];
+                
+                let result = `<p><strong>${type.charAt(0).toUpperCase() + type.slice(1)} Loot:</strong></p><ul>`;
+                
+                // Generate 3-5 items
+                const itemCount = Math.floor(Math.random() * 3) + 3;
+                const selectedIndices = new Set();
+                
+                while (selectedIndices.size < itemCount) {
+                    selectedIndices.add(Math.floor(Math.random() * table.length));
+                }
+                
+                for (const index of selectedIndices) {
+                    result += `<li>${table[index]}</li>`;
+                }
+                
+                result += "</ul>";
+                
+                // Add eurodollars
+                const money = Math.floor(Math.random() * 100) + 50;
+                result += `<p><strong>Eurodollars:</strong> ${money}eb</p>`;
+                
+                resultDiv.innerHTML = result;
+            });
+            
+            return panel;
+        }
+        
+        // Create a Night City map panel
+        function createMapPanel() {
+            const panel = createPanel('Night City Map');
+            panel.style.width = "500px";
+            panel.style.height = "400px";
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="text-align: center; padding: 10px;">
+                    <p>Night City Districts:</p>
+                    <div style="border: 1px solid #00ccff; padding: 20px; margin: 10px;">
+                        <div style="position: relative; width: 400px; height: 300px; background-color: #070914; margin: 0 auto; border: 1px solid #00ccff;">
+                            <!-- This is a simplified ASCII-style map -->
+                            <div style="position: absolute; top: 20px; left: 180px; color: #ff4f4f;">City Center</div>
+                            <div style="position: absolute; top: 60px; left: 100px; color: #4f80ff;">Watson</div>
+                            <div style="position: absolute; top: 60px; left: 280px; color: #4fff4f;">Westbrook</div>
+                            <div style="position: absolute; top: 130px; left: 70px; color: #ff4f4f;">Northside</div>
+                            <div style="position: absolute; top: 130px; left: 320px; color: #4fff4f;">Heywood</div>
+                            <div style="position: absolute; top: 200px; left: 150px; color: #ff8f4f;">Santo Domingo</div>
+                            <div style="position: absolute; top: 250px; left: 280px; color: #ff4f4f;">Pacifica</div>
+                            <div style="position: absolute; top: 100px; left: 200px; font-size: 12px; color: #00ccff;">Corpo Plaza</div>
+                            
+                            <!-- Lines connecting districts -->
+                            <div style="position: absolute; top: 40px; left: 170px; width: 60px; height: 1px; background-color: #00ccff;"></div>
+                            <div style="position: absolute; top: 45px; left: 160px; width: 100px; height: 1px; background-color: #00ccff; transform: rotate(45deg);"></div>
+                            <div style="position: absolute; top: 45px; left: 140px; width: 100px; height: 1px; background-color: #00ccff; transform: rotate(-45deg);"></div>
+                            <div style="position: absolute; top: 90px; left: 90px; width: 25px; height: 1px; background-color: #00ccff; transform: rotate(90deg);"></div>
+                            <div style="position: absolute; top: 90px; left: 290px; width: 25px; height: 1px; background-color: #00ccff; transform: rotate(90deg);"></div>
+                            <div style="position: absolute; top: 180px; left: 210px; width: 100px; height: 1px; background-color: #00ccff; transform: rotate(60deg);"></div>
+                            <div style="position: absolute; top: 180px; left: 90px; width: 100px; height: 1px; background-color: #00ccff; transform: rotate(-60deg);"></div>
+                        </div>
+                    </div>
+                    <button id="generate-location">Generate Random Location</button>
+                </div>
+            `;
+            
+            // Add location generation functionality
+            const genButton = panel.querySelector('#generate-location');
+            
+            const districts = [
+                "City Center (Corporate HQs, luxury apartments)",
+                "Watson (Former corporate suburb, now dangerous)",
+                "Westbrook (Upscale shopping and entertainment)",
+                "Heywood (Middle-class residential area)",
+                "Pacifica (Abandoned, gang-controlled)",
+                "Santo Domingo (Industrial zone)",
+                "Northside (Poor, crime-ridden district)"
+            ];
+            
+            const locations = [
+                "Abandoned apartment building",
+                "Street food market",
+                "Underground club",
+                "Corporate security checkpoint",
+                "Ripper doc clinic",
+                "Arms dealer shop",
+                "Dive bar",
+                "Street corner drug deal",
+                "Braindance den",
+                "Security turret nest",
+                "Trauma Team landing pad",
+                "Megabuilding residential block",
+                "Scav hideout",
+                "Outdoor market",
+                "Netrunner den"
+            ];
+            
+            genButton.addEventListener('click', function() {
+                const district = districts[Math.floor(Math.random() * districts.length)];
+                const location = locations[Math.floor(Math.random() * locations.length)];
+                
+                alert(`Location: ${location} in ${district}`);
+            });
+            
+            return panel;
+        }
+        
+        // Create a location generator panel
+        function createLocationPanel() {
+            const panel = createPanel('Location Generator');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <button id="generate-location-details">Generate Location</button>
+                    <select id="location-type" style="margin-left: 10px;">
+                        <option value="bar">Bar/Club</option>
+                        <option value="corpo">Corporate Building</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="store">Store/Shop</option>
+                        <option value="street">Street Scene</option>
+                    </select>
+                </div>
+                <div id="location-result" style="border: 1px solid #00ccff; padding: 10px;">
+                    Click to generate a location
+                </div>
+            `;
+            
+            // Add generation functionality
+            const genButton = panel.querySelector('#generate-location-details');
+            const typeSelect = panel.querySelector('#location-type');
+            const resultDiv = panel.querySelector('#location-result');
+            
+            const nameStart = ["Neo", "Cyber", "Night", "Chrome", "Digital", "Neon", "Tech", "Data", "Retro", "Silver", "Meta", "Glitch", "Hack", "Virtual", "Static"];
+            const nameEnd = ["Dive", "Pit", "Haven", "Space", "Zone", "Lounge", "Byte", "Wave", "Run", "Pulse", "Edge", "Portal", "Link", "Circuit", "Flow"];
+            
+            const locationDetails = {
+                bar: {
+                    features: ["Holographic entertainment", "Synthetic alcohol", "Braindance booths", "Fighting pit", "Private booths", "Dance floor", "Live music", "Gambling tables", "Black market dealer", "Mercenary meetup spot"],
+                    atmosphere: ["Smoky and dim", "Loud and chaotic", "Trendy and upscale", "Seedy and dangerous", "Relaxed and local", "Strange and exotic"],
+                    npcs: ["Bartender (augmented vision)", "Bouncer (obvious cyberware)", "Fixer in the corner", "Drunk corpo", "Street gang members", "Undercover cop"]
+                },
+                corpo: {
+                    features: ["Biometric scanners", "Armed guards", "Reception desk", "Executive offices", "Research lab", "Server room", "Meeting rooms", "Cafeteria", "Security checkpoint", "Underground parking"],
+                    atmosphere: ["Sterile and clean", "Oppressive and monitored", "Luxurious and wasteful", "High-tech and sleek", "Busy and stressful"],
+                    npcs: ["Security guard", "Receptionist (corporate loyalty)", "Stressed employee", "Executive (enhanced)", "Maintenance worker", "IT specialist"]
+                },
+                apartment: {
+                    features: ["Broken appliances", "Reinforced door", "Hidden weapon stash", "Computer terminal", "Personal armory", "Basic medical supplies", "Surveillance system", "Makeshift workshop", "Smuggling compartment", "Air filtration"],
+                    atmosphere: ["Cramped and dirty", "Surprisingly clean", "High-tech but small", "Personalized and unique", "Barely habitable", "Luxury amid decay"],
+                    npcs: ["Building super", "Neighbor (nosy)", "Security drone", "Food delivery person", "Maintenance bot", "Unexpected visitor"]
+                },
+                store: {
+                    features: ["Security shutters", "Display cases", "Counter with armor", "Back room (illegal goods)", "Weapon displays", "Medical supplies", "Tech components", "Clothing racks", "Food dispensers", "Repair station"],
+                    atmosphere: ["Cluttered and packed", "Organized and corporate", "Questionable hygiene", "Fortified and paranoid", "Bright and flashy"],
+                    npcs: ["Shop owner (armed)", "Security guard", "Desperate customer", "Rich customer", "Shoplifter", "Corporate inspector"]
+                },
+                street: {
+                    features: ["Food vendors", "Homeless camp", "Street performers", "Security cameras", "Police drone", "Market stalls", "Graffiti murals", "Public screens", "Trash piles", "Abandoned vehicles"],
+                    atmosphere: ["Crowded and noisy", "Empty and dangerous", "Rainy and reflective", "Busy daytime rush", "Late night emptiness"],
+                    npcs: ["Street vendor", "Gang members", "Corporate workers", "Homeless person", "Street kid", "Police patrol"]
+                }
+            };
+            
+            genButton.addEventListener('click', function() {
+                const type = typeSelect.value;
+                const details = locationDetails[type];
+                
+                // Generate name
+                const start = nameStart[Math.floor(Math.random() * nameStart.length)];
+                const end = nameEnd[Math.floor(Math.random() * nameEnd.length)];
+                let name = start + end;
+                
+                if (type === "corpo") {
+                    name += " Corporation";
+                } else if (type === "apartment") {
+                    name = "Apartment in " + name + " Complex";
+                } else if (type === "store") {
+                    name += " Shop";
+                } else if (type === "street") {
+                    name += " Street";
+                }
+                
+                // Pick random features, atmosphere and NPCs
+                const feature1 = details.features[Math.floor(Math.random() * details.features.length)];
+                const feature2 = details.features[Math.floor(Math.random() * details.features.length)];
+                const atmosphere = details.atmosphere[Math.floor(Math.random() * details.atmosphere.length)];
+                const npc1 = details.npcs[Math.floor(Math.random() * details.npcs.length)];
+                const npc2 = details.npcs[Math.floor(Math.random() * details.npcs.length)];
+                
+                const result = `
+                    <p><strong>${name}</strong></p>
+                    <p><strong>Atmosphere:</strong> ${atmosphere}</p>
+                    <p><strong>Notable Features:</strong></p>
+                    <ul>
+                        <li>${feature1}</li>
+                        <li>${feature2}</li>
+                    </ul>
+                    <p><strong>Present NPCs:</strong></p>
+                    <ul>
+                        <li>${npc1}</li>
+                        <li>${npc2}</li>
+                    </ul>
+                `;
+                
+                resultDiv.innerHTML = result;
+            });
+            
+            return panel;
+        }
+        
+        // Create a random encounter panel
+        function createEncounterPanel() {
+            const panel = createPanel('Random Encounter');
+            
+            panel.querySelector('.panel-content').innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <button id="generate-encounter">Generate Encounter</button>
+                    <select id="encounter-type" style="margin-left: 10px;">
+                        <option value="combat">Combat</option>
+                        <option value="social">Social</option>
+                        <option value="environmental">Environmental</option>
+                        <option value="mystery">Mystery</option>
+                    </select>
+                </div>
+                <div id="encounter-result" style="border: 1px solid #00ccff; padding: 10px;">
+                    Click to generate an encounter
+                </div>
+            `;
+            
+            // Add generation functionality
+            const genButton = panel.querySelector('#generate-encounter');
+            const typeSelect = panel.querySelector('#encounter-type');
+            const resultDiv = panel.querySelector('#encounter-result');
+            
+            const encounters = {
+                combat: [
+                    "Gang ambush (3-6 gangers with melee weapons)",
+                    "Corporate security checkpoint (2 guards, possibly lethal)",
+                    "Cyberpsycho attack (1 heavily augmented opponent)",
+                    "Street robbery gone wrong (2-3 desperate criminals)",
+                    "Rival edgerunners (enemy netrunner plus backup)",
+                    "Police drone patrol (non-lethal but persistent)",
+                    "Corporate extraction team (4 professionals, targeting NPC)",
+                    "Gang territory dispute (crossfire situation)",
+                    "Trauma Team operation (defending their client)",
+                    "Cyberware harvesting scavs (3-5 well-equipped)",
+                    "Malfunctioning security bot (heavy weapons)"
+                ],
+                social: [
+                    "Fixer with a job offer (time-sensitive)",
+                    "Journalist seeking insider information",
+                    "Ex-corpo whistleblower needing protection",
+                    "Street kid with valuable information",
+                    "Corporate rivalry dispute (players caught in middle)",
+                    "Old friend in serious trouble",
+                    "Trauma Team medic off-duty (potential contact)",
+                    "Braindance producer seeking 'real experiences'",
+                    "Tech dealer with prototype cyberware",
+                    "Netrunner offering data for protection"
+                ],
+                environmental: [
+                    "Power outage in a dangerous district",
+                    "Toxic chemical spill blocking main route",
+                    "Riot breaking out (corporate protest)",
+                    "Sudden weather control malfunction (acid rain)",
+                    "Building collapse (need to search for survivors)",
+                    "Cyberware malfunction zone (causes glitches)",
+                    "Corporate lockdown (need to find alternate route)",
+                    "Fire in megabuilding (limited escape routes)",
+                    "Public transit failure (stranded in bad area)",
+                    "NCPD mass scanning operation (checking IDs)"
+                ],
+                mystery: [
+                    "Encrypted message on abandoned terminal",
+                    "Braindance recording showing murder clues",
+                    "Corporate data shard with mysterious coordinates",
+                    "Repeated sightings of missing person",
+                    "Illegal cyberware causing strange side effects",
+                    "Netrunning trail leading to hidden server",
+                    "Blackmail scheme targeting multiple victims",
+                    "Mysterious symbol appearing across the city",
+                    "Disappearing street kids investigation",
+                    "Conspiracy involving contaminated cyberware"
+                ]
+            };
+            
+            genButton.addEventListener('click', function() {
+                const type = typeSelect.value;
+                const encounterList = encounters[type];
+                
+                const encounter = encounterList[Math.floor(Math.random() * encounterList.length)];
+                
+                // Generate difficulty and reward
+                const difficulties = ["Easy (DV 13 checks)", "Average (DV 15 checks)", "Challenging (DV 17 checks)", "Difficult (DV 21 checks)", "Very difficult (DV 24 checks)"];
+                const difficulty = difficulties[Math.floor(Math.random() * difficulties.length)];
+                
+                const rewards = ["100-300 eurodollars", "Weapon or armor", "Useful cyberware", "Valuable information", "Corporate contact", "Street cred", "Rare tech item", "Vehicle access"];
+                const reward = rewards[Math.floor(Math.random() * rewards.length)];
+                
+                // Generate complication
+                const complications = [
+                    "Time limit (must complete quickly)",
+                    "Civilian bystanders at risk",
+                    "Rival group with same objective",
+                    "Corporate security response incoming",
+                    "Environmental hazard (toxic, electrical, etc.)",
+                    "Media presence (actions will be recorded)",
+                    "NCPD involvement imminent",
+                    "Cyberware interference zone",
+                    "An NPC ally betrays the group",
+                    "Target/objective is not what it seems"
+                ];
+                const complication = complications[Math.floor(Math.random() * complications.length)];
+                
+                const result = `
+                    <p><strong>${type.charAt(0).toUpperCase() + type.slice(1)} Encounter</strong></p>
+                    <p>${encounter}</p>
+                    <p><strong>Difficulty:</strong> ${difficulty}</p>
+                    <p><strong>Potential Reward:</strong> ${reward}</p>
+                    <p><strong>Complication:</strong> ${complication}</p>
+                `;
+                
+                resultDiv.innerHTML = result;
+            });
+            
+            return panel;
+        }
+        
+        // Font control functions
+        function updateFontSize(size) {
+            currentFontSize = size;
+            document.body.style.fontSize = size + 'px';
+            
+            // Update active button
+            const buttons = document.querySelectorAll('.font-size-btn');
+            buttons.forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.getAttribute('data-size')) === size);
+            });
+        }
+        
+        function updateFontFamily(family) {
+            currentFontFamily = family;
+            document.body.style.fontFamily = family;
+        }
+        
+        // Add event listeners once the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Panel creation event listeners
+            document.getElementById('add-notes').addEventListener('click', function(e) {
+                e.preventDefault();
+                createNotesPanel();
+            });
+            
+            document.getElementById('add-dice').addEventListener('click', function(e) {
+                e.preventDefault();
+                createDicePanel();
+            });
+            
+            document.getElementById('add-rules').addEventListener('click', function(e) {
+                e.preventDefault();
+                createRulesPanel();
+            });
+            
+            document.getElementById('add-initiative').addEventListener('click', function(e) {
+                e.preventDefault();
+                createInitiativePanel();
+            });
+            
+            document.getElementById('add-timer').addEventListener('click', function(e) {
+                e.preventDefault();
+                createTimerPanel();
+            });
+            
+            document.getElementById('add-calculator').addEventListener('click', function(e) {
+                e.preventDefault();
+                createCalculatorPanel();
+            });
+            
+            document.getElementById('add-weapons').addEventListener('click', function(e) {
+                e.preventDefault();
+                createWeaponsPanel();
+            });
+            
+            document.getElementById('add-armor').addEventListener('click', function(e) {
+                e.preventDefault();
+                createArmorPanel();
+            });
+            
+            document.getElementById('add-critical').addEventListener('click', function(e) {
+                e.preventDefault();
+                createCriticalInjuryPanel();
+            });
+            
+            document.getElementById('add-netrunning').addEventListener('click', function(e) {
+                e.preventDefault();
+                createNetrunningPanel();
+            });
+            
+            document.getElementById('add-character').addEventListener('click', function(e) {
+                e.preventDefault();
+                createCharacterPanel();
+            });
+            
+            document.getElementById('add-npc').addEventListener('click', function(e) {
+                e.preventDefault();
+                createNPCPanel();
+            });
+            
+            document.getElementById('add-loot').addEventListener('click', function(e) {
+                e.preventDefault();
+                createLootPanel();
+            });
+            
+            document.getElementById('add-map').addEventListener('click', function(e) {
+                e.preventDefault();
+                createMapPanel();
+            });
+            
+            document.getElementById('add-location').addEventListener('click', function(e) {
+                e.preventDefault();
+                createLocationPanel();
+            });
+            
+            document.getElementById('add-encounter').addEventListener('click', function(e) {
+                e.preventDefault();
+                createEncounterPanel();
+            });
+            
+            // Font size buttons
+            document.querySelectorAll('.font-size-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const size = parseInt(this.getAttribute('data-size'));
+                    updateFontSize(size);
+                });
+            });
+            
+            // Font family select
+            document.getElementById('font-family').addEventListener('change', function() {
+                updateFontFamily(this.value);
+            });
+            
+            // Apply font button
+            document.getElementById('apply-font').addEventListener('click', function() {
+                const panels = document.querySelectorAll('.panel');
+                panels.forEach(panel => {
+                    panel.style.fontSize = currentFontSize + 'px';
+                    panel.style.fontFamily = currentFontFamily;
+                });
+                alert('Font applied to all panels');
+            });
+            
+            // Layout management
+            document.getElementById('save-layout').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get all panels
+                const panels = document.querySelectorAll('.panel');
+                const savedPanels = [];
+                
+                panels.forEach(panel => {
+                    const title = panel.querySelector('.panel-header div').textContent;
+                    
+                    savedPanels.push({
+                        title: title,
+                        left: panel.style.left,
+                        top: panel.style.top,
+                        width: panel.style.width,
+                        height: panel.style.height,
+                        zIndex: panel.style.zIndex
+                    });
+                });
+                
+                localStorage.setItem('cyberpunk-layout', JSON.stringify(savedPanels));
+                alert('Layout saved');
+            });
+            
+            document.getElementById('load-layout').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const savedLayout = localStorage.getItem('cyberpunk-layout');
+                
+                if (!savedLayout) {
+                    alert('No saved layout found');
+                    return;
+                }
+                
+                // Clear current layout
+                document.querySelectorAll('.panel').forEach(panel => panel.remove());
+                
+                // Parse saved layout
+                const panels = JSON.parse(savedLayout);
+                
+                // Special handling based on panel titles
+                panels.forEach(panel => {
+                    let newPanel;
+                    
+                    // Create appropriate panel type based on title
+                    if (panel.title === 'Notes') {
+                        newPanel = createNotesPanel();
+                    } else if (panel.title === 'Dice Roller') {
+                        newPanel = createDicePanel();
+                    } else if (panel.title === 'Rules Reference') {
+                        newPanel = createRulesPanel();
+                    } else if (panel.title === 'Initiative Tracker') {
+                        newPanel = createInitiativePanel();
+                    } else if (panel.title === 'Game Timer') {
+                        newPanel = createTimerPanel();
+                    } else if (panel.title === 'Calculator') {
+                        newPanel = createCalculatorPanel();
+                    } else if (panel.title === 'Weapons Table') {
+                        newPanel = createWeaponsPanel();
+                    } else if (panel.title === 'Armor Table') {
+                        newPanel = createArmorPanel();
+                    } else if (panel.title === 'Critical Injuries') {
+                        newPanel = createCriticalInjuryPanel();
+                    } else if (panel.title === 'Netrunning') {
+                        newPanel = createNetrunningPanel();
+                    } else if (panel.title.includes('Character')) {
+                        newPanel = createCharacterPanel();
+                    } else if (panel.title.includes('NPC')) {
+                        newPanel = createNPCPanel();
+                    } else if (panel.title.includes('Loot')) {
+                        newPanel = createLootPanel();
+                    } else if (panel.title.includes('Map')) {
+                        newPanel = createMapPanel();
+                    } else if (panel.title.includes('Location')) {
+                        newPanel = createLocationPanel();
+                    } else if (panel.title.includes('Encounter')) {
+                        newPanel = createEncounterPanel();
+                    } else {
+                        // Default to notes panel
+                        newPanel = createNotesPanel();
+                    }
+                    
+                    // Apply saved position and size
+                    newPanel.style.left = panel.left;
+                    newPanel.style.top = panel.top;
+                    if (panel.width) newPanel.style.width = panel.width;
+                    if (panel.height) newPanel.style.height = panel.height;
+                    newPanel.style.zIndex = panel.zIndex;
+                });
+                
+                alert('Layout loaded');
+            });
+            
+            document.getElementById('clear-layout').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (confirm('Remove all panels?')) {
+                    document.querySelectorAll('.panel').forEach(panel => panel.remove());
+                }
+            });
+            
+            document.getElementById('reset-layout').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (confirm('Reset to default layout?')) {
+                    // Clear current layout
+                    document.querySelectorAll('.panel').forEach(panel => panel.remove());
+                    
+                    // Create default layout
+                    createNotesPanel();
+                    createDicePanel();
+                    createInitiativePanel();
+                }
+            });
+            
+            // Toggle animations
+            document.getElementById('toggle-animations').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.body.classList.toggle('no-animations');
+                
+                if (document.body.classList.contains('no-animations')) {
+                    alert('Animations disabled');
+                } else {
+                    alert('Animations enabled');
+                }
+            });
+            
+            // Font controls close button
+            document.getElementById('close-font-controls').addEventListener('click', function() {
+                document.querySelector('.controls').style.display = 'none';
+            });
+            
+            // Add button to show font controls in the settings menu
+            document.getElementById('about').insertAdjacentHTML('beforebegin', 
+                '<a href="#" id="show-font-settings">Font Settings</a>');
+                
+            document.getElementById('show-font-settings').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector('.controls').style.display = 'block';
+            });
+            
+            document.getElementById('about').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Cyberpunk RED GM Screen\nA minimalist tool for Game Masters\nVersion 1.0');
+            });
+            
+            // Auto-Organize panels
+            document.getElementById('auto-organize').addEventListener('click', function(e) {
+                e.preventDefault();
+                autoOrganizePanels();
+            });
+            
+            // Fit panels to window
+            document.getElementById('fit-to-window').addEventListener('click', function(e) {
+                e.preventDefault();
+                fitPanelsToWindow();
+            });
+            
+            // Create an initial notes panel
+            createNotesPanel();
+            
+            // Function to auto-organize panels in a grid based on panel title
+            function autoOrganizePanels() {
+                const panels = document.querySelectorAll('.panel');
+                if (panels.length === 0) return;
+                
+                // Sort panels by title
+                const sortedPanels = Array.from(panels).sort((a, b) => {
+                    const titleA = a.querySelector('.panel-header div').textContent;
+                    const titleB = b.querySelector('.panel-header div').textContent;
+                    return titleA.localeCompare(titleB);
+                });
+                
+                // Calculate grid dimensions
+                const totalPanels = sortedPanels.length;
+                const cols = Math.ceil(Math.sqrt(totalPanels)); // Square-ish grid
+                
+                // Get available space
+                const containerWidth = window.innerWidth - 40; // 20px margin on each side
+                const containerHeight = window.innerHeight - 100; // 100px for toolbar and margins
+                
+                // Calculate panel dimensions
+                const panelWidth = Math.floor(containerWidth / cols);
+                const panelHeight = Math.floor(containerHeight / Math.ceil(totalPanels / cols));
+                
+                // Position panels
+                sortedPanels.forEach((panel, index) => {
+                    const row = Math.floor(index / cols);
+                    const col = index % cols;
+                    
+                    panel.style.left = (20 + col * panelWidth) + 'px';
+                    panel.style.top = (70 + row * panelHeight) + 'px'; // 70px to account for toolbar
+                    panel.style.width = (panelWidth - 20) + 'px'; // 10px gap on each side
+                    panel.style.height = (panelHeight - 20) + 'px'; // 10px gap on each side
+                    panel.style.zIndex = index + 1;
+                });
+                
+                alert('Panels organized by name');
+            }
+            
+            // Function to fit all panels to window dimensions
+            function fitPanelsToWindow() {
+                const panels = document.querySelectorAll('.panel');
+                if (panels.length === 0) return;
+                
+                // Group panels by type (based on title)
+                const panelGroups = {};
+                
+                panels.forEach(panel => {
+                    const title = panel.querySelector('.panel-header div').textContent;
+                    
+                    // Extract panel type from title
+                    let type = title.split(' ')[0].toLowerCase();
+                    if (!panelGroups[type]) {
+                        panelGroups[type] = [];
+                    }
+                    panelGroups[type].push(panel);
+                });
+                
+                // Get list of panel types
+                const panelTypes = Object.keys(panelGroups);
+                
+                // Calculate layout based on number of panel types
+                const numGroups = panelTypes.length;
+                let rows, cols;
+                
+                if (numGroups <= 2) {
+                    rows = 1;
+                    cols = numGroups;
+                } else if (numGroups <= 6) {
+                    rows = 2;
+                    cols = Math.ceil(numGroups / rows);
+                } else {
+                    rows = 3;
+                    cols = Math.ceil(numGroups / rows);
+                }
+                
+                // Get available space
+                const containerWidth = window.innerWidth - 40;
+                const containerHeight = window.innerHeight - 100;
+                
+                // Calculate cell dimensions
+                const cellWidth = Math.floor(containerWidth / cols);
+                const cellHeight = Math.floor(containerHeight / rows);
+                
+                // Position panels by group
+                panelTypes.forEach((type, groupIndex) => {
+                    const row = Math.floor(groupIndex / cols);
+                    const col = groupIndex % cols;
+                    
+                    const groupPanels = panelGroups[type];
+                    const numPanelsInGroup = groupPanels.length;
+                    
+                    if (numPanelsInGroup === 1) {
+                        // Single panel - fill the cell
+                        const panel = groupPanels[0];
+                        panel.style.left = (20 + col * cellWidth) + 'px';
+                        panel.style.top = (70 + row * cellHeight) + 'px';
+                        panel.style.width = (cellWidth - 20) + 'px';
+                        panel.style.height = (cellHeight - 20) + 'px';
+                        panel.style.zIndex = groupIndex + 1;
+                    } else {
+                        // Multiple panels - create a sub-grid
+                        const subCols = Math.ceil(Math.sqrt(numPanelsInGroup));
+                        const subRows = Math.ceil(numPanelsInGroup / subCols);
+                        
+                        const subCellWidth = Math.floor(cellWidth / subCols);
+                        const subCellHeight = Math.floor(cellHeight / subRows);
+                        
+                        groupPanels.forEach((panel, subIndex) => {
+                            const subRow = Math.floor(subIndex / subCols);
+                            const subCol = subIndex % subCols;
+                            
+                            panel.style.left = (20 + col * cellWidth + subCol * subCellWidth) + 'px';
+                            panel.style.top = (70 + row * cellHeight + subRow * subCellHeight) + 'px';
+                            panel.style.width = (subCellWidth - 20) + 'px';
+                            panel.style.height = (subCellHeight - 20) + 'px';
+                            panel.style.zIndex = groupIndex + 1;
+                        });
+                    }
+                });
+                
+                alert('Panels fit to window and organized by type');
+            }
+        });
+    </script>
+</body>
+</html>

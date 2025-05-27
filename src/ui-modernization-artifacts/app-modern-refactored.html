@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cyberpunk RED - GM Screen</title>
+    <link rel="stylesheet" href="css/styles-modern.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="js/hotfix.js"></script>
+    <script src="js/app-modern.js"></script>
+</head>
+<body class="theme-neon-synthwave">
+    <!-- Toolbar with dropdown menus -->
+    <div class="toolbar" role="navigation">
+        <div class="title">Cyberpunk RED GM Screen</div>
+        
+        <!-- Panel menu -->
+        <div class="dropdown">
+            <button class="dropbtn" aria-haspopup="true" aria-expanded="false">Add Panel</button>
+            <div class="dropdown-content" role="menu">
+                <div class="menu-category" role="presentation">GM Tools</div>
+                <a href="#" class="panel-button" id="add-notes" role="menuitem">Notes</a>
+                <a href="#" class="panel-button" id="add-dice" role="menuitem">Dice Roller</a>
+                <a href="#" class="panel-button" id="add-initiative" role="menuitem">Initiative Tracker</a>
+                <a href="#" class="panel-button" id="add-timer" role="menuitem">Game Timer</a>
+                <a href="#" class="panel-button" id="add-calculator" role="menuitem">Calculator</a>
+                
+                <div class="menu-category" role="presentation">Reference</div>
+                <a href="#" class="panel-button" id="add-rules" role="menuitem">Rules Reference</a>
+                <a href="#" class="panel-button" id="add-weapons" role="menuitem">Weapons Table</a>
+                <a href="#" class="panel-button" id="add-armor" role="menuitem">Armor Table</a>
+                <a href="#" class="panel-button" id="add-critical" role="menuitem">Critical Injuries</a>
+                <a href="#" class="panel-button" id="add-netrunning" role="menuitem">Netrunning</a>
+                
+                <div class="menu-category" role="presentation">Characters</div>
+                <a href="#" class="panel-button" id="add-character" role="menuitem">Character Sheet</a>
+                <a href="#" class="panel-button" id="add-npc" role="menuitem">NPC Generator</a>
+                <a href="#" class="panel-button" id="add-loot" role="menuitem">Loot Generator</a>
+                
+                <div class="menu-category" role="presentation">World</div>
+                <a href="#" class="panel-button" id="add-map" role="menuitem">Night City Map</a>
+                <a href="#" class="panel-button" id="add-location" role="menuitem">Location Generator</a>
+                <a href="#" class="panel-button" id="add-encounter" role="menuitem">Random Encounter</a>
+            </div>
+        </div>
+        
+        <!-- Layout menu -->
+        <div class="dropdown">
+            <button class="dropbtn" aria-haspopup="true" aria-expanded="false">Layout</button>
+            <div class="dropdown-content" role="menu">
+                <a href="#" class="layout-button" id="save-layout" role="menuitem">Save Layout</a>
+                <a href="#" class="layout-button" id="load-layout" role="menuitem">Load Layout</a>
+                <a href="#" class="layout-button" id="clear-layout" role="menuitem">Clear Layout</a>
+                <a href="#" class="layout-button" id="reset-layout" role="menuitem">Reset Layout</a>
+                <a href="#" class="layout-button" id="auto-organize" role="menuitem">Auto-Organize</a>
+                <a href="#" class="layout-button" id="fit-to-window" role="menuitem">Fit to Window</a>
+            </div>
+        </div>
+        
+        <!-- Settings menu -->
+        <div class="dropdown">
+            <button class="dropbtn" aria-haspopup="true" aria-expanded="false">Settings</button>
+            <div class="dropdown-content" role="menu">
+                <a href="#" class="settings-button" id="toggle-animations" role="menuitem">Toggle Animations</a>
+                <a href="#" class="settings-button" id="show-font-settings" role="menuitem">Font Settings</a>
+                <a href="#" class="settings-button" id="about" role="menuitem">About</a>
+            </div>
+        </div>
+        
+        <!-- Theme switcher -->
+        <div class="theme-switcher" role="radiogroup" aria-label="Theme Selection">
+            <span id="theme-label">Theme:</span>
+            <div class="theme-options">
+                <button type="button" class="theme-option theme-neon active" 
+                        data-theme="neon-synthwave" 
+                        aria-labelledby="theme-label neon-theme-name"
+                        aria-checked="true">
+                    <span id="neon-theme-name" class="sr-only">Neon Synthwave</span>
+                </button>
+                <button type="button" class="theme-option theme-noir" 
+                        data-theme="tech-noir" 
+                        aria-labelledby="theme-label noir-theme-name"
+                        aria-checked="false">
+                    <span id="noir-theme-name" class="sr-only">Tech Noir</span>
+                </button>
+                <button type="button" class="theme-option theme-minimal" 
+                        data-theme="minimal" 
+                        aria-labelledby="theme-label minimal-theme-name"
+                        aria-checked="false">
+                    <span id="minimal-theme-name" class="sr-only">Minimal</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Font controls dialog -->
+    <div class="controls" style="display: none;" role="dialog" aria-labelledby="font-controls-title">
+        <div class="font-controls-header">
+            <span id="font-controls-title">Font Settings</span>
+            <button class="close-button" id="close-font-controls" aria-label="Close font settings">&times;</button>
+        </div>
+        <div class="font-options">
+            <label for="font-size-group">Font Size</label>
+            <div class="font-buttons" id="font-size-group" role="radiogroup" aria-label="Font size selection">
+                <button type="button" class="font-size-btn" data-size="12" aria-pressed="false">Small</button>
+                <button type="button" class="font-size-btn active" data-size="16" aria-pressed="true">Medium</button>
+                <button type="button" class="font-size-btn" data-size="20" aria-pressed="false">Large</button>
+            </div>
+        </div>
+        <div class="font-options">
+            <label for="font-family">Font Family</label>
+            <select id="font-family" aria-label="Select font family">
+                <option value="var(--cp-font-family-mono)">Monospace</option>
+                <option value="var(--cp-font-family-base)">Sans-serif</option>
+                <option value="var(--cp-font-family-display)">Display</option>
+            </select>
+        </div>
+        <button id="apply-font">Apply Font</button>
+    </div>
+
+    <!-- Notifications container will be created by JS -->
+</body>
+</html>

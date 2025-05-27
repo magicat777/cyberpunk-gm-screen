@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyberpunk Theme Demo</title>
+    <link rel="stylesheet" href="css/styles-modern.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .demo-section {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid var(--theme-primary);
+            border-radius: var(--cp-border-radius-md);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        .demo-heading {
+            color: var(--theme-primary);
+            font-family: var(--cp-font-family-display);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--theme-primary);
+            padding-bottom: 10px;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .demo-item {
+            padding: 15px;
+            border: 1px solid var(--theme-primary);
+            border-radius: var(--cp-border-radius-sm);
+            background-color: var(--theme-bg-secondary);
+        }
+        
+        .color-swatch {
+            height: 40px;
+            margin-bottom: 10px;
+            border-radius: var(--cp-border-radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="theme-neon-synthwave">
+    <div class="toolbar">
+        <div class="title">Cyberpunk Theme Demo</div>
+        
+        <!-- Theme switcher -->
+        <div class="theme-switcher">
+            <label>Theme:</label>
+            <div class="theme-options">
+                <div class="theme-option theme-neon active" data-theme="neon-synthwave" title="Neon Synthwave"></div>
+                <div class="theme-option theme-noir" data-theme="tech-noir" title="Tech Noir"></div>
+                <div class="theme-option theme-minimal" data-theme="minimal" title="Minimal"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h1 class="demo-heading">Theme Colors</h1>
+        
+        <div class="demo-grid">
+            <div class="demo-item">
+                <div class="color-swatch" style="background-color: var(--theme-primary);"></div>
+                <p>Primary Color</p>
+                <code>var(--theme-primary)</code>
+            </div>
+            
+            <div class="demo-item">
+                <div class="color-swatch" style="background-color: var(--theme-secondary);"></div>
+                <p>Secondary Color</p>
+                <code>var(--theme-secondary)</code>
+            </div>
+            
+            <div class="demo-item">
+                <div class="color-swatch" style="background-color: var(--theme-accent);"></div>
+                <p>Accent Color</p>
+                <code>var(--theme-accent)</code>
+            </div>
+            
+            <div class="demo-item">
+                <div class="color-swatch" style="background-color: var(--theme-bg-primary);"></div>
+                <p>Background Primary</p>
+                <code>var(--theme-bg-primary)</code>
+            </div>
+            
+            <div class="demo-item">
+                <div class="color-swatch" style="background-color: var(--theme-bg-secondary);"></div>
+                <p>Background Secondary</p>
+                <code>var(--theme-bg-secondary)</code>
+            </div>
+            
+            <div class="demo-item">
+                <div class="color-swatch" style="background-color: var(--theme-panel-bg);"></div>
+                <p>Panel Background</p>
+                <code>var(--theme-panel-bg)</code>
+            </div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h1 class="demo-heading">Typography</h1>
+        
+        <div class="demo-item">
+            <h1 style="font-family: var(--cp-font-family-display);">Display Font</h1>
+            <p style="font-family: var(--cp-font-family-display);">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890</p>
+            <code>var(--cp-font-family-display)</code>
+        </div>
+        
+        <div class="demo-item">
+            <h1 style="font-family: var(--cp-font-family-base);">Base Font</h1>
+            <p style="font-family: var(--cp-font-family-base);">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890</p>
+            <code>var(--cp-font-family-base)</code>
+        </div>
+        
+        <div class="demo-item">
+            <h1 style="font-family: var(--cp-font-family-mono);">Mono Font</h1>
+            <p style="font-family: var(--cp-font-family-mono);">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>1234567890</p>
+            <code>var(--cp-font-family-mono)</code>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h1 class="demo-heading">UI Components</h1>
+        
+        <div class="demo-grid">
+            <div class="demo-item">
+                <h3>Buttons</h3>
+                <button>Standard Button</button>
+                <button style="background-color: var(--theme-accent); color: white;">Accent Button</button>
+            </div>
+            
+            <div class="demo-item">
+                <h3>Form Elements</h3>
+                <input type="text" placeholder="Text Input">
+                <select>
+                    <option>Option 1</option>
+                    <option>Option 2</option>
+                </select>
+            </div>
+            
+            <div class="demo-item">
+                <h3>Panels</h3>
+                <div style="width: 100%; height: 100px; position: relative;" class="panel">
+                    <div class="panel-header">
+                        <div>Panel Title</div>
+                        <button class="close-button">&times;</button>
+                    </div>
+                    <div class="panel-content">Panel content</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="demo-section">
+        <h1 class="demo-heading">Sample Panel Layout</h1>
+        
+        <button id="create-sample">Create Sample Layout</button>
+        <button id="clear-sample">Clear Panels</button>
+    </div>
+    
+    <script>
+        // Theme switching functionality
+        function switchTheme(themeName) {
+            // Remove all theme classes
+            document.body.classList.remove('theme-neon-synthwave', 'theme-tech-noir', 'theme-minimal');
+            
+            // Add selected theme class
+            document.body.classList.add('theme-' + themeName);
+            
+            // Update active theme option
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.toggle('active', option.getAttribute('data-theme') === themeName);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme switcher
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const theme = this.getAttribute('data-theme');
+                    switchTheme(theme);
+                });
+            });
+            
+            // Sample layout creator
+            document.getElementById('create-sample').addEventListener('click', function() {
+                // Define sample panels
+                const panels = [
+                    {
+                        title: 'Dice Roller',
+                        content: `
+                            <div class="dice-container">
+                                <div class="dice-controls">
+                                    <select>
+                                        <option>1</option><option>2</option><option>3</option>
+                                    </select>
+                                    d
+                                    <select>
+                                        <option>6</option><option>10</option><option>20</option>
+                                    </select>
+                                    <button>Roll</button>
+                                </div>
+                                <div id="dice-result">
+                                    <div>Rolls: 3, 5, 2</div>
+                                    <div class="dice-total">10</div>
+                                </div>
+                            </div>
+                        `,
+                        left: '50px',
+                        top: '400px'
+                    },
+                    {
+                        title: 'Notes',
+                        content: '<textarea>Welcome to the Cyberpunk RED GM Screen!\n\nThis is a themed demo showing the new styling system.</textarea>',
+                        left: '500px',
+                        top: '400px'
+                    },
+                    {
+                        title: 'Initiative Tracker',
+                        content: `
+                            <div class="initiative-form">
+                                <input type="text" placeholder="Name">
+                                <input type="number" placeholder="Roll">
+                                <button>Add</button>
+                            </div>
+                            <div class="initiative-table">
+                                <div class="initiative-item initiative-pc initiative-active">
+                                    <div>V</div>
+                                    <div>18</div>
+                                </div>
+                                <div class="initiative-item initiative-npc">
+                                    <div>Corp Security</div>
+                                    <div>15</div>
+                                </div>
+                                <div class="initiative-item initiative-pc">
+                                    <div>Netrunner</div>
+                                    <div>12</div>
+                                </div>
+                            </div>
+                        `,
+                        left: '950px',
+                        top: '400px'
+                    }
+                ];
+                
+                // Clear existing panels
+                document.querySelectorAll('.demo-panel').forEach(panel => panel.remove());
+                
+                // Create panels
+                panels.forEach(panelInfo => {
+                    const panel = document.createElement('div');
+                    panel.className = 'panel demo-panel';
+                    panel.style.position = 'absolute';
+                    panel.style.left = panelInfo.left;
+                    panel.style.top = panelInfo.top;
+                    panel.style.width = '400px';
+                    panel.style.height = '300px';
+                    
+                    panel.innerHTML = `
+                        <div class="panel-header">
+                            <div>${panelInfo.title}</div>
+                            <button class="close-button">&times;</button>
+                        </div>
+                        <div class="panel-content">${panelInfo.content}</div>
+                        <div class="resize-handle"></div>
+                    `;
+                    
+                    document.body.appendChild(panel);
+                    
+                    // Add close functionality
+                    panel.querySelector('.close-button').addEventListener('click', function() {
+                        panel.remove();
+                    });
+                });
+            });
+            
+            // Clear sample panels
+            document.getElementById('clear-sample').addEventListener('click', function() {
+                document.querySelectorAll('.demo-panel').forEach(panel => panel.remove());
+            });
+        });
+    </script>
+</body>
+</html>

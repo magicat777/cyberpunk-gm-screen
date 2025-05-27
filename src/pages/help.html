@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Help - Cyberpunk RED GM Screen</title>
+    <link rel="stylesheet" href="../css/styles-modern.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Help and documentation for using the Cyberpunk RED Game Master Screen">
+    <style>
+        .content-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: rgba(30, 30, 45, 0.7);
+            border: 1px solid var(--accent-primary, #00ccff);
+            border-radius: 5px;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--accent-primary, #00ccff);
+            text-decoration: none;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        h2 {
+            color: var(--accent-primary, #00ccff);
+            border-bottom: 1px solid rgba(0, 204, 255, 0.3);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+        }
+        
+        h3 {
+            color: var(--accent-primary, #00ccff);
+            margin-top: 1.5rem;
+        }
+        
+        .help-section {
+            margin-bottom: 2rem;
+        }
+        
+        code {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        th, td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            background-color: rgba(0, 204, 255, 0.1);
+            color: var(--accent-primary, #00ccff);
+        }
+        
+        .faq-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .faq-question {
+            font-weight: bold;
+            color: var(--accent-primary, #00ccff);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="theme-neon-synthwave">
+    <header>
+        <div class="toolbar">
+            <h1 class="title">Cyberpunk RED GM Screen</h1>
+        </div>
+    </header>
+    
+    <main id="main-content" role="main">
+        <div class="content-container">
+            <a href="../index.html" class="back-link">« Back to GM Screen</a>
+            
+            <h1>Help Guide</h1>
+            
+            <div class="help-section">
+                <h2>Getting Started</h2>
+                <p>The Cyberpunk RED GM Screen is designed to be intuitive and easy to use. Here's how to get started:</p>
+                
+                <h3>Adding Panels</h3>
+                <ol>
+                    <li>Click on the <strong>Add Panel</strong> dropdown in the top toolbar</li>
+                    <li>Select the type of panel you want to add from the menu</li>
+                    <li>The panel will appear in the main content area</li>
+                    <li>Drag panels by their header to reposition them</li>
+                    <li>Resize panels using the resize handle in the bottom-right corner</li>
+                </ol>
+                
+                <h3>Managing Layouts</h3>
+                <p>You can save and load different panel layouts:</p>
+                <ol>
+                    <li>Click on the <strong>Layout</strong> dropdown in the top toolbar</li>
+                    <li>Select <strong>Export Layout</strong> to save your current arrangement</li>
+                    <li>Use <strong>Import Layout</strong> to load a previously saved layout</li>
+                    <li>Toggle <strong>Auto-Save</strong> to automatically save your layout</li>
+                </ol>
+            </div>
+            
+            <div class="help-section">
+                <h2>Panel Types</h2>
+                
+                <h3>Notes Panel</h3>
+                <p>The Notes panel provides a rich text editor for keeping game notes:</p>
+                <ul>
+                    <li>Use the formatting toolbar to apply styling (bold, italic, lists, etc.)</li>
+                    <li>Content is automatically saved to your browser's local storage</li>
+                    <li>You can create multiple note panels for different topics</li>
+                </ul>
+                
+                <h3>Dice Roller</h3>
+                <p>The Dice Roller panel allows you to roll virtual dice:</p>
+                <ul>
+                    <li>Select the dice type (d6, d10, etc.) from the dropdown</li>
+                    <li>Enter the number of dice to roll</li>
+                    <li>View results with individual dice values and totals</li>
+                    <li>Roll history is saved for the current session</li>
+                </ul>
+                
+                <h3>Initiative Tracker</h3>
+                <p>Keep track of combat turns with the Initiative Tracker:</p>
+                <ul>
+                    <li>Add characters with their initiative values</li>
+                    <li>Sort automatically by initiative order</li>
+                    <li>Mark current turn and track round number</li>
+                    <li>Add notes or status effects to characters</li>
+                </ul>
+                
+                <h3>Reference Panels</h3>
+                <p>Access game rules and tables quickly with reference panels:</p>
+                <ul>
+                    <li>Rules Reference: Quick access to core game mechanics</li>
+                    <li>Weapons Table: Stats for various weapons</li>
+                    <li>Armor Table: Protection values and special properties</li>
+                    <li>Critical Injuries: Effects and recovery times</li>
+                    <li>Netrunning: Architecture and program references</li>
+                </ul>
+                
+                <h3>Generator Panels</h3>
+                <p>Generate content on the fly for your game:</p>
+                <ul>
+                    <li>NPC Generator: Create random characters with stats</li>
+                    <li>Location Generator: Generate urban locations with descriptions</li>
+                    <li>Random Encounter: Create unexpected situations</li>
+                </ul>
+                
+                <h3>Night City Map</h3>
+                <p>Interactive map of Night City with district information:</p>
+                <ul>
+                    <li>Click on districts to view information</li>
+                    <li>Toggle points of interest</li>
+                    <li>Add custom markers for campaign locations</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h2>Settings & Customization</h2>
+                
+                <h3>Theme Switching</h3>
+                <p>Change the visual appearance of the GM Screen:</p>
+                <ul>
+                    <li>Neon Synthwave: Vibrant neon colors with purple accents</li>
+                    <li>Tech Noir: Green-on-black terminal style interface</li>
+                    <li>Minimal: Cleaner, less distracting interface</li>
+                </ul>
+                
+                <h3>Font Settings</h3>
+                <p>Customize text appearance for better readability:</p>
+                <ul>
+                    <li>Adjust font size (Tiny, Small, Medium, Large)</li>
+                    <li>Select font family (Monospace, Sans-serif, Display, Cyberpunk)</li>
+                    <li>Settings are saved between sessions</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h2>Keyboard Shortcuts</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Shortcut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Save Layout</td>
+                                <td><code>Ctrl + S</code></td>
+                            </tr>
+                            <tr>
+                                <td>Auto-Organize Panels</td>
+                                <td><code>Ctrl + O</code></td>
+                            </tr>
+                            <tr>
+                                <td>Fit Panels to Window</td>
+                                <td><code>Ctrl + F</code></td>
+                            </tr>
+                            <tr>
+                                <td>Toggle Theme</td>
+                                <td><code>Ctrl + T</code></td>
+                            </tr>
+                            <tr>
+                                <td>Open Font Settings</td>
+                                <td><code>Ctrl + ,</code></td>
+                            </tr>
+                            <tr>
+                                <td>Open Help</td>
+                                <td><code>F1</code> or <code>?</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>For a complete list of shortcuts, visit the <a href="shortcuts.html">Keyboard Shortcuts</a> page.</p>
+            </div>
+            
+            <div class="help-section">
+                <h2>Frequently Asked Questions</h2>
+                
+                <div class="faq-item">
+                    <p class="faq-question">Q: Are my notes and layouts saved permanently?</p>
+                    <p>A: Notes and layouts are saved in your browser's local storage. They will persist between sessions but can be lost if you clear your browser data. For long-term storage, use the Export Layout feature to save your layouts as files.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <p class="faq-question">Q: Can I use this offline?</p>
+                    <p>A: Yes, once loaded, the application can function offline. However, some features like external links will not be available without an internet connection.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <p class="faq-question">Q: How do I report bugs or request features?</p>
+                    <p>A: Visit the <a href="feedback.html">Feedback</a> page to report issues or suggest improvements.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <p class="faq-question">Q: Will my custom layouts work in future versions?</p>
+                    <p>A: We strive to maintain compatibility, but major updates may require layout adjustments. Always keep backups of important layouts.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <p class="faq-question">Q: Can I share layouts with other GMs?</p>
+                    <p>A: Yes, exported layout files can be shared with other users who can then import them into their GM Screen.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <h2>Troubleshooting</h2>
+                
+                <h3>Layout Problems</h3>
+                <ul>
+                    <li><strong>Panels not saving:</strong> Check if your browser has storage restrictions or is in private/incognito mode</li>
+                    <li><strong>Panel positioning issues:</strong> Try the "Fit to Window" option in the Layout menu</li>
+                    <li><strong>Missing panels:</strong> Use "Auto-Organize" to bring off-screen panels back into view</li>
+                </ul>
+                
+                <h3>Performance Issues</h3>
+                <ul>
+                    <li><strong>Slow response:</strong> Reducing the number of open panels can improve performance</li>
+                    <li><strong>Browser freezing:</strong> Try clearing the application cache or using a different browser</li>
+                    <li><strong>Display glitches:</strong> Refresh the page or switch themes to reset visual elements</li>
+                </ul>
+                
+                <h3>Reset Application</h3>
+                <p>If you encounter persistent issues, you can reset the application:</p>
+                <ol>
+                    <li>Open the Settings menu</li>
+                    <li>Select "Test Storage"</li>
+                    <li>Use the "Clear All Storage" option (Warning: This will delete all saved data)</li>
+                </ol>
+            </div>
+            
+            <div class="help-section">
+                <h2>Need More Help?</h2>
+                <p>If you couldn't find an answer to your question, please visit the <a href="feedback.html">Feedback</a> page to contact us.</p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h2 class="footer-heading">Cyberpunk RED GM Screen</h2>
+                <p>A digital Game Master screen for Cyberpunk RED tabletop RPG.</p>
+                <p class="copyright">© 2025 | <a href="privacy.html">Privacy Policy</a></p>
+            </div>
+            
+            <div class="footer-section">
+                <h2 class="footer-heading">Quick Links</h2>
+                <nav aria-label="Footer Navigation">
+                    <ul class="footer-links">
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="help.html">Help</a></li>
+                        <li><a href="feedback.html">Feedback</a></li>
+                        <li><a href="shortcuts.html">Keyboard Shortcuts</a></li>
+                    </ul>
+                </nav>
+            </div>
+            
+            <div class="footer-section">
+                <h2 class="footer-heading">Resources</h2>
+                <ul class="footer-links">
+                    <li><a href="https://rtalsoriangames.com/cyberpunk/" target="_blank" rel="noopener noreferrer">Cyberpunk RED Official</a></li>
+                    <li><a href="attributions.html">Attributions</a></li>
+                    <li><a href="license.html">License</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "extends": "stylelint-config-standard",
+  "rules": {
+    "selector-class-pattern": "^[a-z][a-zA-Z0-9]+$",
+    "color-hex-length": "short",
+    "declaration-block-no-redundant-longhand-properties": true,
+    "shorthand-property-no-redundant-values": true,
+    "function-url-quotes": "always",
+    "number-max-precision": 4,
+    "unit-case": "lower",
+    "value-keyword-case": "lower",
+    "declaration-colon-space-after": "always",
+    "declaration-colon-space-before": "never",
+    "selector-pseudo-element-colon-notation": "double",
+    "media-feature-range-operator-space-after": "always",
+    "media-feature-range-operator-space-before": "always"
+  }
+}

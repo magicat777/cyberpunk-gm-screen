@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cyberpunk GM Screen - A digital Game Master screen for Cyberpunk RED">
+  <title>Cyberpunk GM Screen</title>
+  <link rel="stylesheet" href="./styles/design-system.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--color-background);
+      color: var(--color-text-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      background: var(--color-surface-secondary);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: var(--toolbar-height);
+    }
+
+    .app-title {
+      font-family: var(--font-display);
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin: 0;
+    }
+
+    .theme-neon-synthwave .app-title {
+      color: var(--color-neon-cyan);
+      text-shadow: 
+        0 0 10px var(--color-neon-cyan),
+        0 0 20px var(--color-neon-cyan);
+    }
+
+    .controls {
+      display: flex;
+      gap: var(--space-4);
+      align-items: center;
+    }
+
+    .theme-selector {
+      background: var(--color-surface-primary);
+      color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--border-radius);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+    }
+
+    .panel-creator {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .btn {
+      background: var(--color-accent);
+      color: var(--color-text-inverse);
+      border: none;
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--border-radius);
+      font-family: var(--font-body);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: all var(--duration-fast);
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: var(--space-4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .info-panel {
+      background: var(--color-surface-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-lg);
+      padding: var(--space-6);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .info-panel h2 {
+      font-family: var(--font-display);
+      font-size: var(--font-size-xl);
+      margin-top: 0;
+      color: var(--color-accent);
+    }
+
+    .test-section {
+      margin-top: var(--space-6);
+      padding: var(--space-4);
+      background: var(--color-surface-secondary);
+      border-radius: var(--border-radius);
+    }
+
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+    }
+
+    .test-item {
+      padding: var(--space-3);
+      background: var(--color-surface-primary);
+      border-radius: var(--border-radius);
+      text-align: center;
+    }
+
+    .status {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: var(--space-2);
+    }
+
+    .status.success {
+      background: var(--color-success);
+      box-shadow: 0 0 10px var(--color-success);
+    }
+
+    .status.error {
+      background: var(--color-error);
+      box-shadow: 0 0 10px var(--color-error);
+    }
+
+    .notification-container {
+      position: fixed;
+      top: var(--space-4);
+      right: var(--space-4);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .notification {
+      background: var(--color-surface-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: var(--space-3) var(--space-4);
+      min-width: 300px;
+      animation: slide-in 0.3s ease-out;
+    }
+
+    @keyframes slide-in {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body class="theme-neon-synthwave">
+  <header class="app-header">
+    <h1 class="app-title">Cyberpunk GM Screen</h1>
+    <div class="controls">
+      <select class="theme-selector" id="themeSelector">
+        <option value="theme-neon-synthwave">Neon Synthwave</option>
+        <option value="theme-tech-noir">Tech Noir</option>
+        <option value="theme-minimal">Minimal</option>
+      </select>
+      <div class="panel-creator">
+        <button class="btn" id="testStore">Test Store</button>
+        <button class="btn" id="testEvents">Test Events</button>
+        <button class="btn" id="testNotification">Test Notification</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="info-panel">
+      <h2>Infrastructure Test Page</h2>
+      <p>This page tests the core infrastructure components of the modernized Cyberpunk GM Screen.</p>
+      
+      <div class="test-section">
+        <h3>System Status</h3>
+        <div class="test-grid">
+          <div class="test-item">
+            <span class="status" id="moduleStatus"></span>
+            <span>ES Modules</span>
+          </div>
+          <div class="test-item">
+            <span class="status" id="typeStatus"></span>
+            <span>TypeScript</span>
+          </div>
+          <div class="test-item">
+            <span class="status" id="eventStatus"></span>
+            <span>Event System</span>
+          </div>
+          <div class="test-item">
+            <span class="status" id="storeStatus"></span>
+            <span>State Store</span>
+          </div>
+          <div class="test-item">
+            <span class="status" id="themeStatus"></span>
+            <span>Theme System</span>
+          </div>
+          <div class="test-item">
+            <span class="status" id="cssStatus"></span>
+            <span>CSS Variables</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h3>Store State</h3>
+        <pre id="storeState" style="font-family: var(--font-mono); font-size: var(--font-size-sm); overflow-x: auto;"></pre>
+      </div>
+
+      <div class="test-section">
+        <h3>Event Log</h3>
+        <div id="eventLog" style="font-family: var(--font-mono); font-size: var(--font-size-sm); max-height: 200px; overflow-y: auto;"></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="notification-container" id="notificationContainer"></div>
+
+  <script type="module">
+    // Test ES modules
+    const moduleStatus = document.getElementById('moduleStatus');
+    const typeStatus = document.getElementById('typeStatus');
+    const eventStatus = document.getElementById('eventStatus');
+    const storeStatus = document.getElementById('storeStatus');
+    const themeStatus = document.getElementById('themeStatus');
+    const cssStatus = document.getElementById('cssStatus');
+
+    try {
+      // Test module loading
+      moduleStatus.classList.add('success');
+
+      // Test CSS variables
+      const testColor = getComputedStyle(document.documentElement).getPropertyValue('--color-accent');
+      if (testColor) {
+        cssStatus.classList.add('success');
+      } else {
+        cssStatus.classList.add('error');
+      }
+
+      // Test theme system
+      const themeSelector = document.getElementById('themeSelector');
+      themeSelector.addEventListener('change', (e) => {
+        document.body.className = e.target.value;
+        addToEventLog(`Theme changed to: ${e.target.value}`);
+      });
+      themeStatus.classList.add('success');
+
+      // Import our modules
+      import('./test-app.js').then(module => {
+        console.log('Test app loaded:', module);
+        typeStatus.classList.add('success');
+        eventStatus.classList.add('success');
+        storeStatus.classList.add('success');
+      }).catch(error => {
+        console.error('Failed to load test app:', error);
+        typeStatus.classList.add('error');
+        eventStatus.classList.add('error');
+        storeStatus.classList.add('error');
+      });
+
+    } catch (error) {
+      console.error('Module test failed:', error);
+      moduleStatus.classList.add('error');
+    }
+
+    // Event log helper
+    function addToEventLog(message) {
+      const eventLog = document.getElementById('eventLog');
+      const entry = document.createElement('div');
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      eventLog.appendChild(entry);
+      eventLog.scrollTop = eventLog.scrollHeight;
+    }
+
+    // Notification helper
+    function showNotification(message, type = 'info') {
+      const container = document.getElementById('notificationContainer');
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.textContent = message;
+      notification.style.borderLeftColor = `var(--color-${type})`;
+      notification.style.borderLeftWidth = '4px';
+      container.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slide-in 0.3s ease-out reverse';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Expose for testing
+    window.addToEventLog = addToEventLog;
+    window.showNotification = showNotification;
+  </script>
+</body>
+</html>

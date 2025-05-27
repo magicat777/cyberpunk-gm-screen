@@ -1,0 +1,231 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "cyberpunk-gm-screen",
+    "title": "Cyberpunk GM Screen - Application Monitoring",
+    "tags": ["cyberpunk", "gm-screen", "application"],
+    "timezone": "browser",
+    "schemaVersion": 30,
+    "version": 0,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+        "type": "stat",
+        "title": "Active Users",
+        "targets": [
+          {
+            "expr": "cyberpunk_gm_active_users",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 10 },
+                { "color": "red", "value": 50 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+        "type": "stat",
+        "title": "Total Panel Opens",
+        "targets": [
+          {
+            "expr": "sum(rate(cyberpunk_gm_panel_opens_total[5m])) * 60",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "color": { "mode": "palette-classic" }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+        "type": "stat",
+        "title": "Error Rate",
+        "targets": [
+          {
+            "expr": "sum(rate(cyberpunk_gm_errors_total[5m])) * 60",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "errors/min",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 1 },
+                { "color": "red", "value": 5 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+        "type": "gauge",
+        "title": "Avg Page Load Time",
+        "targets": [
+          {
+            "expr": "avg(cyberpunk_gm_page_load_duration_seconds)",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "min": 0,
+            "max": 5,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 2 },
+                { "color": "red", "value": 3 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+        "type": "graph",
+        "title": "Panel Usage Over Time",
+        "targets": [
+          {
+            "expr": "sum by (panel_type) (rate(cyberpunk_gm_panel_opens_total[5m]))",
+            "legendFormat": "{{panel_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          { "format": "ops", "label": "Opens per second" },
+          { "format": "short" }
+        ]
+      },
+      {
+        "id": 6,
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+        "type": "graph",
+        "title": "Dice Roll Statistics",
+        "targets": [
+          {
+            "expr": "sum(rate(cyberpunk_gm_dice_rolls_total[5m])) * 60",
+            "legendFormat": "Total Rolls/min",
+            "refId": "A"
+          },
+          {
+            "expr": "sum(rate(cyberpunk_gm_dice_critical_total[5m])) * 60",
+            "legendFormat": "Critical Rolls/min",
+            "refId": "B"
+          },
+          {
+            "expr": "sum(rate(cyberpunk_gm_dice_fumble_total[5m])) * 60",
+            "legendFormat": "Fumble Rolls/min",
+            "refId": "C"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "gridPos": { "h": 8, "w": 8, "x": 0, "y": 12 },
+        "type": "heatmap",
+        "title": "Page Load Time Distribution",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(cyberpunk_gm_page_load_duration_seconds_bucket[5m])) by (le))",
+            "format": "time_series",
+            "refId": "A"
+          }
+        ],
+        "dataFormat": "timeseries"
+      },
+      {
+        "id": 8,
+        "gridPos": { "h": 8, "w": 8, "x": 8, "y": 12 },
+        "type": "table",
+        "title": "Top Dice Formulas",
+        "targets": [
+          {
+            "expr": "topk(10, sum by (formula) (cyberpunk_gm_dice_rolls_total))",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "gridPos": { "h": 8, "w": 8, "x": 16, "y": 12 },
+        "type": "piechart",
+        "title": "Error Distribution",
+        "targets": [
+          {
+            "expr": "sum by (error_type) (cyberpunk_gm_errors_total)",
+            "legendFormat": "{{error_type}}",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "gridPos": { "h": 6, "w": 24, "x": 0, "y": 20 },
+        "type": "logs",
+        "title": "Recent Errors",
+        "targets": [
+          {
+            "expr": "{job=\"cyberpunk-gm-screen\"} |= \"ERROR\"",
+            "refId": "A"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "instance",
+          "type": "query",
+          "query": "label_values(cyberpunk_gm_active_users, instance)",
+          "multi": true,
+          "includeAll": true,
+          "current": {
+            "selected": true,
+            "text": "All",
+            "value": "$__all"
+          }
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "cyberpunk_gm_errors_total > 0",
+          "name": "Errors",
+          "tagKeys": "error_type,severity",
+          "textFormat": "Error: {{error_type}}"
+        }
+      ]
+    }
+  }
+}

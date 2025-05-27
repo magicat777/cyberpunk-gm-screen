@@ -7,7 +7,9 @@ Thumbs.db
 desktop.ini
 
 # Editor files
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.swp
 *~
@@ -42,3 +44,17 @@ build/
 .env.test.local
 .env.production.local
 **/.claude/settings.local.json
+
+# Testing
+coverage/
+.nyc_output/
+playwright-report/
+playwright/.cache/
+test-results/
+lighthouse-report.html
+
+# Vitest
+vitest.config.ts.timestamp-*
+
+# Husky
+.husky/_/

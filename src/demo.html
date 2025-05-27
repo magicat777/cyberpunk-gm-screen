@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyberpunk GM Screen - Design System Demo</title>
+  <link rel="stylesheet" href="./styles/design-system.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--color-background);
+      color: var(--color-text-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-6);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: var(--space-12);
+    }
+
+    .title {
+      font-family: var(--font-display);
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-black);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin: 0 0 var(--space-4) 0;
+    }
+
+    .theme-neon-synthwave .title {
+      color: var(--color-neon-cyan);
+      text-shadow: 
+        0 0 20px var(--color-neon-cyan),
+        0 0 40px var(--color-neon-cyan);
+    }
+
+    .theme-selector {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-8);
+    }
+
+    .theme-btn {
+      padding: var(--space-2) var(--space-4);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface-secondary);
+      color: var(--color-text-primary);
+      font-family: var(--font-mono);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      transition: all var(--duration-fast);
+      border-radius: var(--border-radius);
+    }
+
+    .theme-btn:hover {
+      background: var(--color-surface-tertiary);
+      border-color: var(--color-accent);
+    }
+
+    .theme-btn.active {
+      background: var(--color-accent);
+      color: var(--color-text-inverse);
+      border-color: var(--color-accent);
+    }
+
+    .demo-section {
+      background: var(--color-surface-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-lg);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+    }
+
+    .demo-section h2 {
+      font-family: var(--font-display);
+      font-size: var(--font-size-2xl);
+      color: var(--color-accent);
+      margin: 0 0 var(--space-4) 0;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+
+    .color-swatch {
+      height: 80px;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: var(--font-size-xs);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .color-swatch span {
+      background: rgba(0, 0, 0, 0.8);
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--border-radius-sm);
+    }
+
+    .typography-samples {
+      margin-top: var(--space-4);
+    }
+
+    .typography-samples > * {
+      margin: var(--space-3) 0;
+    }
+
+    .button-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+
+    .demo-btn {
+      padding: var(--space-3) var(--space-6);
+      border: none;
+      border-radius: var(--border-radius);
+      font-family: var(--font-body);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+      transition: all var(--duration-fast);
+      background: var(--color-accent);
+      color: var(--color-text-inverse);
+    }
+
+    .demo-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .demo-btn.secondary {
+      background: var(--color-surface-tertiary);
+      color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
+    }
+
+    .demo-panel {
+      background: var(--color-surface-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-lg);
+      padding: var(--space-4);
+      margin-top: var(--space-4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .demo-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: var(--color-surface-secondary);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .demo-panel-content {
+      margin-top: var(--space-10);
+    }
+
+    .spacing-demo {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin-top: var(--space-4);
+    }
+
+    .spacing-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .spacing-box {
+      background: var(--color-accent);
+      height: 32px;
+    }
+
+    .animation-demo {
+      display: flex;
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+    }
+
+    .animation-box {
+      width: 100px;
+      height: 100px;
+      background: var(--color-accent);
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-inverse);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .glow-demo {
+      animation: neon-pulse 2s infinite;
+    }
+
+    .glitch-demo {
+      animation: glitch 3s infinite;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: var(--space-4);
+      }
+
+      .title {
+        font-size: var(--font-size-3xl);
+      }
+
+      .color-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body class="theme-neon-synthwave">
+  <div class="container">
+    <header class="header">
+      <h1 class="title">Cyberpunk GM Screen</h1>
+      <p>Design System Demo</p>
+    </header>
+
+    <div class="theme-selector">
+      <button class="theme-btn active" data-theme="theme-neon-synthwave">Neon Synthwave</button>
+      <button class="theme-btn" data-theme="theme-tech-noir">Tech Noir</button>
+      <button class="theme-btn" data-theme="theme-minimal">Minimal</button>
+    </div>
+
+    <section class="demo-section">
+      <h2>Colors</h2>
+      <div class="color-grid">
+        <div class="color-swatch" style="background: var(--color-accent)">
+          <span>Accent</span>
+        </div>
+        <div class="color-swatch" style="background: var(--color-accent-secondary)">
+          <span>Secondary</span>
+        </div>
+        <div class="color-swatch" style="background: var(--color-success)">
+          <span>Success</span>
+        </div>
+        <div class="color-swatch" style="background: var(--color-warning)">
+          <span>Warning</span>
+        </div>
+        <div class="color-swatch" style="background: var(--color-error)">
+          <span>Error</span>
+        </div>
+        <div class="color-swatch" style="background: var(--color-info)">
+          <span>Info</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Typography</h2>
+      <div class="typography-samples">
+        <h1 style="font-family: var(--font-display); font-size: var(--font-size-4xl);">Display Heading</h1>
+        <h2 style="font-size: var(--font-size-3xl);">Heading 2XL</h2>
+        <h3 style="font-size: var(--font-size-2xl);">Heading XL</h3>
+        <h4 style="font-size: var(--font-size-xl);">Heading Large</h4>
+        <p style="font-size: var(--font-size-base);">Body text with normal size. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <p style="font-size: var(--font-size-sm);">Small text for secondary information.</p>
+        <code style="font-family: var(--font-mono); font-size: var(--font-size-base);">console.log('Monospace code');</code>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Components</h2>
+      
+      <h3>Buttons</h3>
+      <div class="button-grid">
+        <button class="demo-btn">Primary Button</button>
+        <button class="demo-btn secondary">Secondary Button</button>
+        <button class="demo-btn" disabled style="opacity: 0.5; cursor: not-allowed;">Disabled</button>
+      </div>
+
+      <h3>Panel Example</h3>
+      <div class="demo-panel">
+        <div class="demo-panel-content">
+          <h4>Panel Title</h4>
+          <p>This is an example of a panel component with the cyberpunk styling.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Spacing Scale</h2>
+      <div class="spacing-demo">
+        <div class="spacing-item">
+          <code style="font-family: var(--font-mono); width: 100px;">space-1</code>
+          <div class="spacing-box" style="width: var(--space-1);"></div>
+        </div>
+        <div class="spacing-item">
+          <code style="font-family: var(--font-mono); width: 100px;">space-2</code>
+          <div class="spacing-box" style="width: var(--space-2);"></div>
+        </div>
+        <div class="spacing-item">
+          <code style="font-family: var(--font-mono); width: 100px;">space-4</code>
+          <div class="spacing-box" style="width: var(--space-4);"></div>
+        </div>
+        <div class="spacing-item">
+          <code style="font-family: var(--font-mono); width: 100px;">space-8</code>
+          <div class="spacing-box" style="width: var(--space-8);"></div>
+        </div>
+        <div class="spacing-item">
+          <code style="font-family: var(--font-mono); width: 100px;">space-16</code>
+          <div class="spacing-box" style="width: var(--space-16);"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-section">
+      <h2>Animations</h2>
+      <div class="animation-demo">
+        <div class="animation-box glow-demo">Glow</div>
+        <div class="animation-box glitch-demo">Glitch</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Theme switching
+    const themeButtons = document.querySelectorAll('.theme-btn');
+    themeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.theme;
+        document.body.className = theme;
+        
+        themeButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Check if CSS variables are working
+    console.log('CSS Variables Test:', {
+      accent: getComputedStyle(document.documentElement).getPropertyValue('--color-accent'),
+      fontSize: getComputedStyle(document.documentElement).getPropertyValue('--font-size-base'),
+      spacing: getComputedStyle(document.documentElement).getPropertyValue('--space-4')
+    });
+  </script>
+</body>
+</html>

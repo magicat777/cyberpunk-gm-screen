@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk RED GM Screen</title>
+    
+    <!-- CSS Architecture -->
+    <link rel="stylesheet" href="css/cyberpunk-variables.css">
+    <link rel="stylesheet" href="css/cyberpunk-reset.css">
+    <link rel="stylesheet" href="css/cyberpunk-typography.css">
+    <link rel="stylesheet" href="css/cyberpunk-neon-synthwave.css">
+    <link rel="stylesheet" href="css/cyberpunk-tech-noir.css">
+    
+    <style>
+        /* Modern App Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--background-primary);
+            color: var(--neutral-light);
+            font-family: var(--font-primary);
+            font-size: var(--text-base);
+            min-height: 100vh;
+        }
+        
+        /* Toolbar */
+        .cp-toolbar {
+            background-color: var(--background-secondary);
+            color: var(--accent-cyan);
+            padding: var(--spacing-sm) var(--spacing-md);
+            display: flex;
+            align-items: center;
+            border-bottom: var(--border-primary);
+            position: sticky;
+            top: 0;
+            z-index: var(--z-index-sticky);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .cp-title {
+            font-weight: var(--font-weight-bold);
+            font-family: var(--font-display);
+            margin-right: var(--spacing-lg);
+            font-size: var(--text-xl);
+            color: var(--accent-cyan);
+            letter-spacing: var(--letter-spacing-wide);
+            text-shadow: var(--glow-text);
+        }
+        
+        /* Dropdown Menu */
+        .cp-dropdown {
+            position: relative;
+            margin-right: var(--spacing-md);
+        }
+        
+        .cp-dropdown-button {
+            background-color: var(--background-tertiary);
+            color: var(--accent-cyan);
+            border: var(--border-primary);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-xs) var(--spacing-md);
+            cursor: pointer;
+            min-width: 120px;
+            text-align: center;
+            transition: var(--transition-all);
+            font-size: var(--text-base);
+        }
+        
+        .cp-dropdown-button:hover,
+        .cp-dropdown-button:focus {
+            background-color: var(--background-tertiary);
+            box-shadow: var(--glow-cyan-soft);
+        }
+        
+        .cp-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--background-secondary);
+            min-width: 200px;
+            box-shadow: var(--shadow-lg);
+            z-index: var(--z-index-dropdown);
+            border: var(--border-primary);
+            border-radius: var(--border-radius-md);
+            max-height: 80vh;
+            overflow-y: auto;
+            left: 0;
+            top: 100%;
+            margin-top: var(--spacing-xs);
+        }
+        
+        .cp-dropdown-content.active {
+            display: block;
+        }
+        
+        .cp-dropdown-content a {
+            color: var(--neutral-light);
+            padding: var(--spacing-sm) var(--spacing-md);
+            text-decoration: none;
+            display: block;
+            transition: var(--transition-all);
+        }
+        
+        .cp-dropdown-content a:hover,
+        .cp-dropdown-content a:focus {
+            background-color: var(--background-tertiary);
+            color: var(--accent-cyan);
+        }
+        
+        .cp-menu-category {
+            background-color: var(--background-primary);
+            color: var(--accent-cyan);
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-weight: var(--font-weight-bold);
+            border-top: var(--border-secondary);
+            border-bottom: var(--border-secondary);
+        }
+        
+        /* Panels */
+        .cp-panel {
+            position: absolute;
+            width: 400px;
+            height: 300px;
+            background-color: var(--background-secondary);
+            border: var(--border-primary);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-panel);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: box-shadow var(--transition-normal) var(--ease-out);
+        }
+        
+        .cp-panel:focus-within {
+            box-shadow: var(--shadow-active);
+        }
+        
+        .cp-panel.active {
+            box-shadow: var(--shadow-active);
+        }
+        
+        .cp-panel-header {
+            background: var(--gradient-header);
+            padding: var(--panel-header-padding);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            border-bottom: var(--border-primary);
+            border-top-left-radius: var(--border-radius-md);
+            border-top-right-radius: var(--border-radius-md);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .cp-panel-title {
+            font-weight: var(--font-weight-bold);
+            font-family: var(--font-display);
+            color: var(--neutral-light);
+            font-size: var(--text-lg);
+        }
+        
+        .cp-panel-content {
+            flex-grow: 1;
+            padding: var(--spacing-md);
+            overflow: auto;
+            position: relative;
+        }
+        
+        .cp-close-button {
+            background: none;
+            border: none;
+            color: var(--accent-cyan);
+            cursor: pointer;
+            font-weight: var(--font-weight-bold);
+            font-size: var(--text-xl);
+            line-height: 1;
+            padding: 0 var(--spacing-xs);
+            transition: var(--transition-color);
+        }
+        
+        .cp-close-button:hover,
+        .cp-close-button:focus {
+            color: var(--accent-red);
+            text-shadow: var(--glow-text);
+        }
+        
+        .cp-resize-handle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: 0;
+            bottom: 0;
+            cursor: nwse-resize;
+            background-color: var(--accent-cyan-dim);
+            opacity: 0.5;
+            border-bottom-right-radius: var(--border-radius-md);
+            transition: opacity var(--transition-fast);
+            z-index: var(--z-index-floating);
+        }
+        
+        .cp-resize-handle:hover,
+        .cp-resize-handle:focus {
+            opacity: 0.8;
+        }
+        
+        /* Font controls */
+        .cp-controls {
+            position: fixed;
+            bottom: var(--spacing-lg);
+            right: var(--spacing-lg);
+            background-color: var(--background-secondary);
+            border: var(--border-primary);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            width: 250px;
+            z-index: var(--z-index-modal);
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+        
+        .cp-controls.active {
+            display: block;
+        }
+        
+        .cp-controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: var(--border-primary);
+        }
+        
+        .cp-font-options {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .cp-font-options label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            color: var(--accent-cyan);
+        }
+        
+        .cp-font-buttons {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+        
+        .cp-font-size-btn {
+            flex: 1;
+            background-color: var(--background-tertiary);
+            color: var(--accent-cyan);
+            border: var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-xs) 0;
+            cursor: pointer;
+            transition: var(--transition-all);
+        }
+        
+        .cp-font-size-btn:hover,
+        .cp-font-size-btn:focus {
+            background-color: var(--background-primary);
+            box-shadow: var(--glow-cyan-soft);
+        }
+        
+        .cp-font-size-btn.active {
+            background-color: var(--accent-cyan);
+            color: var(--background-primary);
+        }
+        
+        .cp-select {
+            width: 100%;
+            margin-bottom: var(--spacing-md);
+            background-color: var(--background-tertiary);
+            color: var(--neutral-light);
+            border: var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-sm);
+        }
+        
+        /* Notes panel */
+        .cp-textarea {
+            width: 100%;
+            height: 100%;
+            resize: none;
+            background-color: var(--background-tertiary);
+            color: var(--neutral-light);
+            border: var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-sm);
+            font-family: var(--font-mono);
+            box-sizing: border-box;
+        }
+        
+        /* Tables */
+        .cp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .cp-table th {
+            background-color: var(--background-tertiary);
+            padding: var(--spacing-sm);
+            text-align: left;
+            border: var(--border-primary);
+            color: var(--accent-cyan);
+        }
+        
+        .cp-table td {
+            padding: var(--spacing-sm);
+            border: var(--border-primary);
+        }
+        
+        /* Forms */
+        .cp-input {
+            background-color: var(--background-tertiary);
+            color: var(--neutral-light);
+            border: var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-sm);
+            margin-right: var(--spacing-xs);
+        }
+        
+        .cp-button {
+            background-color: var(--background-tertiary);
+            color: var(--accent-cyan);
+            border: var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            cursor: pointer;
+            transition: var(--transition-all);
+        }
+        
+        .cp-button:hover,
+        .cp-button:focus {
+            background-color: var(--accent-cyan);
+            color: var(--background-primary);
+            box-shadow: var(--glow-cyan-soft);
+        }
+        
+        /* Dice Roller */
+        .cp-dice-container {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .cp-dice-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .cp-dice-controls select {
+            width: 60px;
+            margin: 0 var(--spacing-xs);
+            background-color: var(--background-tertiary);
+            color: var(--neutral-light);
+            border: var(--border-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-xs);
+        }
+        
+        .cp-dice-result {
+            border: var(--border-primary);
+            padding: var(--spacing-md);
+            text-align: center;
+            margin-top: var(--spacing-sm);
+            font-size: var(--text-lg);
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--background-tertiary);
+            border-radius: var(--border-radius-sm);
+        }
+        
+        .cp-dice-total {
+            font-size: var(--text-2xl);
+            margin-top: var(--spacing-sm);
+            font-weight: var(--font-weight-bold);
+            color: var(--accent-cyan);
+        }
+        
+        /* Initiative Tracker */
+        .cp-initiative-form {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .cp-initiative-form input[type="text"] {
+            flex: 2;
+        }
+        
+        .cp-initiative-form input[type="number"] {
+            flex: 1;
+        }
+        
+        .cp-initiative-table {
+            width: 100%;
+            border: var(--border-primary);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+            min-height: 100px;
+            border-radius: var(--border-radius-sm);
+            background-color: var(--background-tertiary);
+        }
+        
+        .cp-initiative-active {
+            background-color: var(--background-tertiary) !important;
+            border-left: 3px solid var(--accent-cyan);
+        }
+        
+        .cp-initiative-npc {
+            background-color: rgba(255, 0, 0, 0.2);
+        }
+        
+        .cp-initiative-pc {
+            background-color: rgba(0, 255, 0, 0.1);
+        }
+        
+        .cp-initiative-empty {
+            text-align: center;
+            color: var(--neutral-muted);
+            padding: var(--spacing-md);
+        }
+        
+        .cp-initiative-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-xs);
+            position: relative;
+            border-radius: var(--border-radius-sm);
+        }
+        
+        .cp-initiative-remove {
+            position: absolute;
+            right: var(--spacing-xs);
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--accent-red);
+            font-size: var(--text-sm);
+            padding: var(--spacing-xs) var(--spacing-xs);
+            cursor: pointer;
+            opacity: 0.7;
+            transition: var(--transition-opacity);
+        }
+        
+        .cp-initiative-remove:hover,
+        .cp-initiative-remove:focus {
+            opacity: 1;
+        }
+        
+        .cp-initiative-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--spacing-md);
+        }
+        
+        /* Theme toggle */
+        .cp-theme-toggle {
+            margin-left: auto;
+            display: flex;
+            gap: var(--spacing-xs);
+            align-items: center;
+        }
+        
+        /* No animations class */
+        .cp-no-animations * {
+            transition: none !important;
+            animation: none !important;
+        }
+        
+        /* Dragging class */
+        .cp-dragging {
+            opacity: 0.8;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 767px) {
+            .cp-toolbar {
+                flex-wrap: wrap;
+            }
+            
+            .cp-dropdown {
+                margin-bottom: var(--spacing-xs);
+            }
+            
+            .cp-panel {
+                width: 90vw !important;
+                left: 5vw !important;
+            }
+            
+            .cp-theme-toggle {
+                margin-top: var(--spacing-xs);
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar with dropdown menus -->
+    <div class="cp-toolbar" role="navigation" aria-label="Main Controls">
+        <div class="cp-title">Cyberpunk RED GM Screen</div>
+        
+        <!-- Panel menu -->
+        <div class="cp-dropdown" data-dropdown="panel">
+            <button class="cp-dropdown-button" aria-haspopup="true" aria-expanded="false">Add Panel</button>
+            <div class="cp-dropdown-content" role="menu">
+                <div class="cp-menu-category">GM Tools</div>
+                <a href="#" role="menuitem" data-panel="notes">Notes</a>
+                <a href="#" role="menuitem" data-panel="dice">Dice Roller</a>
+                <a href="#" role="menuitem" data-panel="initiative">Initiative Tracker</a>
+                <a href="#" role="menuitem" data-panel="timer">Game Timer</a>
+                <a href="#" role="menuitem" data-panel="calculator">Calculator</a>
+                
+                <div class="cp-menu-category">Reference</div>
+                <a href="#" role="menuitem" data-panel="rules">Rules Reference</a>
+                <a href="#" role="menuitem" data-panel="weapons">Weapons Table</a>
+                <a href="#" role="menuitem" data-panel="armor">Armor Table</a>
+                <a href="#" role="menuitem" data-panel="critical">Critical Injuries</a>
+                <a href="#" role="menuitem" data-panel="netrunning">Netrunning</a>
+                
+                <div class="cp-menu-category">Characters</div>
+                <a href="#" role="menuitem" data-panel="character">Character Sheet</a>
+                <a href="#" role="menuitem" data-panel="npc">NPC Generator</a>
+                <a href="#" role="menuitem" data-panel="loot">Loot Generator</a>
+                
+                <div class="cp-menu-category">World</div>
+                <a href="#" role="menuitem" data-panel="map">Night City Map</a>
+                <a href="#" role="menuitem" data-panel="location">Location Generator</a>
+                <a href="#" role="menuitem" data-panel="encounter">Random Encounter</a>
+            </div>
+        </div>
+        
+        <!-- Layout menu -->
+        <div class="cp-dropdown" data-dropdown="layout">
+            <button class="cp-dropdown-button" aria-haspopup="true" aria-expanded="false">Layout</button>
+            <div class="cp-dropdown-content" role="menu">
+                <a href="#" role="menuitem" data-action="save-layout">Save Layout</a>
+                <a href="#" role="menuitem" data-action="load-layout">Load Layout</a>
+                <a href="#" role="menuitem" data-action="clear-layout">Clear Layout</a>
+                <a href="#" role="menuitem" data-action="reset-layout">Reset Layout</a>
+                <a href="#" role="menuitem" data-action="auto-organize">Auto-Organize</a>
+                <a href="#" role="menuitem" data-action="fit-to-window">Fit to Window</a>
+            </div>
+        </div>
+        
+        <!-- Settings menu -->
+        <div class="cp-dropdown" data-dropdown="settings">
+            <button class="cp-dropdown-button" aria-haspopup="true" aria-expanded="false">Settings</button>
+            <div class="cp-dropdown-content" role="menu">
+                <a href="#" role="menuitem" data-action="font-settings">Font Settings</a>
+                <a href="#" role="menuitem" data-action="toggle-animations">Toggle Animations</a>
+                <a href="#" role="menuitem" data-action="about">About</a>
+            </div>
+        </div>
+        
+        <!-- Theme toggle -->
+        <div class="cp-theme-toggle">
+            <button class="cp-button cp-theme-btn active" data-theme="">Default</button>
+            <button class="cp-button cp-theme-btn" data-theme="neon-synthwave">Neon</button>
+            <button class="cp-button cp-theme-btn" data-theme="tech-noir">Noir</button>
+        </div>
+    </div>
+    
+    <!-- Font controls -->
+    <div class="cp-controls" id="fontControls">
+        <div class="cp-controls-header">
+            <span>Font Settings</span>
+            <button class="cp-close-button" id="closeFontControls" aria-label="Close font controls">&times;</button>
+        </div>
+        <div class="cp-font-options">
+            <label for="fontSize">Font Size</label>
+            <div class="cp-font-buttons">
+                <button class="cp-font-size-btn" data-size="12">Small</button>
+                <button class="cp-font-size-btn active" data-size="16">Medium</button>
+                <button class="cp-font-size-btn" data-size="20">Large</button>
+            </div>
+        </div>
+        <div class="cp-font-options">
+            <label for="fontFamily">Font Family</label>
+            <select id="fontFamily" class="cp-select">
+                <option value="var(--font-mono)">Monospace</option>
+                <option value="var(--font-primary)">Sans-serif</option>
+                <option value="serif">Serif</option>
+            </select>
+        </div>
+        <button id="applyFont" class="cp-button">Apply Font</button>
+    </div>
+
+    <script>
+    // Encapsulate all functionality to avoid global namespace pollution
+    (function() {
+        // Application state management
+        const appState = {
+            panels: [],
+            currentZIndex: 10,
+            activePanelId: null,
+            settings: {
+                fontSize: 16,
+                fontFamily: "var(--font-mono)",
+                theme: "",
+                animations: true
+            }
+        };
+
+        // Panel factory for creating different types of panels
+        const PanelFactory = {
+            // Panel creation registry - maps panel types to creation functions
+            registry: {},
+
+            // Register a new panel type
+            register: function(type, creationFunction) {
+                if (typeof creationFunction === 'function') {
+                    this.registry[type] = creationFunction;
+                    return true;
+                }
+                return false;
+            },
+
+            // Create a panel of specified type
+            create: function(type) {
+                try {
+                    // Check if panel type exists in registry
+                    if (this.registry[type]) {
+                        return this.registry[type]();
+                    } else {
+                        console.error(`Unknown panel type: ${type}`);
+                        return null;
+                    }
+                } catch (error) {
+                    console.error(`Error creating panel of type ${type}:`, error);
+                    return null;
+                }
+            }
+        };
+
+        // Function to generate a unique ID
+        function generateId() {
+            return 'panel-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Functions to handle panel dragging and resizing
+        function makePanelDraggable(panel) {
+            const header = panel.querySelector('.cp-panel-header');
+            const panelId = panel.getAttribute('data-panel-id');
+            let isDragging = false;
+            let initialX, initialY, initialLeft, initialTop;
+
+            // Mouse events
+            header.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', dragPanel);
+            document.addEventListener('mouseup', stopDrag);
+
+            // Touch events
+            header.addEventListener('touchstart', startDrag, { passive: false });
+            document.addEventListener('touchmove', dragPanel, { passive: false });
+            document.addEventListener('touchend', stopDrag);
+
+            function startDrag(e) {
+                // If clicking a button in the header, don't start dragging
+                if (e.target.closest('button')) return;
+
+                // Set this panel as active
+                setActivePanel(panelId);
+
+                isDragging = true;
+                
+                // Get event position based on whether it's touch or mouse
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+                initialX = clientX;
+                initialY = clientY;
+                initialLeft = panel.offsetLeft;
+                initialTop = panel.offsetTop;
+                
+                panel.classList.add('cp-dragging');
+                
+                // Prevent default behavior for touch events
+                if (e.type.includes('touch')) {
+                    e.preventDefault();
+                }
+            }
+
+            function dragPanel(e) {
+                if (!isDragging) return;
+                
+                // Get event position based on whether it's touch or mouse
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+                const deltaX = clientX - initialX;
+                const deltaY = clientY - initialY;
+
+                const newLeft = Math.max(0, initialLeft + deltaX);
+                const newTop = Math.max(0, initialTop + deltaY);
+
+                panel.style.left = newLeft + 'px';
+                panel.style.top = newTop + 'px';
+                
+                // Prevent default behavior for touch events
+                if (e.type.includes('touch')) {
+                    e.preventDefault();
+                }
+            }
+
+            function stopDrag() {
+                if (isDragging) {
+                    isDragging = false;
+                    panel.classList.remove('cp-dragging');
+                    
+                    // Save panel position
+                    const panelObj = appState.panels.find(p => p.id === panelId);
+                    if (panelObj) {
+                        panelObj.left = panel.style.left;
+                        panelObj.top = panel.style.top;
+                    }
+                }
+            }
+        }
+
+        function makePanelResizable(panel) {
+            const handle = panel.querySelector('.cp-resize-handle');
+            const panelId = panel.getAttribute('data-panel-id');
+            let isResizing = false;
+            let initialWidth, initialHeight, initialX, initialY;
+
+            // Mouse events
+            handle.addEventListener('mousedown', startResize);
+            document.addEventListener('mousemove', resizePanel);
+            document.addEventListener('mouseup', stopResize);
+
+            // Touch events
+            handle.addEventListener('touchstart', startResize, { passive: false });
+            document.addEventListener('touchmove', resizePanel, { passive: false });
+            document.addEventListener('touchend', stopResize);
+
+            function startResize(e) {
+                // Set this panel as active
+                setActivePanel(panelId);
+
+                isResizing = true;
+                
+                // Get event position based on whether it's touch or mouse
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+                initialX = clientX;
+                initialY = clientY;
+                initialWidth = panel.offsetWidth;
+                initialHeight = panel.offsetHeight;
+                
+                // Prevent default behavior and event propagation
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            function resizePanel(e) {
+                if (!isResizing) return;
+                
+                // Get event position based on whether it's touch or mouse
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+                const deltaX = clientX - initialX;
+                const deltaY = clientY - initialY;
+                
+                const newWidth = Math.max(250, initialWidth + deltaX);
+                const newHeight = Math.max(150, initialHeight + deltaY);
+                
+                panel.style.width = newWidth + 'px';
+                panel.style.height = newHeight + 'px';
+                
+                // Prevent default behavior for touch events
+                if (e.type.includes('touch')) {
+                    e.preventDefault();
+                }
+            }
+
+            function stopResize() {
+                if (isResizing) {
+                    isResizing = false;
+                    
+                    // Save panel dimensions
+                    const panelObj = appState.panels.find(p => p.id === panelId);
+                    if (panelObj) {
+                        panelObj.width = panel.style.width;
+                        panelObj.height = panel.style.height;
+                    }
+                }
+            }
+        }
+
+        // Function to create a base panel
+        function createBasePanel(title, content) {
+            const panelId = generateId();
+            
+            // Create panel container
+            const panel = document.createElement('div');
+            panel.className = 'cp-panel';
+            panel.setAttribute('data-panel-id', panelId);
+            panel.setAttribute('tabindex', '-1'); // Make it focusable
+            panel.setAttribute('role', 'region');
+            panel.setAttribute('aria-labelledby', `${panelId}-title`);
+            
+            // Position the panel with an offset
+            const panelCount = appState.panels.length;
+            panel.style.left = (50 + panelCount * 20) + 'px';
+            panel.style.top = (50 + panelCount * 20) + 'px';
+            panel.style.zIndex = appState.currentZIndex++;
+            
+            // Create the panel header
+            const header = document.createElement('div');
+            header.className = 'cp-panel-header';
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'cp-panel-title';
+            titleDiv.textContent = title;
+            titleDiv.id = `${panelId}-title`;
+            
+            const closeButton = document.createElement('button');
+            closeButton.className = 'cp-close-button';
+            closeButton.textContent = '×';
+            closeButton.setAttribute('aria-label', 'Close panel');
+            
+            header.appendChild(titleDiv);
+            header.appendChild(closeButton);
+            
+            // Create the panel content
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'cp-panel-content';
+            contentDiv.innerHTML = content || '';
+            
+            // Create resize handle
+            const resizeHandle = document.createElement('div');
+            resizeHandle.className = 'cp-resize-handle';
+            resizeHandle.setAttribute('aria-label', 'Resize panel');
+            resizeHandle.setAttribute('role', 'button');
+            resizeHandle.setAttribute('tabindex', '0');
+            
+            // Assemble the panel
+            panel.appendChild(header);
+            panel.appendChild(contentDiv);
+            panel.appendChild(resizeHandle);
+            
+            // Add event listeners
+            closeButton.addEventListener('click', function() {
+                removePanel(panelId);
+            });
+            
+            panel.addEventListener('mousedown', function() {
+                setActivePanel(panelId);
+            });
+            
+            panel.addEventListener('touchstart', function() {
+                setActivePanel(panelId);
+            });
+            
+            // Make panel draggable and resizable
+            document.body.appendChild(panel);
+            makePanelDraggable(panel);
+            makePanelResizable(panel);
+            
+            // Add to state management
+            appState.panels.push({
+                id: panelId,
+                type: title.toLowerCase().replace(/\s+/g, '-'),
+                title: title,
+                left: panel.style.left,
+                top: panel.style.top,
+                width: panel.style.width,
+                height: panel.style.height,
+                zIndex: panel.style.zIndex
+            });
+            
+            // Set this panel as active
+            setActivePanel(panelId);
+            
+            return { panel, contentDiv, id: panelId };
+        }
+
+        // Function to set a panel as active
+        function setActivePanel(panelId) {
+            // Reset active state on all panels
+            document.querySelectorAll('.cp-panel').forEach(p => {
+                p.classList.remove('active');
+                p.style.zIndex = p.getAttribute('data-panel-id') === panelId ? 
+                    appState.currentZIndex++ : p.style.zIndex;
+            });
+            
+            // Set active state on this panel
+            const panel = document.querySelector(`.cp-panel[data-panel-id="${panelId}"]`);
+            if (panel) {
+                panel.classList.add('active');
+                appState.activePanelId = panelId;
+            }
+        }
+
+        // Function to remove a panel
+        function removePanel(panelId) {
+            const panel = document.querySelector(`.cp-panel[data-panel-id="${panelId}"]`);
+            if (panel) {
+                panel.remove();
+                appState.panels = appState.panels.filter(p => p.id !== panelId);
+                
+                // Set another panel as active if available
+                if (appState.panels.length > 0) {
+                    setActivePanel(appState.panels[appState.panels.length - 1].id);
+                }
+            }
+        }
+
+        // Function to create a notes panel
+        function createNotesPanel() {
+            const { panel, contentDiv, id } = createBasePanel('Notes');
+            
+            contentDiv.innerHTML = `
+                <textarea class="cp-textarea" placeholder="Enter your notes here..." aria-label="Notes content"></textarea>
+            `;
+            
+            return panel;
+        }
+
+        // Function to create a dice roller panel
+        function createDicePanel() {
+            const { panel, contentDiv, id } = createBasePanel('Dice Roller');
+            
+            contentDiv.innerHTML = `
+                <div class="cp-dice-container">
+                    <div class="cp-dice-controls">
+                        <select id="${id}-dice-count" aria-label="Number of dice">
+                            <option>1</option><option>2</option><option>3</option>
+                            <option>4</option><option>5</option><option>6</option>
+                        </select>
+                        d
+                        <select id="${id}-dice-type" aria-label="Type of dice">
+                            <option>4</option><option>6</option><option>8</option>
+                            <option>10</option><option>12</option><option>20</option>
+                            <option>100</option>
+                        </select>
+                        <button id="${id}-roll-dice" class="cp-button">Roll</button>
+                    </div>
+                    <div id="${id}-dice-result" class="cp-dice-result" aria-live="polite">
+                        Result will appear here
+                    </div>
+                </div>
+            `;
+            
+            // Add roll functionality
+            const rollButton = contentDiv.querySelector(`#${id}-roll-dice`);
+            rollButton.addEventListener('click', function() {
+                const count = parseInt(contentDiv.querySelector(`#${id}-dice-count`).value);
+                const type = parseInt(contentDiv.querySelector(`#${id}-dice-type`).value);
+                
+                let total = 0;
+                let rolls = [];
+                
+                for (let i = 0; i < count; i++) {
+                    const roll = Math.floor(Math.random() * type) + 1;
+                    rolls.push(roll);
+                    total += roll;
+                }
+                
+                contentDiv.querySelector(`#${id}-dice-result`).innerHTML = `
+                    <div>Rolls: ${rolls.join(', ')}</div>
+                    <div class="cp-dice-total">${total}</div>
+                `;
+            });
+            
+            return panel;
+        }
+
+        // Function to create a rules reference panel
+        function createRulesPanel() {
+            const { panel, contentDiv, id } = createBasePanel('Rules Reference');
+            
+            contentDiv.innerHTML = `
+                <select id="${id}-rule-section" class="cp-select" aria-label="Rule section">
+                    <option value="combat">Combat Basics</option>
+                    <option value="damage">Damage</option>
+                    <option value="skills">Skills</option>
+                    <option value="stats">Character Stats</option>
+                    <option value="gear">Gear</option>
+                </select>
+                <div id="${id}-rule-content" class="cp-panel-content">
+                    <p><strong>Combat Basics</strong></p>
+                    <p>Combat in Cyberpunk RED is handled in Rounds (3 second increments) and Turns.</p>
+                    <p>To make an attack, roll 1d10 + STAT + SKILL + Bonus vs DV.</p>
+                    <p>Initiative = 1d10 + REF + Bonus.</p>
+                </div>
+            `;
+            
+            // Add rule selection functionality
+            const select = contentDiv.querySelector(`#${id}-rule-section`);
+            const content = contentDiv.querySelector(`#${id}-rule-content`);
+            
+            select.addEventListener('change', function() {
+                const value = this.value;
+                
+                if (value === 'combat') {
+                    content.innerHTML = `
+                        <p><strong>Combat Basics</strong></p>
+                        <p>Combat in Cyberpunk RED is handled in Rounds (3 second increments) and Turns.</p>
+                        <p>To make an attack, roll 1d10 + STAT + SKILL + Bonus vs DV.</p>
+                        <p>Initiative = 1d10 + REF + Bonus.</p>
+                    `;
+                } else if (value === 'damage') {
+                    content.innerHTML = `
+                        <p><strong>Damage & Health</strong></p>
+                        <p>HP = 10 + (5 × BODY).</p>
+                        <p>Stun Save = BODY + WILL (Damage > BODY = Fall Unconscious).</p>
+                        <p>Death Save = BODY x 3 (at 0 HP, fail = death).</p>
+                    `;
+                } else if (value === 'skills') {
+                    content.innerHTML = `
+                        <p><strong>Skill Checks</strong></p>
+                        <p>Roll 1d10 + STAT + SKILL vs DV.</p>
+                        <p>DV 13 = Easy, DV 15 = Average, DV 17 = Difficult, DV 21 = Very Difficult, DV 24 = Almost Impossible.</p>
+                        <p>Critical Success on Natural 10 roll, Critical Failure on Natural 1.</p>
+                    `;
+                } else if (value === 'stats') {
+                    content.innerHTML = `
+                        <p><strong>Character Stats</strong></p>
+                        <p>INT = Intelligence</p>
+                        <p>REF = Reflexes</p>
+                        <p>DEX = Dexterity</p>
+                        <p>TECH = Technical</p>
+                        <p>COOL = Cool</p>
+                        <p>WILL = Willpower</p>
+                        <p>LUCK = Luck</p>
+                        <p>MOVE = Movement</p>
+                        <p>BODY = Body</p>
+                        <p>EMP = Empathy</p>
+                    `;
+                } else if (value === 'gear') {
+                    content.innerHTML = `
+                        <p><strong>Gear & Equipment</strong></p>
+                        <p>Weapons have DMG, ROF values.</p>
+                        <p>Armor has SP (Stopping Power) for each location.</p>
+                        <p>Cyberware has Humanity Cost (HC) and requires installation.</p>
+                    `;
+                }
+            });
+            
+            return panel;
+        }
+
+        // Function to create an initiative tracker panel
+        function createInitiativePanel() {
+            const { panel, contentDiv, id } = createBasePanel('Initiative Tracker');
+            
+            contentDiv.innerHTML = `
+                <div class="cp-initiative-form">
+                    <input type="text" id="${id}-init-name" class="cp-input" placeholder="Name" aria-label="Combatant name">
+                    <input type="number" id="${id}-init-value" class="cp-input" placeholder="Roll" aria-label="Initiative roll">
+                    <button id="${id}-init-add" class="cp-button">Add</button>
+                </div>
+                <div id="${id}-init-list" class="cp-initiative-table" aria-live="polite">
+                    <div class="cp-initiative-empty">No combatants added</div>
+                </div>
+                <div class="cp-initiative-controls">
+                    <button id="${id}-init-next" class="cp-button">Next Turn</button>
+                    <button id="${id}-init-reset" class="cp-button">Reset</button>
+                    <button id="${id}-init-roll" class="cp-button">Roll For All</button>
+                </div>
+            `;
+            
+            // Initiative state for this panel
+            const initState = {
+                combatants: [],
+                currentTurn: -1
+            };
+            
+            // Add functionality
+            const addButton = contentDiv.querySelector(`#${id}-init-add`);
+            const nameInput = contentDiv.querySelector(`#${id}-init-name`);
+            const valueInput = contentDiv.querySelector(`#${id}-init-value`);
+            const listElement = contentDiv.querySelector(`#${id}-init-list`);
+            const nextButton = contentDiv.querySelector(`#${id}-init-next`);
+            const resetButton = contentDiv.querySelector(`#${id}-init-reset`);
+            const rollButton = contentDiv.querySelector(`#${id}-init-roll`);
+            
+            // Add combatant
+            addButton.addEventListener('click', function() {
+                const name = nameInput.value.trim();
+                const initiative = parseInt(valueInput.value) || 0;
+                
+                if (!name) {
+                    alert('Please enter a name');
+                    return;
+                }
+                
+                initState.combatants.push({
+                    name: name,
+                    initiative: initiative,
+                    isNPC: name.toLowerCase().includes('npc') || name.toLowerCase().includes('enemy')
+                });
+                
+                // Sort by initiative
+                initState.combatants.sort((a, b) => b.initiative - a.initiative);
+                
+                // Reset inputs
+                nameInput.value = '';
+                valueInput.value = '';
+                nameInput.focus();
+                
+                // Refresh display
+                refreshInitiativeList();
+            });
+            
+            // Next turn
+            nextButton.addEventListener('click', function() {
+                if (initState.combatants.length === 0) return;
+                
+                initState.currentTurn = (initState.currentTurn + 1) % initState.combatants.length;
+                refreshInitiativeList();
+            });
+            
+            // Reset
+            resetButton.addEventListener('click', function() {
+                initState.currentTurn = -1;
+                refreshInitiativeList();
+            });
+            
+            // Roll for all
+            rollButton.addEventListener('click', function() {
+                initState.combatants.forEach(combatant => {
+                    // REF bonus between 2-7 for NPCs, 4-8 for PCs
+                    const refBonus = combatant.isNPC ? 
+                        Math.floor(Math.random() * 6) + 2 : 
+                        Math.floor(Math.random() * 5) + 4;
+                    
+                    combatant.initiative = Math.floor(Math.random() * 10) + 1 + refBonus;
+                });
+                
+                // Sort by initiative
+                initState.combatants.sort((a, b) => b.initiative - a.initiative);
+                
+                // Reset turn
+                initState.currentTurn = -1;
+                
+                // Refresh display
+                refreshInitiativeList();
+            });
+            
+            // Refresh initiative list
+            function refreshInitiativeList() {
+                if (initState.combatants.length === 0) {
+                    listElement.innerHTML = `<div class="cp-initiative-empty">No combatants added</div>`;
+                    return;
+                }
+                
+                let html = '';
+                
+                initState.combatants.forEach((combatant, index) => {
+                    const isActive = index === initState.currentTurn;
+                    const itemClass = `cp-initiative-item ${isActive ? 'cp-initiative-active' : (combatant.isNPC ? 'cp-initiative-npc' : 'cp-initiative-pc')}`;
+                    
+                    html += `
+                        <div class="${itemClass}">
+                            <div>${combatant.name}</div>
+                            <div>${combatant.initiative}</div>
+                            <button class="cp-initiative-remove" data-index="${index}" aria-label="Remove ${combatant.name}">×</button>
+                        </div>
+                    `;
+                });
+                
+                listElement.innerHTML = html;
+                
+                // Add remove buttons event listeners
+                const removeButtons = listElement.querySelectorAll('.cp-initiative-remove');
+                removeButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        
+                        // Adjust current turn if needed
+                        if (index === initState.currentTurn) {
+                            initState.currentTurn = -1;
+                        } else if (index < initState.currentTurn) {
+                            initState.currentTurn--;
+                        }
+                        
+                        // Remove combatant
+                        initState.combatants.splice(index, 1);
+                        
+                        // Refresh display
+                        refreshInitiativeList();
+                    });
+                });
+            }
+            
+            return panel;
+        }
+
+        // Register panel types with the factory
+        PanelFactory.register('notes', createNotesPanel);
+        PanelFactory.register('dice', createDicePanel);
+        PanelFactory.register('rules', createRulesPanel);
+        PanelFactory.register('initiative', createInitiativePanel);
+
+        // Function to toggle animations
+        function toggleAnimations() {
+            appState.settings.animations = !appState.settings.animations;
+            document.body.classList.toggle('cp-no-animations', !appState.settings.animations);
+            saveSettings();
+        }
+
+        // Function to show/hide font controls
+        function toggleFontControls() {
+            const controls = document.getElementById('fontControls');
+            controls.classList.toggle('active');
+        }
+
+        // Function to save the current layout
+        function saveLayout() {
+            try {
+                localStorage.setItem('cp-layout', JSON.stringify(appState.panels));
+                alert('Layout saved successfully');
+            } catch (error) {
+                console.error('Error saving layout:', error);
+                alert('Error saving layout. Check console for details.');
+            }
+        }
+
+        // Function to load a saved layout
+        function loadLayout() {
+            try {
+                const savedLayout = localStorage.getItem('cp-layout');
+                
+                if (!savedLayout) {
+                    alert('No saved layout found');
+                    return;
+                }
+                
+                // Clear current layout
+                clearLayout();
+                
+                // Parse saved layout
+                const panels = JSON.parse(savedLayout);
+                
+                // Create panels
+                panels.forEach(panel => {
+                    const newPanel = PanelFactory.create(panel.type);
+                    
+                    if (newPanel) {
+                        // Apply saved properties
+                        newPanel.style.left = panel.left;
+                        newPanel.style.top = panel.top;
+                        if (panel.width) newPanel.style.width = panel.width;
+                        if (panel.height) newPanel.style.height = panel.height;
+                        newPanel.style.zIndex = panel.zIndex;
+                    }
+                });
+                
+                alert('Layout loaded successfully');
+            } catch (error) {
+                console.error('Error loading layout:', error);
+                alert('Error loading layout. Check console for details.');
+            }
+        }
+
+        // Function to clear the layout
+        function clearLayout() {
+            if (confirm('Remove all panels?')) {
+                document.querySelectorAll('.cp-panel').forEach(panel => panel.remove());
+                appState.panels = [];
+                appState.currentZIndex = 10;
+                appState.activePanelId = null;
+            }
+        }
+
+        // Function to reset to default layout
+        function resetLayout() {
+            if (confirm('Reset to default layout?')) {
+                // Clear current layout
+                clearLayout();
+                
+                // Create default layout
+                PanelFactory.create('notes');
+                PanelFactory.create('dice');
+                PanelFactory.create('initiative');
+            }
+        }
+
+        // Function to auto-organize panels
+        function autoOrganizePanels() {
+            const panels = document.querySelectorAll('.cp-panel');
+            if (panels.length === 0) return;
+            
+            // Sort panels by title
+            const sortedPanels = Array.from(panels).sort((a, b) => {
+                const titleA = a.querySelector('.cp-panel-title').textContent;
+                const titleB = b.querySelector('.cp-panel-title').textContent;
+                return titleA.localeCompare(titleB);
+            });
+            
+            // Calculate grid dimensions
+            const totalPanels = sortedPanels.length;
+            const cols = Math.ceil(Math.sqrt(totalPanels)); // Square-ish grid
+            
+            // Get available space
+            const containerWidth = window.innerWidth - 40; // 20px margin on each side
+            const toolbarHeight = document.querySelector('.cp-toolbar').offsetHeight || 0;
+            const containerHeight = window.innerHeight - toolbarHeight - 40; // 20px margin on each side
+            
+            // Calculate panel dimensions
+            const panelWidth = Math.floor(containerWidth / cols);
+            const panelHeight = Math.floor(containerHeight / Math.ceil(totalPanels / cols));
+            
+            // Position panels
+            sortedPanels.forEach((panel, index) => {
+                const row = Math.floor(index / cols);
+                const col = index % cols;
+                
+                panel.style.left = (20 + col * panelWidth) + 'px';
+                panel.style.top = (toolbarHeight + 20 + row * panelHeight) + 'px';
+                panel.style.width = (panelWidth - 20) + 'px'; // 10px gap on each side
+                panel.style.height = (panelHeight - 20) + 'px'; // 10px gap on each side
+                panel.style.zIndex = index + 10;
+                
+                // Update panel in state
+                const panelId = panel.getAttribute('data-panel-id');
+                const panelObj = appState.panels.find(p => p.id === panelId);
+                if (panelObj) {
+                    panelObj.left = panel.style.left;
+                    panelObj.top = panel.style.top;
+                    panelObj.width = panel.style.width;
+                    panelObj.height = panel.style.height;
+                    panelObj.zIndex = panel.style.zIndex;
+                }
+            });
+        }
+
+        // Function to fit panels to window
+        function fitPanelsToWindow() {
+            const panels = document.querySelectorAll('.cp-panel');
+            if (panels.length === 0) return;
+            
+            // Get available space
+            const containerWidth = window.innerWidth - 40; // 20px margin on each side
+            const toolbarHeight = document.querySelector('.cp-toolbar').offsetHeight || 0;
+            const containerHeight = window.innerHeight - toolbarHeight - 40; // 20px margin on each side
+            
+            // Group panels by type
+            const panelGroups = {};
+            
+            panels.forEach(panel => {
+                const title = panel.querySelector('.cp-panel-title').textContent;
+                const type = title.toLowerCase().replace(/\s+/g, '-');
+                
+                if (!panelGroups[type]) {
+                    panelGroups[type] = [];
+                }
+                panelGroups[type].push(panel);
+            });
+            
+            const types = Object.keys(panelGroups);
+            const totalTypes = types.length;
+            
+            // Calculate grid dimensions based on number of types
+            let rows, cols;
+            
+            if (totalTypes <= 2) {
+                rows = 1;
+                cols = totalTypes;
+            } else if (totalTypes <= 6) {
+                rows = 2;
+                cols = Math.ceil(totalTypes / 2);
+            } else {
+                rows = 3;
+                cols = Math.ceil(totalTypes / 3);
+            }
+            
+            // Calculate cell dimensions
+            const cellWidth = Math.floor(containerWidth / cols);
+            const cellHeight = Math.floor(containerHeight / rows);
+            
+            // Position panels
+            types.forEach((type, typeIndex) => {
+                const row = Math.floor(typeIndex / cols);
+                const col = typeIndex % cols;
+                
+                const typePanels = panelGroups[type];
+                const panelCount = typePanels.length;
+                
+                if (panelCount === 1) {
+                    // Single panel - fill the cell
+                    const panel = typePanels[0];
+                    
+                    panel.style.left = (20 + col * cellWidth) + 'px';
+                    panel.style.top = (toolbarHeight + 20 + row * cellHeight) + 'px';
+                    panel.style.width = (cellWidth - 40) + 'px';
+                    panel.style.height = (cellHeight - 40) + 'px';
+                    panel.style.zIndex = typeIndex + 10;
+                    
+                    // Update panel in state
+                    const panelId = panel.getAttribute('data-panel-id');
+                    const panelObj = appState.panels.find(p => p.id === panelId);
+                    if (panelObj) {
+                        panelObj.left = panel.style.left;
+                        panelObj.top = panel.style.top;
+                        panelObj.width = panel.style.width;
+                        panelObj.height = panel.style.height;
+                        panelObj.zIndex = panel.style.zIndex;
+                    }
+                } else {
+                    // Multiple panels - create sub-grid
+                    const subRows = Math.ceil(Math.sqrt(panelCount));
+                    const subCols = Math.ceil(panelCount / subRows);
+                    
+                    const subCellWidth = Math.floor(cellWidth / subCols);
+                    const subCellHeight = Math.floor(cellHeight / subRows);
+                    
+                    typePanels.forEach((panel, panelIndex) => {
+                        const subRow = Math.floor(panelIndex / subCols);
+                        const subCol = panelIndex % subCols;
+                        
+                        panel.style.left = (20 + col * cellWidth + subCol * subCellWidth) + 'px';
+                        panel.style.top = (toolbarHeight + 20 + row * cellHeight + subRow * subCellHeight) + 'px';
+                        panel.style.width = (subCellWidth - 40) + 'px';
+                        panel.style.height = (subCellHeight - 40) + 'px';
+                        panel.style.zIndex = typeIndex + 10;
+                        
+                        // Update panel in state
+                        const panelId = panel.getAttribute('data-panel-id');
+                        const panelObj = appState.panels.find(p => p.id === panelId);
+                        if (panelObj) {
+                            panelObj.left = panel.style.left;
+                            panelObj.top = panel.style.top;
+                            panelObj.width = panel.style.width;
+                            panelObj.height = panel.style.height;
+                            panelObj.zIndex = panel.style.zIndex;
+                        }
+                    });
+                }
+            });
+        }
+
+        // Function to apply font settings
+        function applyFontSettings() {
+            const panels = document.querySelectorAll('.cp-panel');
+            
+            panels.forEach(panel => {
+                panel.style.fontSize = appState.settings.fontSize + 'px';
+                panel.style.fontFamily = appState.settings.fontFamily;
+            });
+            
+            saveSettings();
+        }
+
+        // Function to save settings
+        function saveSettings() {
+            try {
+                localStorage.setItem('cp-settings', JSON.stringify(appState.settings));
+            } catch (error) {
+                console.error('Error saving settings:', error);
+            }
+        }
+
+        // Function to load settings
+        function loadSettings() {
+            try {
+                const savedSettings = localStorage.getItem('cp-settings');
+                
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+                    
+                    // Merge saved settings with defaults
+                    appState.settings = { ...appState.settings, ...settings };
+                    
+                    // Apply theme
+                    setTheme(appState.settings.theme || '');
+                    
+                    // Apply animations setting
+                    document.body.classList.toggle('cp-no-animations', !appState.settings.animations);
+                    
+                    // Update font size buttons
+                    document.querySelectorAll('.cp-font-size-btn').forEach(btn => {
+                        btn.classList.toggle('active', parseInt(btn.getAttribute('data-size')) === appState.settings.fontSize);
+                    });
+                    
+                    // Update font family select
+                    const fontSelect = document.getElementById('fontFamily');
+                    if (fontSelect) {
+                        fontSelect.value = appState.settings.fontFamily;
+                    }
+                    
+                    // Apply current font settings to body
+                    document.body.style.fontSize = appState.settings.fontSize + 'px';
+                    document.body.style.fontFamily = appState.settings.fontFamily;
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        // Function to set theme
+        function setTheme(theme) {
+            // Remove all theme classes
+            document.body.className = '';
+            document.documentElement.className = '';
+            
+            // Add selected theme class if not default
+            if (theme) {
+                document.body.classList.add(theme);
+                document.documentElement.classList.add(theme);
+            }
+            
+            // Update active theme button
+            document.querySelectorAll('.cp-theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-theme') === theme);
+            });
+            
+            // Save theme setting
+            appState.settings.theme = theme;
+            saveSettings();
+        }
+
+        // Function to show about dialog
+        function showAbout() {
+            alert('Cyberpunk RED GM Screen\nA tool for Game Masters\nVersion 2.0.0');
+        }
+
+        // Function to handle dropdown menus
+        function setupDropdowns() {
+            document.querySelectorAll('.cp-dropdown-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const dropdown = this.closest('.cp-dropdown');
+                    const content = dropdown.querySelector('.cp-dropdown-content');
+                    
+                    // Toggle aria attributes
+                    const expanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', !expanded);
+                    
+                    // Toggle active class
+                    content.classList.toggle('active');
+                    
+                    // Close other dropdowns
+                    document.querySelectorAll('.cp-dropdown-content').forEach(dc => {
+                        if (dc !== content) {
+                            dc.classList.remove('active');
+                            const otherButton = dc.parentElement.querySelector('.cp-dropdown-button');
+                            if (otherButton) {
+                                otherButton.setAttribute('aria-expanded', 'false');
+                            }
+                        }
+                    });
+                });
+            });
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.cp-dropdown')) {
+                    document.querySelectorAll('.cp-dropdown-content').forEach(content => {
+                        content.classList.remove('active');
+                        
+                        const button = content.parentElement.querySelector('.cp-dropdown-button');
+                        if (button) {
+                            button.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Set up panel creation
+        function setupPanelCreation() {
+            document.querySelectorAll('[data-panel]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const panelType = this.getAttribute('data-panel');
+                    PanelFactory.create(panelType);
+                    
+                    // Close dropdown
+                    const dropdown = this.closest('.cp-dropdown-content');
+                    if (dropdown) {
+                        dropdown.classList.remove('active');
+                        
+                        const button = dropdown.parentElement.querySelector('.cp-dropdown-button');
+                        if (button) {
+                            button.setAttribute('aria-expanded', 'false');
+                        }
+                    }
+                });
+            });
+        }
+
+        // Set up layout actions
+        function setupLayoutActions() {
+            document.querySelectorAll('[data-action]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const action = this.getAttribute('data-action');
+                    
+                    switch (action) {
+                        case 'save-layout':
+                            saveLayout();
+                            break;
+                        case 'load-layout':
+                            loadLayout();
+                            break;
+                        case 'clear-layout':
+                            clearLayout();
+                            break;
+                        case 'reset-layout':
+                            resetLayout();
+                            break;
+                        case 'auto-organize':
+                            autoOrganizePanels();
+                            break;
+                        case 'fit-to-window':
+                            fitPanelsToWindow();
+                            break;
+                        case 'font-settings':
+                            toggleFontControls();
+                            break;
+                        case 'toggle-animations':
+                            toggleAnimations();
+                            break;
+                        case 'about':
+                            showAbout();
+                            break;
+                    }
+                    
+                    // Close dropdown
+                    const dropdown = this.closest('.cp-dropdown-content');
+                    if (dropdown) {
+                        dropdown.classList.remove('active');
+                        
+                        const button = dropdown.parentElement.querySelector('.cp-dropdown-button');
+                        if (button) {
+                            button.setAttribute('aria-expanded', 'false');
+                        }
+                    }
+                });
+            });
+        }
+
+        // Set up font controls
+        function setupFontControls() {
+            // Font size buttons
+            document.querySelectorAll('.cp-font-size-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.cp-font-size-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Update font size setting
+                    appState.settings.fontSize = parseInt(this.getAttribute('data-size'));
+                });
+            });
+            
+            // Font family select
+            document.getElementById('fontFamily').addEventListener('change', function() {
+                appState.settings.fontFamily = this.value;
+            });
+            
+            // Apply font button
+            document.getElementById('applyFont').addEventListener('click', function() {
+                applyFontSettings();
+                toggleFontControls(); // Close the controls
+            });
+            
+            // Close font controls button
+            document.getElementById('closeFontControls').addEventListener('click', function() {
+                toggleFontControls();
+            });
+        }
+
+        // Set up theme buttons
+        function setupThemeButtons() {
+            document.querySelectorAll('.cp-theme-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const theme = this.getAttribute('data-theme');
+                    setTheme(theme);
+                });
+            });
+        }
+
+        // Keyboard navigation and accessibility
+        function setupKeyboardNavigation() {
+            // ESC key to close active dropdown
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    // Close font controls if open
+                    const fontControls = document.getElementById('fontControls');
+                    if (fontControls.classList.contains('active')) {
+                        toggleFontControls();
+                        return;
+                    }
+                    
+                    // Close active dropdown
+                    const activeDropdown = document.querySelector('.cp-dropdown-content.active');
+                    if (activeDropdown) {
+                        activeDropdown.classList.remove('active');
+                        
+                        const button = activeDropdown.parentElement.querySelector('.cp-dropdown-button');
+                        if (button) {
+                            button.setAttribute('aria-expanded', 'false');
+                        }
+                        return;
+                    }
+                }
+            });
+            
+            // Keyboard support for resize handle
+            document.addEventListener('keydown', function(e) {
+                if (!appState.activePanelId) return;
+                
+                const panel = document.querySelector(`.cp-panel[data-panel-id="${appState.activePanelId}"]`);
+                if (!panel) return;
+                
+                const resizeHandle = panel.querySelector('.cp-resize-handle');
+                if (document.activeElement === resizeHandle) {
+                    const step = e.shiftKey ? 50 : 10;
+                    
+                    switch (e.key) {
+                        case 'ArrowRight':
+                            panel.style.width = (panel.offsetWidth + step) + 'px';
+                            e.preventDefault();
+                            break;
+                        case 'ArrowDown':
+                            panel.style.height = (panel.offsetHeight + step) + 'px';
+                            e.preventDefault();
+                            break;
+                        case 'ArrowLeft':
+                            panel.style.width = Math.max(250, panel.offsetWidth - step) + 'px';
+                            e.preventDefault();
+                            break;
+                        case 'ArrowUp':
+                            panel.style.height = Math.max(150, panel.offsetHeight - step) + 'px';
+                            e.preventDefault();
+                            break;
+                    }
+                    
+                    // Update panel dimensions in state
+                    const panelObj = appState.panels.find(p => p.id === appState.activePanelId);
+                    if (panelObj) {
+                        panelObj.width = panel.style.width;
+                        panelObj.height = panel.style.height;
+                    }
+                }
+            });
+        }
+
+        // Register event for window resize
+        window.addEventListener('resize', function() {
+            // Consider refitting panels to window on resize
+            // This is optional and depends on UX preference
+        });
+
+        // Initialization function
+        function initialize() {
+            console.log('Initializing Cyberpunk RED GM Screen...');
+            
+            // Setup event handlers
+            setupDropdowns();
+            setupPanelCreation();
+            setupLayoutActions();
+            setupFontControls();
+            setupThemeButtons();
+            setupKeyboardNavigation();
+            
+            // Load settings
+            loadSettings();
+            
+            // Check if there's a saved layout
+            try {
+                const savedLayout = localStorage.getItem('cp-layout');
+                if (savedLayout) {
+                    // Ask if user wants to load the saved layout
+                    if (confirm('Load saved layout?')) {
+                        loadLayout();
+                    } else {
+                        // Create default panels
+                        resetLayout();
+                    }
+                } else {
+                    // Create default panels
+                    resetLayout();
+                }
+            } catch (error) {
+                console.error('Error checking saved layout:', error);
+                // Create default panels
+                resetLayout();
+            }
+            
+            console.log('Initialization complete.');
+        }
+
+        // Initialize when the DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
+    })();
+    </script>
+</body>
+</html>

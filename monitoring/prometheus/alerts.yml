@@ -1,0 +1,164 @@
+groups:
+  - name: cyberpunk_gm_screen
+    interval: 30s
+    rules:
+      # Performance Alerts
+      - alert: HighPageLoadTime
+        expr: avg(cyberpunk_gm_page_load_duration_seconds) > 3
+        for: 5m
+        labels:
+          severity: warning
+          component: performance
+        annotations:
+          summary: "High page load time detected"
+          description: "Average page load time is {{ $value }}s (threshold: 3s)"
+          
+      - alert: VeryHighPageLoadTime
+        expr: avg(cyberpunk_gm_page_load_duration_seconds) > 5
+        for: 2m
+        labels:
+          severity: critical
+          component: performance
+        annotations:
+          summary: "Critical page load time"
+          description: "Page load time is critically high at {{ $value }}s"
+          
+      # Error Rate Alerts
+      - alert: HighErrorRate
+        expr: sum(rate(cyberpunk_gm_errors_total[5m])) * 60 > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: application
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value }} errors/min (threshold: 10)"
+          
+      - alert: CriticalErrorRate
+        expr: sum(rate(cyberpunk_gm_errors_total[5m])) * 60 > 50
+        for: 2m
+        labels:
+          severity: critical
+          component: application
+        annotations:
+          summary: "Critical error rate"
+          description: "Error rate is critically high at {{ $value }} errors/min"
+          
+      # Component-specific Alerts
+      - alert: ComponentErrorSpike
+        expr: sum by (error_type) (rate(cyberpunk_gm_errors_total{error_type="component_error"}[5m])) * 60 > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: ui
+        annotations:
+          summary: "UI component errors detected"
+          description: "Component error rate: {{ $value }} errors/min"
+          
+      # Memory Alerts
+      - alert: HighMemoryUsage
+        expr: cyberpunk_gm_memory_usage_bytes > 500000000  # 500MB
+        for: 10m
+        labels:
+          severity: warning
+          component: performance
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ humanize $value }} (threshold: 500MB)"
+          
+      # User Experience Alerts
+      - alert: PoorCoreWebVitals
+        expr: |
+          avg(cyberpunk_gm_lcp_duration_seconds) > 2.5 or
+          avg(cyberpunk_gm_fid_duration_seconds) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          component: ux
+        annotations:
+          summary: "Poor Core Web Vitals"
+          description: "User experience metrics are below acceptable thresholds"
+          
+      # Availability Alerts
+      - alert: NoActiveUsers
+        expr: cyberpunk_gm_active_users == 0
+        for: 30m
+        labels:
+          severity: info
+          component: monitoring
+        annotations:
+          summary: "No active users"
+          description: "No users have been active for 30 minutes"
+          
+      # Panel Usage Alerts
+      - alert: UnusualPanelActivity
+        expr: |
+          abs(rate(cyberpunk_gm_panel_opens_total[10m]) - 
+          rate(cyberpunk_gm_panel_opens_total[1h] offset 1h)) > 
+          2 * stddev_over_time(rate(cyberpunk_gm_panel_opens_total[1h])[1d:1h])
+        for: 15m
+        labels:
+          severity: info
+          component: usage
+        annotations:
+          summary: "Unusual panel activity detected"
+          description: "Panel open rate deviates significantly from normal patterns"
+          
+      # Dice Roll Anomalies
+      - alert: AbnormalCriticalRate
+        expr: |
+          (sum(rate(cyberpunk_gm_dice_critical_total[1h])) / 
+           sum(rate(cyberpunk_gm_dice_rolls_total[1h]))) > 0.15
+        for: 30m
+        labels:
+          severity: info
+          component: gameplay
+        annotations:
+          summary: "Abnormal critical roll rate"
+          description: "Critical roll rate is {{ $value }}% (expected: ~10%)"
+
+  - name: cyberpunk_gm_slo
+    interval: 1m
+    rules:
+      # Service Level Objectives
+      - alert: SLOViolation_Availability
+        expr: |
+          (1 - (
+            sum(rate(cyberpunk_gm_errors_total[5m])) /
+            sum(rate(cyberpunk_gm_panel_opens_total[5m]))
+          )) < 0.99
+        for: 5m
+        labels:
+          severity: critical
+          component: slo
+          slo: availability
+        annotations:
+          summary: "Availability SLO violation"
+          description: "Error rate exceeds 1% (current: {{ $value }}%)"
+          
+      - alert: SLOViolation_Performance
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(cyberpunk_gm_page_load_duration_seconds_bucket[5m])) by (le)
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+          component: slo
+          slo: performance
+        annotations:
+          summary: "Performance SLO violation"
+          description: "95th percentile page load time exceeds 2s (current: {{ $value }}s)"
+          
+      - alert: SLOViolation_UserExperience
+        expr: |
+          (sum(rate(cyberpunk_gm_panel_interactions_total[5m])) == 0 and
+           cyberpunk_gm_active_users > 0)
+        for: 10m
+        labels:
+          severity: warning
+          component: slo
+          slo: engagement
+        annotations:
+          summary: "User engagement SLO violation"
+          description: "No user interactions despite active users"

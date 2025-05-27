@@ -1,0 +1,283 @@
+@import '@/styles/variables.scss';
+
+.panel {
+  @include panel-base;
+  
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  min-height: 150px;
+  transition: box-shadow var(--duration-fast), transform var(--duration-fast);
+  will-change: transform;
+  contain: layout style;
+  
+  // Font scaling
+  --panel-font-scale: 1;
+  font-size: calc(var(--font-size-base) * var(--panel-font-scale));
+  
+  &[data-font-scale="0.75"] { --panel-font-scale: 0.75; }
+  &[data-font-scale="0.875"] { --panel-font-scale: 0.875; }
+  &[data-font-scale="1"] { --panel-font-scale: 1; }
+  &[data-font-scale="1.125"] { --panel-font-scale: 1.125; }
+  &[data-font-scale="1.25"] { --panel-font-scale: 1.25; }
+  &[data-font-scale="1.5"] { --panel-font-scale: 1.5; }
+  &[data-font-scale="2"] { --panel-font-scale: 2; }
+  
+  // States
+  &.active {
+    z-index: $z-index-panel-active;
+    box-shadow: var(--shadow-xl), 0 0 20px var(--color-accent);
+  }
+  
+  &.dragging {
+    opacity: 0.9;
+    cursor: move;
+    box-shadow: var(--shadow-2xl);
+  }
+  
+  &.resizing {
+    user-select: none;
+  }
+  
+  &.minimized {
+    height: var(--panel-header-height) !important;
+    min-height: var(--panel-header-height) !important;
+    
+    .content {
+      display: none;
+    }
+  }
+  
+  &.maximized {
+    position: fixed !important;
+    top: var(--toolbar-height) !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    z-index: $z-index-panel-active + 10;
+  }
+  
+  &.loading {
+    .content {
+      @extend %flex-center;
+      min-height: 100px;
+      
+      &::after {
+        content: '';
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--color-neutral-700);
+        border-top-color: var(--color-accent);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+  
+  // Responsive behavior
+  @include mobile {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 200px;
+    margin-bottom: var(--space-4);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  @include tablet {
+    position: relative !important;
+    min-height: 300px;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--panel-header-height);
+  padding: 0 var(--panel-padding);
+  background: var(--color-surface-secondary);
+  border-bottom: 1px solid var(--color-border);
+  cursor: move;
+  user-select: none;
+  
+  @include mobile {
+    cursor: pointer;
+  }
+}
+
+.title {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  
+  .theme-neon-synthwave & {
+    @include neon-text;
+  }
+}
+
+.controls {
+  display: flex;
+  gap: var(--space-2);
+  margin-left: var(--space-4);
+}
+
+.control {
+  @include button-base;
+  @include touch-target;
+  
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  
+  &:hover {
+    color: var(--color-text-primary);
+    background: var(--color-surface-tertiary);
+  }
+  
+  &:active {
+    background: var(--color-surface-primary);
+  }
+  
+  @include mobile {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.content {
+  flex: 1;
+  padding: var(--panel-padding);
+  overflow: auto;
+  @include scrollbar;
+  
+  // Content containment for performance
+  contain: content;
+}
+
+.footer {
+  padding: var(--space-3) var(--panel-padding);
+  background: var(--color-surface-secondary);
+  border-top: 1px solid var(--color-border);
+}
+
+// Resize handles
+.resizeHandle {
+  position: absolute;
+  
+  &Top {
+    top: -4px;
+    left: 0;
+    right: 0;
+    height: 8px;
+    cursor: ns-resize;
+  }
+  
+  &Right {
+    top: 0;
+    right: -4px;
+    bottom: 0;
+    width: 8px;
+    cursor: ew-resize;
+  }
+  
+  &Bottom {
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 8px;
+    cursor: ns-resize;
+  }
+  
+  &Left {
+    top: 0;
+    left: -4px;
+    bottom: 0;
+    width: 8px;
+    cursor: ew-resize;
+  }
+  
+  &TopLeft {
+    top: -4px;
+    left: -4px;
+    width: 12px;
+    height: 12px;
+    cursor: nw-resize;
+  }
+  
+  &TopRight {
+    top: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    cursor: ne-resize;
+  }
+  
+  &BottomLeft {
+    bottom: -4px;
+    left: -4px;
+    width: 12px;
+    height: 12px;
+    cursor: sw-resize;
+  }
+  
+  &BottomRight {
+    bottom: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    cursor: se-resize;
+  }
+  
+  @include mobile {
+    display: none;
+  }
+}
+
+// Error state
+.error {
+  @extend %flex-center;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--color-text-secondary);
+  
+  p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+  }
+  
+  button {
+    @include button-base;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-primary-600);
+    color: white;
+    
+    &:hover {
+      background: var(--color-primary-700);
+    }
+  }
+}
+
+// Animations
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
