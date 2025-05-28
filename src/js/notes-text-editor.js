@@ -26,59 +26,68 @@ function createEnhancedNotesPanel() {
     console.log('Creating enhanced notes panel with advanced editor');
     
     try {
-        // Try to use the standard panel creation function
-        const createPanelFunc = (typeof createPanel === 'function') ? createPanel : window.createPanel;
-        const panel = createPanelFunc('Notes');
-        
-        if (!panel) {
-            console.error('Panel creation failed - createPanel returned null or undefined');
-            throw new Error('Panel creation failed');
+        // Check if panelSystem is available
+        if (!window.panelSystem || typeof window.panelSystem.createPanel !== 'function') {
+            console.error('Panel system not available, falling back to basic panel');
+            throw new Error('Panel system not initialized');
         }
         
-        const content = panel.querySelector('.panel-content');
-        if (!content) {
-            console.error('Could not find .panel-content in Notes Panel');
-            throw new Error('Panel-content not found');
-        }
+        // Generate unique panel ID
+        const panelId = 'notes-' + Date.now();
         
-        // Make the notes panel larger by default
-        panel.style.width = '500px';
-        panel.style.height = '400px';
-        panel.style.resize = 'both';
-        panel.style.overflow = 'hidden';
+        // Create temporary content div to build our editor
+        const tempDiv = document.createElement('div');
+        tempDiv.id = panelId;
         
-        // Add resize handle
-        const resizeHandle = document.createElement('div');
-        resizeHandle.className = 'resize-handle';
-        resizeHandle.style.position = 'absolute';
-        resizeHandle.style.bottom = '0';
-        resizeHandle.style.right = '0';
-        resizeHandle.style.width = '15px';
-        resizeHandle.style.height = '15px';
-        resizeHandle.style.cursor = 'nwse-resize';
-        resizeHandle.style.background = 'linear-gradient(135deg, transparent 50%, rgba(0, 204, 255, 0.5) 50%)';
-        resizeHandle.style.zIndex = '100';
-        panel.appendChild(resizeHandle);
+        // Create panel using panelSystem
+        const panelConfig = {
+            title: 'Session Notes',
+            content: tempDiv.outerHTML,
+            position: { x: 320, y: 100 },
+            size: { width: 500, height: 400 }
+        };
         
-        // Generate a unique ID for this panel
-        const panelId = panel.id || `notes-panel-${Date.now()}`;
-        panel.id = panelId;
-        
-        // Add styles for the enhanced editor
+        // Add styles for the enhanced editor (can be done before panel creation)
         addEditorStyles(panelId);
         
-        // Create the editor UI
-        content.innerHTML = createEditorHtml(panelId);
+        // Create the editor HTML
+        const editorHtml = createEditorHtml(panelId);
         
-        // Initialize the editor functionality
-        initializeEditor(panel, panelId);
+        // Update panel config with actual content
+        panelConfig.content = editorHtml;
         
-        // Try to load saved notes
-        loadNotesList(panelId);
-        loadCurrentNote(panelId);
+        // Create the panel
+        window.panelSystem.createPanel(panelConfig);
         
-        console.log('Enhanced notes panel fully initialized');
-        return panel;
+        // Initialize after panel is created
+        setTimeout(() => {
+            const panels = document.querySelectorAll('.panel');
+            let panel = null;
+            
+            // Find our panel by checking the content
+            for (let p of panels) {
+                if (p.querySelector(`#notes-editor-${panelId}`)) {
+                    panel = p;
+                    break;
+                }
+            }
+            
+            if (!panel) {
+                console.error('Could not find created notes panel');
+                return;
+            }
+            
+            // Initialize the editor functionality
+            initializeEditor(panel, panelId);
+            
+            // Try to load saved notes
+            loadNotesList(panelId);
+            loadCurrentNote(panelId);
+            
+            console.log('Enhanced notes panel fully initialized');
+        }, 100);
+        
+        return true;
     }
     catch (error) {
         console.error('Error creating enhanced notes panel:', error);
@@ -254,6 +263,8 @@ function addEditorStyles(panelId) {
             border: none;
             color: var(--theme-text-primary, #e0e0e0);
             padding: 10px;
+            padding-bottom: 15px;
+            margin-bottom: 5px;
             font-size: 14px;
             line-height: 1.4;
             outline: none;
@@ -277,13 +288,15 @@ function addEditorStyles(panelId) {
         
         /* Footer */
         .enhanced-notes-footer {
-            padding: 5px;
+            padding: 8px 10px;
             display: flex;
             justify-content: space-between;
             font-size: 12px;
             color: rgba(200, 200, 255, 0.7);
             border-top: 1px solid rgba(200, 200, 255, 0.2);
             background-color: rgba(20, 20, 35, 0.9);
+            min-height: 28px;
+            align-items: center;
         }
         
         .word-count {
@@ -292,7 +305,26 @@ function addEditorStyles(panelId) {
         
         .notes-status {
             text-align: right;
-            min-width: 100px;
+            min-width: 150px;
+            font-weight: 500;
+            padding: 2px 5px;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .notes-status.success {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+        
+        .notes-status.error {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .notes-status.info {
+            background-color: rgba(33, 150, 243, 0.2);
+            color: #2196F3;
         }
         
         /* Text styling */
@@ -506,6 +538,14 @@ function createEditorHtml(panelId) {
                     <button id="save-note-${panelId}" class="editor-button primary" title="Save Note (Ctrl+S)" aria-label="Save Note" style="background-color: rgba(0, 150, 200, 0.4);">💾 Save</button>
                 </div>
                 
+                <!-- File operations group -->
+                <div class="toolbar-group">
+                    <button id="file-save-${panelId}" class="editor-button" title="Save to File" aria-label="Save to File">📥</button>
+                    <button id="file-load-${panelId}" class="editor-button" title="Load from File" aria-label="Load from File">📤</button>
+                    <button id="file-save-docs-${panelId}" class="editor-button" title="Save to Documents" aria-label="Save to Documents">📁</button>
+                    <button id="file-load-docs-${panelId}" class="editor-button" title="Load from Documents" aria-label="Load from Documents">📂</button>
+                </div>
+                
                 <!-- Text style group -->
                 <div class="toolbar-group">
                     <button id="format-bold-${panelId}" class="editor-button" data-command="bold" title="Bold (Ctrl+B)" aria-label="Bold"><strong>B</strong></button>
@@ -558,6 +598,8 @@ function createEditorHtml(panelId) {
                 <div class="toolbar-group">
                     <button id="export-${panelId}" class="editor-button" title="Export Note" aria-label="Export Note">↓</button>
                     <button id="import-${panelId}" class="editor-button" title="Import Note" aria-label="Import Note">↑</button>
+                    <button id="file-save-docs-${panelId}" class="editor-button" title="Save to Documents" aria-label="Save to Documents">📁</button>
+                    <button id="file-load-docs-${panelId}" class="editor-button" title="Load from Documents" aria-label="Load from Documents">📂</button>
                     <button id="fullscreen-${panelId}" class="editor-button" title="Toggle Fullscreen (F11)" aria-label="Toggle Fullscreen">⛶</button>
                 </div>
             </div>
@@ -716,6 +758,285 @@ function initializeEditor(panel, panelId) {
         }, 1500);
     });
     
+    // File save handler
+    document.getElementById(`file-save-${panelId}`).addEventListener('click', async () => {
+        const fileManager = window.notesFileManager;
+        const content = editor.innerHTML;
+        
+        // Create a dropdown menu for file format selection
+        const menu = document.createElement('div');
+        menu.style.cssText = `
+            position: absolute;
+            background: rgba(25, 25, 40, 0.95);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            padding: 5px 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        `;
+        
+        const formats = [
+            { label: 'Text (.txt)', handler: () => fileManager.saveToFile(editor.textContent) },
+            { label: 'HTML (.html)', handler: () => fileManager.saveAsHtml(content) },
+            { label: 'Markdown (.md)', handler: () => fileManager.saveAsMarkdown(content) }
+        ];
+        
+        formats.forEach(format => {
+            const btn = document.createElement('button');
+            btn.textContent = format.label;
+            btn.style.cssText = `
+                display: block;
+                width: 100%;
+                padding: 8px 16px;
+                background: none;
+                border: none;
+                color: var(--text-primary);
+                cursor: pointer;
+                text-align: left;
+            `;
+            btn.onmouseover = () => btn.style.background = 'rgba(0, 255, 255, 0.1)';
+            btn.onmouseout = () => btn.style.background = 'none';
+            btn.onclick = async () => {
+                try {
+                    await format.handler();
+                    updateStatus(statusElement, 'File saved!', 'success');
+                } catch (error) {
+                    updateStatus(statusElement, 'Save failed: ' + error.message, 'error');
+                }
+                document.body.removeChild(menu);
+            };
+            menu.appendChild(btn);
+        });
+        
+        // Position menu near the button
+        const btnRect = document.getElementById(`file-save-${panelId}`).getBoundingClientRect();
+        menu.style.left = btnRect.left + 'px';
+        menu.style.top = (btnRect.bottom + 5) + 'px';
+        
+        document.body.appendChild(menu);
+        
+        // Close menu when clicking outside
+        setTimeout(() => {
+            const closeMenu = (e) => {
+                if (!menu.contains(e.target)) {
+                    document.body.removeChild(menu);
+                    document.removeEventListener('click', closeMenu);
+                }
+            };
+            document.addEventListener('click', closeMenu);
+        }, 100);
+    });
+    
+    // File load handler
+    document.getElementById(`file-load-${panelId}`).addEventListener('click', () => {
+        const fileManager = window.notesFileManager;
+        const input = fileManager.createFileInput(async (content, fileName) => {
+            try {
+                // If it's an HTML file, use the content directly
+                if (fileName.endsWith('.html')) {
+                    editor.innerHTML = content;
+                } else {
+                    // For text and markdown files, convert to HTML
+                    editor.textContent = content;
+                }
+                
+                updateStatus(statusElement, `Loaded: ${fileName}`, 'success');
+                updateWordCount(editor, wordCountElement);
+                
+                // Save to current note
+                saveCurrentNote(panelId);
+            } catch (error) {
+                updateStatus(statusElement, 'Load failed: ' + error.message, 'error');
+            }
+        });
+        
+        input.click();
+    });
+    
+    // Save to Documents handler
+    document.getElementById(`file-save-docs-${panelId}`).addEventListener('click', async () => {
+        const fsManager = window.notesFilesystemManager;
+        if (!fsManager) {
+            updateStatus(statusElement, 'Filesystem manager not available', 'error');
+            return;
+        }
+        
+        const content = editor.innerHTML;
+        const timestamp = new Date().toISOString().split('T')[0];
+        
+        // Create a dropdown menu for file format selection
+        const menu = document.createElement('div');
+        menu.style.cssText = `
+            position: absolute;
+            background: rgba(25, 25, 40, 0.95);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            padding: 5px 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        `;
+        
+        const formats = [
+            { 
+                label: 'Text (.txt)', 
+                ext: '.txt',
+                handler: async () => {
+                    const result = await fsManager.saveToDocuments(
+                        editor.textContent, 
+                        `cyberpunk-notes-${timestamp}.txt`, 
+                        'text'
+                    );
+                    return result;
+                }
+            },
+            { 
+                label: 'Markdown (.md)', 
+                ext: '.md',
+                handler: async () => {
+                    const markdown = fsManager.htmlToMarkdown(content);
+                    const result = await fsManager.saveToDocuments(
+                        markdown, 
+                        `cyberpunk-notes-${timestamp}.md`, 
+                        'markdown'
+                    );
+                    return result;
+                }
+            },
+            { 
+                label: 'HTML (.html)', 
+                ext: '.html',
+                handler: async () => {
+                    const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cyberpunk Notes - ${timestamp}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1, h2, h3 { color: #00ffff; }
+        code { background: #f0f0f0; padding: 2px 4px; }
+        pre { background: #f0f0f0; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+${content}
+</body>
+</html>`;
+                    const result = await fsManager.saveToDocuments(
+                        htmlContent, 
+                        `cyberpunk-notes-${timestamp}.html`, 
+                        'html'
+                    );
+                    return result;
+                }
+            }
+        ];
+        
+        formats.forEach(format => {
+            const btn = document.createElement('button');
+            btn.textContent = format.label;
+            btn.style.cssText = `
+                display: block;
+                width: 100%;
+                padding: 8px 16px;
+                background: none;
+                border: none;
+                color: var(--text-primary);
+                cursor: pointer;
+                text-align: left;
+            `;
+            btn.onmouseover = () => btn.style.background = 'rgba(0, 255, 255, 0.1)';
+            btn.onmouseout = () => btn.style.background = 'none';
+            btn.onclick = async () => {
+                try {
+                    const result = await format.handler();
+                    if (result.success) {
+                        updateStatus(statusElement, result.message, 'success');
+                    } else {
+                        updateStatus(statusElement, result.message, 'info');
+                    }
+                } catch (error) {
+                    updateStatus(statusElement, 'Save failed: ' + error.message, 'error');
+                }
+                document.body.removeChild(menu);
+            };
+            menu.appendChild(btn);
+        });
+        
+        // Position menu near the button
+        const btnRect = document.getElementById(`file-save-docs-${panelId}`).getBoundingClientRect();
+        menu.style.left = btnRect.left + 'px';
+        menu.style.top = (btnRect.bottom + 5) + 'px';
+        
+        document.body.appendChild(menu);
+        
+        // Close menu when clicking outside
+        setTimeout(() => {
+            const closeMenu = (e) => {
+                if (!menu.contains(e.target)) {
+                    document.body.removeChild(menu);
+                    document.removeEventListener('click', closeMenu);
+                }
+            };
+            document.addEventListener('click', closeMenu);
+        }, 100);
+    });
+    
+    // Load from Documents handler
+    document.getElementById(`file-load-docs-${panelId}`).addEventListener('click', async () => {
+        const fsManager = window.notesFilesystemManager;
+        if (!fsManager) {
+            updateStatus(statusElement, 'Filesystem manager not available', 'error');
+            return;
+        }
+        
+        try {
+            const result = await fsManager.loadFromDocuments();
+            
+            if (result.success) {
+                let content = result.content;
+                
+                // Handle different file types
+                if (result.fileType === 'markdown') {
+                    // Convert markdown to HTML
+                    content = fsManager.markdownToHtml(content);
+                    editor.innerHTML = content;
+                } else if (result.fileType === 'json') {
+                    // Try to parse JSON and format it
+                    try {
+                        const jsonData = JSON.parse(content);
+                        editor.innerHTML = '<pre>' + JSON.stringify(jsonData, null, 2) + '</pre>';
+                    } catch {
+                        // If not valid JSON, just display as text
+                        editor.textContent = content;
+                    }
+                } else if (result.fileType === 'html') {
+                    // Extract body content if full HTML document
+                    const bodyMatch = content.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                    if (bodyMatch) {
+                        editor.innerHTML = bodyMatch[1];
+                    } else {
+                        editor.innerHTML = content;
+                    }
+                } else {
+                    // Plain text
+                    editor.textContent = content;
+                }
+                
+                updateStatus(statusElement, `Loaded: ${result.fileName}`, 'success');
+                updateWordCount(editor, wordCountElement);
+                
+                // Save to current note
+                saveCurrentNote(panelId);
+            } else {
+                updateStatus(statusElement, result.message || 'Load cancelled', 'info');
+            }
+        } catch (error) {
+            updateStatus(statusElement, 'Load failed: ' + error.message, 'error');
+            console.error('Error loading from Documents:', error);
+        }
+    });
+    
     // Handle note selection changes
     notesSelector.addEventListener('change', () => {
         saveCurrentNote(panelId); // Save current note before switching
@@ -806,23 +1127,19 @@ function initializeEditor(panel, panelId) {
 function updateStatus(statusElement, message, type = 'info', timeout = 3000) {
     statusElement.textContent = message;
     
-    // Set color based on message type
-    switch (type) {
-        case 'error':
-            statusElement.style.color = '#ff5555';
-            break;
-        case 'success':
-            statusElement.style.color = '#55ff55';
-            break;
-        default:
-            statusElement.style.color = 'rgba(200, 200, 255, 0.7)';
+    // Remove all type classes
+    statusElement.classList.remove('success', 'error', 'info');
+    
+    // Add the appropriate class
+    if (type) {
+        statusElement.classList.add(type);
     }
     
     // Auto-clear status after timeout
     if (timeout > 0) {
         setTimeout(() => {
             statusElement.textContent = 'Ready';
-            statusElement.style.color = 'rgba(200, 200, 255, 0.7)';
+            statusElement.classList.remove('success', 'error', 'info');
         }, timeout);
     }
 }

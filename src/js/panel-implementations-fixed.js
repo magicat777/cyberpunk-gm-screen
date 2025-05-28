@@ -42,7 +42,9 @@ document.addEventListener('DOMContentLoaded', function() {
         window.createMapPanel = createMapPanel;
         window.createLocationPanel = createLocationPanel;
         window.createEncounterPanel = createEncounterPanel;
+        window.createAdvancedEncounterPanel = createAdvancedEncounterPanel;
         window.createNotesPanel = createNotesPanel;
+        window.createLoreBrowserPanel = createLoreBrowserPanel;
     }
 });
 
@@ -1185,78 +1187,25 @@ function createLootPanel() {
 function createMapPanel() {
     return safeCreatePanel(() => {
         const panel = createPanel('Night City Map');
-        panel.style.width = '600px';
-        panel.style.height = '500px';
+        panel.style.width = '900px';
+        panel.style.height = '750px';
         const content = panel.querySelector('.panel-content');
-        const panelId = panel.id || Date.now(); // Ensure uniqueness
         
-        content.innerHTML = `
-            <div class="map-panel">
-                <div class="map-controls">
-                    <select id="map-district-${panelId}">
-                        <option value="all">All Districts</option>
-                        <option value="city-center">City Center</option>
-                        <option value="watson">Watson</option>
-                        <option value="heywood">Heywood</option>
-                        <option value="westbrook">Westbrook</option>
-                        <option value="pacifica">Pacifica</option>
-                        <option value="santo-domingo">Santo Domingo</option>
-                        <option value="badlands">Badlands</option>
-                    </select>
-                    <input type="text" id="map-search-${panelId}" placeholder="Search locations...">
+        // Check if night-city-map.js is loaded
+        if (typeof window.nightCityMap === 'undefined' || !window.nightCityMap.createMapPanel) {
+            content.innerHTML = `
+                <div style="padding: 20px; text-align: center;">
+                    <p>Loading Night City Map...</p>
+                    <p style="font-size: 0.9em; color: #999;">Make sure night-city-map.js is included in the page.</p>
                 </div>
-                <div class="map-display">
-                    <div class="map-placeholder">
-                        [Interactive Map - Districts of Night City]
-                        
-                        This is a simplified map representation.
-                        In a full implementation, this would be an interactive
-                        SVG or canvas-based map with clickable regions.
-                    </div>
-                    <div class="map-legend">
-                        <div class="legend-item"><span class="legend-color" style="background-color: #e74c3c;"></span> Combat Zone</div>
-                        <div class="legend-item"><span class="legend-color" style="background-color: #3498db;"></span> Corporate</div>
-                        <div class="legend-item"><span class="legend-color" style="background-color: #2ecc71;"></span> Entertainment</div>
-                        <div class="legend-item"><span class="legend-color" style="background-color: #f1c40f;"></span> Industrial</div>
-                    </div>
-                </div>
-                <div class="map-info">
-                    <div id="district-info-${panelId}">Select a district to see details</div>
-                </div>
-            </div>
-        `;
+            `;
+            console.error('Night City Map module not loaded. Please include night-city-map.js');
+            return panel;
+        }
         
-        // District information
-        const districtInfo = {
-            'city-center': 'City Center: The heart of corporate power in Night City. Home to massive skyscrapers and corporate headquarters. High security, expensive living.',
-            'watson': 'Watson: A mix of industrial areas and residential housing. Contains the Combat Zone and parts of Northside.',
-            'heywood': 'Heywood: Primarily residential area with strong gang presence. Hispanic influences and cultural centers.',
-            'westbrook': 'Westbrook: Entertainment district with Japantown and Charter Hill. Upscale shopping and nightlife.',
-            'pacifica': 'Pacifica: Abandoned resort area turned urban ruin. Controlled by the Voodoo Boys gang. Very dangerous.',
-            'santo-domingo': 'Santo Domingo: Industrial zone with factories and power plants. Working class neighborhood with strong nomad connections.',
-            'badlands': 'Badlands: The harsh desert surrounding Night City. Home to nomad families and abandoned towns.'
-        };
-        
-        // Update district info
-        content.querySelector(`#map-district-${panelId}`).addEventListener('change', function() {
-            const district = this.value;
-            
-            if (district === 'all') {
-                content.querySelector(`#district-info-${panelId}`).textContent = 'All districts of Night City visible. Select specific district for details.';
-            } else {
-                content.querySelector(`#district-info-${panelId}`).textContent = districtInfo[district];
-            }
-        });
-        
-        // Search functionality placeholder
-        content.querySelector(`#map-search-${panelId}`).addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            
-            if (searchTerm.length > 2) {
-                // This would actually search a database of locations
-                content.querySelector(`#district-info-${panelId}`).textContent = `Searching for "${searchTerm}" in locations...`;
-            }
-        });
+        // Create the interactive map
+        const mapContent = window.nightCityMap.createMapPanel();
+        content.appendChild(mapContent);
         
         return panel;
     });
@@ -2138,3 +2087,113 @@ window.createNotesPanel = function() {
 const createNotesPanel = function() {
     return window.createNotesPanel();
 };
+
+
+// Lore Browser Panel Implementation
+window.createLoreBrowserPanel = function() {
+    console.log('Creating Lore Browser Panel');
+    
+    if (typeof window.createPanel \!== 'function') {
+        console.error('createPanel function not available');
+        return null;
+    }
+    
+    const content = '<div id="lore-browser-content" style="height: 100%; display: flex; flex-direction: column;"></div>';
+    
+    const panel = window.createPanel({
+        title: 'Lore Database',
+        content: content,
+        width: 900,
+        height: 700,
+        x: Math.random() * (window.innerWidth - 900),
+        y: 100 + Math.random() * 200,
+        panelClass: 'lore-browser-panel'
+    });
+    
+    if (panel) {
+        // Load the lore browser scripts if not already loaded
+        if (typeof LoreDatabase === 'undefined') {
+            const loreDBScript = document.createElement('script');
+            loreDBScript.src = 'src/js/lore-database.js';
+            loreDBScript.onload = function() {
+                const loreBrowserScript = document.createElement('script');
+                loreBrowserScript.src = 'src/js/lore-browser.js';
+                loreBrowserScript.onload = function() {
+                    // Initialize lore browser after scripts load
+                    if (document.getElementById('lore-browser-content')) {
+                        window.loreBrowser = new LoreBrowser('lore-browser-content');
+                    }
+                };
+                document.head.appendChild(loreBrowserScript);
+            };
+            document.head.appendChild(loreDBScript);
+        } else {
+            // Scripts already loaded, just initialize
+            setTimeout(() => {
+                if (document.getElementById('lore-browser-content')) {
+                    window.loreBrowser = new LoreBrowser('lore-browser-content');
+                }
+            }, 100);
+        }
+    }
+    
+    return panel;
+};
+
+// Expose to global scope if needed
+const createLoreBrowserPanel = window.createLoreBrowserPanel;
+
+
+// Advanced Encounter Panel Implementation
+window.createAdvancedEncounterPanel = function() {
+    console.log('Creating Advanced Encounter Panel');
+    
+    if (typeof window.createPanel \!== 'function') {
+        console.error('createPanel function not available');
+        return null;
+    }
+    
+    const content = '<div id="encounter-panel-content" style="height: 100%; display: flex; flex-direction: column;"></div>';
+    
+    const panel = window.createPanel({
+        title: 'Advanced Encounter Generator',
+        content: content,
+        width: 900,
+        height: 700,
+        x: Math.random() * (window.innerWidth - 900),
+        y: 100 + Math.random() * 200,
+        panelClass: 'encounter-panel-advanced'
+    });
+    
+    if (panel) {
+        // Load the encounter generator scripts if not already loaded
+        if (typeof AdvancedEncounterGenerator === 'undefined') {
+            const genScript = document.createElement('script');
+            genScript.src = 'src/js/encounter-generator-advanced.js';
+            genScript.onload = function() {
+                const panelScript = document.createElement('script');
+                panelScript.src = 'src/js/encounter-panel-advanced.js';
+                panelScript.onload = function() {
+                    // Initialize encounter panel after scripts load
+                    if (document.getElementById('encounter-panel-content')) {
+                        window.encounterPanel = new AdvancedEncounterPanel('encounter-panel-content');
+                    }
+                };
+                document.head.appendChild(panelScript);
+            };
+            document.head.appendChild(genScript);
+        } else {
+            // Scripts already loaded, just initialize
+            setTimeout(() => {
+                if (document.getElementById('encounter-panel-content')) {
+                    window.encounterPanel = new AdvancedEncounterPanel('encounter-panel-content');
+                }
+            }, 100);
+        }
+    }
+    
+    return panel;
+};
+
+// Expose to global scope if needed
+const createAdvancedEncounterPanel = window.createAdvancedEncounterPanel;

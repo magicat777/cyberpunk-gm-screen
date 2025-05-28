@@ -1,19 +1,33 @@
 # Cyberpunk GM Screen
 
-A digital Game Master screen for the Cyberpunk RED tabletop roleplaying game.
+A comprehensive digital Game Master screen for the Cyberpunk RED tabletop roleplaying game, featuring rich content, advanced generators, and a sophisticated UI.
 
-This is the lightweight version featuring:
-- Draggable and resizable panels
+## Core Features
+
+### Panel System
+- Draggable and resizable panels with smooth animations
 - Layout save/restore with auto-save functionality
-- Multiple cyberpunk themes with theme switching
 - Import/export layouts as JSON files
-- Dice roller
-- Initiative tracker
-- Note taking with auto-save
-- Rules reference
-- Game timer
-- Character management with save/load functionality
-- NPC and loot generators with collections
+- Mobile-responsive design with tab-based navigation
+- Touch gesture support for tablets
+
+### Content & Tools
+- **Enhanced Dice Roller** with cyberpunk sound effects
+- **Advanced Combat Tracker** with initiative management
+- **Rich Text Notes** with markdown support and auto-save
+- **NPC Generator** with difficulty tiers and full stats
+- **Location Generator** for Night City districts
+- **Advanced Encounter Generator** with detailed scenarios
+- **Comprehensive Lore Database** with 50+ searchable entries
+- **Rules Quick Reference** with organized categories
+- **Campaign Manager** with data export/import
+
+### New in Phase 10
+- **Enhanced Typography System** with fluid responsive text
+- **Reading Mode** for comfortable long-form content viewing
+- **Automated Test Suite** for quality assurance
+- **Performance Optimization** with FPS monitoring
+- **Progressive Web App** support for offline use
 
 ## Features
 
@@ -38,6 +52,15 @@ This is the lightweight version featuring:
 - **Collections**: Save generated content for later reference
 
 ## Recent Improvements
+
+### Phase 10 - Enhanced Content & Typography
+- **Typography System**: Fluid responsive fonts with multiple families for different content types
+- **Lore Database**: 50+ entries covering corporations, districts, gangs, technology, and history
+- **Advanced Encounters**: Multi-phase scenarios with environmental details and NPC personalities
+- **Automated Testing**: Comprehensive test suite with performance benchmarking
+- **PWA Support**: Offline functionality with service worker caching
+
+### Previous Phases
 - **Major UI Modernization**: Complete rewrite with modern architecture ([See documentation](./docs/ui-modernization-artifacts/UI-MODERNIZATION-SUMMARY.md))
 - Added theme switching with Neon Synthwave, Tech Noir, and Minimal themes
 - Implemented central state management and event delegation
@@ -63,11 +86,21 @@ This is the lightweight version featuring:
    - `fonts/`: Custom fonts
    - `images/`: Icons and images
    - `js/`: JavaScript files
-     - `app-modern.js`: Modern modular implementation
-     - `debug-panel.js`: Debugging utilities
-     - `panel-fix.js`: Fixes for panel functionality
-     - `table-save.js`: Save functionality for generators
-     - `layout-save-improved.js`: Enhanced layout management
+     - Core Systems:
+       - `enhanced-panel-system-fixed.js`: Advanced panel management
+       - `performance-optimizer.js`: FPS monitoring and optimization
+       - `service-worker.js`: PWA offline support
+     - Panels & Features:
+       - `enhanced-dice-roller.js`: Dice rolling with sound effects
+       - `advanced-combat-tracker.js`: Initiative and combat management
+       - `npc-generator.js`: Detailed NPC creation
+       - `location-generator-implementation.js`: Night City locations
+       - `encounter-generator-advanced.js`: Rich encounter scenarios
+       - `lore-database.js` & `lore-browser.js`: Searchable lore system
+     - Utilities:
+       - `panel-test-suite.js`: Automated testing framework
+       - `sound-manager.js`: Cyberpunk audio effects
+       - `campaign-manager.js`: Data export/import
 - `docs/`: Project documentation
    - `ui-modernization-artifacts/`: UI modernization documentation and artifacts
    - `LAYOUT_SAVE_IMPROVED.md`: Documentation for layout system
@@ -83,11 +116,21 @@ The application supports three themes:
 
 To switch themes, use the theme selector in the top right corner of the toolbar.
 
-### Modern Version
-To use the modernized UI version with theme support:
-- Open `app-modern-refactored.html` for the latest version with accessibility improvements
-- Open `app-modern.html` for the previous modernized version
-- Open `app.html` for the original version
+### Getting Started
+1. Open `cyberpunk-gm-screen.html` in a modern web browser
+2. Use the side tray to create panels for your game session
+3. Drag panels to arrange your perfect layout
+4. Your layout auto-saves and will be restored on reload
+
+### Testing
+Run automated tests with: Open the browser console and type `runPanelTests()`
+
+### Keyboard Shortcuts
+- `Alt + Tab`: Switch between panels
+- `Esc`: Close active panel
+- `Ctrl + S`: Save current layout
+- `g`: Generate (in encounter panel)
+- `/`: Focus search (in lore browser)
 
 ## Development
 
@@ -103,6 +146,7 @@ To use the modernized UI version with theme support:
 
 ### Documentation
 For developers working on this project, please review:
+- [Phase 10 Summary - Enhanced Content](./docs/PHASE-10-SUMMARY.md)
 - [UI Modernization Summary](./docs/ui-modernization-artifacts/UI-MODERNIZATION-SUMMARY.md)
 - [Implementation Plan](./docs/ui-modernization-artifacts/UI-MODERNIZATION-IMPLEMENTATION-PLAN.md)
 - [Implementation Progress](./docs/ui-modernization-artifacts/UI-MODERNIZATION-IMPLEMENTATION-PROGRESS.md)
